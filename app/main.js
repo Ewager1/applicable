@@ -4,122 +4,129 @@ import { parseResume } from './resume/parse.js';
 import { loadBrowserFonts } from './pdf/fonts.js';
 import { createPdfBytes } from './pdf/render.js';
 
-const form = document.querySelector('#resume-form');
-const input = document.querySelector('#resume');
-const submit = document.querySelector('#create-pdf');
-const status = document.querySelector('#status');
-const errors = document.querySelector('#error-summary');
+const resumeForm = document.querySelector('#resume-form');
+const resumeInput = document.querySelector('#resume');
+const submitButton = document.querySelector('#create-pdf');
+const statusMessage = document.querySelector('#status');
+const errorSummary = document.querySelector('#error-summary');
 const errorList = document.querySelector('#error-list');
-const result = document.querySelector('#result');
-const preview = document.querySelector('#preview');
-const download = document.querySelector('#download');
-let revision = 0;
-let busy = false;
-let currentUrl;
-let fontData;
+const pdfResult = document.querySelector('#result');
+const pdfPreview = document.querySelector('#preview');
+const downloadLink = document.querySelector('#download');
+let sourceRevision = 0;
+let isGenerating = false;
+let currentPdfUrl;
+let loadedFontData;
 
 function resizeInput() {
-  input.style.height = 'auto';
-  input.style.height = `${input.scrollHeight}px`;
+  resumeInput.style.height = 'auto';
+  resumeInput.style.height = `${resumeInput.scrollHeight}px`;
 }
 function invalidatePdf() {
-  result.hidden = true;
-  preview.removeAttribute('src');
-  download.removeAttribute('href');
-  if (currentUrl) URL.revokeObjectURL(currentUrl);
-  currentUrl = undefined;
+  pdfResult.hidden = true;
+  pdfPreview.removeAttribute('src');
+  downloadLink.removeAttribute('href');
+  if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
+  currentPdfUrl = undefined;
 }
 function clearErrors() {
-  errors.hidden = true;
+  errorSummary.hidden = true;
   errorList.replaceChildren();
-  input.removeAttribute('aria-invalid');
-  input.setAttribute('aria-describedby', 'resume-help');
+  resumeInput.removeAttribute('aria-invalid');
+  resumeInput.setAttribute('aria-describedby', 'resume-help');
 }
+/** @param {import('./resume/types.js').ValidationError[]} items */
 function showErrors(items, invalidInput = true) {
   clearErrors();
   for (const item of items) {
-    const li = document.createElement('li');
-    li.textContent = item.line ? `Line ${item.line}: ${item.message}` : item.message;
-    errorList.append(li);
+    const errorItem = document.createElement('li');
+    errorItem.textContent = item.line ? `Line ${item.line}: ${item.message}` : item.message;
+    errorList.append(errorItem);
   }
-  errors.hidden = false;
-  if (invalidInput) input.setAttribute('aria-invalid', 'true');
-  input.setAttribute('aria-describedby', 'resume-help error-summary');
-  errors.focus();
+  errorSummary.hidden = false;
+  if (invalidInput) resumeInput.setAttribute('aria-invalid', 'true');
+  resumeInput.setAttribute('aria-describedby', 'resume-help error-summary');
+  errorSummary.focus();
 }
 function announce(message) {
-  if (status.textContent !== message) status.textContent = message;
+  if (statusMessage.textContent !== message) statusMessage.textContent = message;
 }
 
-input.addEventListener('input', () => {
-  revision++;
+resumeInput.addEventListener('input', () => {
+  sourceRevision++;
   invalidatePdf();
   clearErrors();
   resizeInput();
   announce('Resume updated. Create a PDF when you’re ready.');
 });
 window.addEventListener('resize', resizeInput);
-input.addEventListener('keydown', event => {
+resumeInput.addEventListener('keydown', event => {
   if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
     event.preventDefault();
-    if (!busy) form.requestSubmit(submit);
+    if (!isGenerating) resumeForm.requestSubmit(submitButton);
   }
 });
 
-form.addEventListener('submit', async event => {
+resumeForm.addEventListener('submit', async event => {
   event.preventDefault();
-  if (busy) return;
-  const source = input.value;
-  const generation = ++revision;
+  if (isGenerating) return;
+  const source = resumeInput.value;
+  const submissionRevision = ++sourceRevision;
   invalidatePdf();
   clearErrors();
-  const parsed = parseResume(source);
-  if (!parsed.ok) {
-    showErrors(parsed.errors);
+  const parseResult = parseResume(source);
+  if (!parseResult.ok) {
+    showErrors(parseResult.errors);
     announce('Check the details above, then create your PDF again.');
     return;
   }
-  busy = true;
-  submit.disabled = true;
-  submit.textContent = 'Creating PDF…';
-  form.setAttribute('aria-busy', 'true');
+  isGenerating = true;
+  submitButton.disabled = true;
+  submitButton.textContent = 'Creating PDF…';
+  resumeForm.setAttribute('aria-busy', 'true');
   announce('Creating your PDF…');
-  const isCurrent = () => revision === generation && input.value === source;
+  const isCurrentSubmission = () => sourceRevision === submissionRevision && resumeInput.value === source;
   try {
     // Failed loads are not cached: a later submission can retry without reloading.
-    if (!fontData) fontData = await loadBrowserFonts();
-    if (!isCurrent()) return;
+    if (!loadedFontData) loadedFontData = await loadBrowserFonts();
+    if (!isCurrentSubmission()) return;
     let pdfMake;
-    try { pdfMake = (await import('pdfmake/build/pdfmake.js')).default; }
-    catch { throw new Error('PDF creation could not be loaded. Restart Applicable and try again.'); }
-    if (!isCurrent()) return;
-    const bytes = await createPdfBytes(parsed.resume, pdfMake, fontData);
-    if (!isCurrent()) return;
-    currentUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-    download.href = currentUrl;
+    try {
+      pdfMake = (await import('pdfmake/build/pdfmake.js')).default;
+    } catch {
+      throw new Error('PDF creation could not be loaded. Restart Applicable and try again.');
+    }
+    if (!isCurrentSubmission()) return;
+    const pdfBytes = await createPdfBytes(parseResult.resume, pdfMake, loadedFontData);
+    if (!isCurrentSubmission()) return;
+    currentPdfUrl = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
+    downloadLink.href = currentPdfUrl;
     // Some browsers download iframe PDFs instead of displaying them. Do not
     // create a second automatic download when native inline viewing is absent.
-    preview.hidden = !navigator.pdfViewerEnabled;
-    if (navigator.pdfViewerEnabled) preview.src = currentUrl;
+    pdfPreview.hidden = !navigator.pdfViewerEnabled;
+    if (navigator.pdfViewerEnabled) pdfPreview.src = currentPdfUrl;
     document.querySelector('#preview-note').textContent = navigator.pdfViewerEnabled
       ? 'Preview the same file you download. If your browser cannot show the preview, use Download PDF to open it.'
       : 'Your browser does not display PDFs here. Use Download PDF to open your resume.';
-    result.hidden = false;
+    pdfResult.hidden = false;
     announce('Your PDF is ready. If the download hasn’t started, use Download PDF.');
-    download.click();
+    downloadLink.click();
     document.querySelector('#result-title').focus();
   } catch (error) {
-    if (!isCurrent()) return;
+    if (!isCurrentSubmission()) return;
     invalidatePdf();
     // A corrupt local font can be fetched again on the next attempt.
-    fontData = undefined;
-    showErrors([{ message: error instanceof Error ? error.message : 'The PDF could not be created. Please try again.', line: null }], false);
+    loadedFontData = undefined;
+    showErrors([{
+      message: error instanceof Error ? error.message : 'The PDF could not be created. Please try again.',
+      line: null,
+    }], false);
     announce('No PDF was created. Your resume text is still here.');
   } finally {
-    busy = false;
-    submit.disabled = false;
-    submit.textContent = 'Create PDF';
-    form.setAttribute('aria-busy', 'false');
+    isGenerating = false;
+    submitButton.disabled = false;
+    submitButton.textContent = 'Create PDF';
+    resumeForm.setAttribute('aria-busy', 'false');
   }
 });
 
@@ -137,5 +144,9 @@ copyButton.addEventListener('click', async () => {
     copyStatus.textContent = 'Select and copy the instructions below.';
   }
 });
-window.addEventListener('pagehide', () => { revision++; invalidatePdf(); announce('Create a PDF when you’re ready.'); });
+window.addEventListener('pagehide', () => {
+  sourceRevision++;
+  invalidatePdf();
+  announce('Create a PDF when you’re ready.');
+});
 resizeInput();
