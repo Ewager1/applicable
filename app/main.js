@@ -1,10 +1,12 @@
 import './styles.css';
 import chatbotInstructions from '../examples/chatbot-instruction.md?raw';
+import { resumeFilename } from './download-filename.js';
 import { parseResume } from './resume/parse.js';
 import { loadBrowserFonts } from './pdf/fonts.js';
 import { createPdfBytes } from './pdf/render.js';
 
 const resumeForm = document.querySelector('#resume-form');
+const companyInput = document.querySelector('#company');
 const resumeInput = document.querySelector('#resume');
 const submitButton = document.querySelector('#create-pdf');
 const statusMessage = document.querySelector('#status');
@@ -26,6 +28,7 @@ function invalidatePdf() {
   pdfResult.hidden = true;
   pdfPreview.removeAttribute('src');
   downloadLink.removeAttribute('href');
+  downloadLink.removeAttribute('download');
   if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
   currentPdfUrl = undefined;
 }
@@ -59,6 +62,12 @@ resumeInput.addEventListener('input', () => {
   resizeInput();
   announce('Resume updated. Create a PDF when you’re ready.');
 });
+companyInput.addEventListener('input', () => {
+  sourceRevision++;
+  invalidatePdf();
+  clearErrors();
+  announce('Company updated. Create a PDF when you’re ready.');
+});
 window.addEventListener('resize', resizeInput);
 resumeInput.addEventListener('keydown', event => {
   if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
@@ -71,6 +80,7 @@ resumeForm.addEventListener('submit', async event => {
   event.preventDefault();
   if (isGenerating) return;
   const source = resumeInput.value;
+  const company = companyInput.value;
   const submissionRevision = ++sourceRevision;
   invalidatePdf();
   clearErrors();
@@ -85,7 +95,7 @@ resumeForm.addEventListener('submit', async event => {
   submitButton.textContent = 'Creating PDF…';
   resumeForm.setAttribute('aria-busy', 'true');
   announce('Creating your PDF…');
-  const isCurrentSubmission = () => sourceRevision === submissionRevision && resumeInput.value === source;
+  const isCurrentSubmission = () => sourceRevision === submissionRevision && resumeInput.value === source && companyInput.value === company;
   try {
     // Failed loads are not cached: a later submission can retry without reloading.
     if (!loadedFontData) loadedFontData = await loadBrowserFonts();
@@ -101,6 +111,7 @@ resumeForm.addEventListener('submit', async event => {
     if (!isCurrentSubmission()) return;
     currentPdfUrl = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
     downloadLink.href = currentPdfUrl;
+    downloadLink.download = resumeFilename(parseResult.resume.title, company);
     // Some browsers download iframe PDFs instead of displaying them. Do not
     // create a second automatic download when native inline viewing is absent.
     pdfPreview.hidden = !navigator.pdfViewerEnabled;

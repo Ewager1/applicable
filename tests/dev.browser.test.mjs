@@ -39,7 +39,7 @@ test('a cold development cache exports a synthetic resume on the first submissio
     const downloaded = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
     const download = await downloaded;
-    assert.equal(download.suggestedFilename(), 'resume.pdf');
+    assert.equal(download.suggestedFilename(), 'Full-Stack Software Engineer Resume.pdf');
     const bytes = await readFile(await download.path());
     const pdf = await getDocument({ data: Uint8Array.from(bytes) }).promise;
     try {

@@ -14,6 +14,7 @@ Turn an entire resume copied from a chat into a consistently formatted PDF with 
 - Place the submit button above the input.
 - Accept the complete resume through copy and paste. File import is outside the initial scope.
 - Submit valid input to generate a downloadable PDF.
+- An optional company field affects only the download filename: professional title plus optional company, followed by “Resume.pdf”. It is outside the resume model and input format; company edits invalidate previous or pending output.
 - Keep the pasted text available after errors so the user can correct it.
 - Do not require individual job, bullet, or skill editors.
 - Every submission supplies the entire resume; no saved profile or resume history is required.
