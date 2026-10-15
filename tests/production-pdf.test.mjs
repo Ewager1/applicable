@@ -9,6 +9,11 @@ import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { renderPdf } from '../proof/pdf.mjs';
 import { parsedExample, stressFixture } from '../proof/production-fixtures.mjs';
 import { fontHashes, supportedRanges } from '../app/pdf/font-coverage.js';
+import { createRequire } from 'node:module';
+import { fonts } from '../app/pdf/fonts.js';
+import { documentDefinition } from '../app/pdf/document.js';
+const require = createRequire(import.meta.url);
+const fontkit = createRequire(require.resolve('pdfmake/package.json'))('@foliojs-fork/fontkit');
 
 const compact = value => value.replace(/\s/g, '');
 const values = resume => [resume.name, ...resume.contact.map(row => row.text), resume.title, resume.summary,
@@ -93,11 +98,33 @@ for (const kind of ['split-job', 'multi-page-bullet', 'long-values']) {
 }
 
 test('font coverage matches exact bundled assets and required glyphs', async () => {
+  let intersection;
   for (const [file, expected] of Object.entries(fontHashes)) {
     const bytes = await readFile(new URL(`../assets/fonts/${file}`, import.meta.url));
     assert.equal(createHash('sha256').update(bytes).digest('hex'), expected);
+    const font = fontkit.create(bytes);
+    const codes = font.characterSet.filter(code => font.hasGlyphForCodePoint(code));
+    intersection = intersection ? intersection.filter(code => codes.includes(code)) : codes;
   }
-  for (const character of 'résumé café “quotes” — •') assert.ok(supportedRanges.some(([first, last]) => character.codePointAt(0) >= first && character.codePointAt(0) <= last));
+  const generated = supportedRanges.flatMap(([first, last]) => Array.from({ length: last - first + 1 }, (_, index) => first + index));
+  assert.deepEqual(generated, intersection.sort((a, b) => a - b), 'Coverage is exactly the intersection of actual bundled font glyphs');
+  for (const character of 'résumé café “quotes” — • Δ Ж') assert.ok(supportedRanges.some(([first, last]) => character.codePointAt(0) >= first && character.codePointAt(0) <= last));
+});
+
+test('static Source Sans 3 files and PDF semantic styles use distinct real weights', async () => {
+  for (const [file, weight] of [['SourceSans3-Regular.ttf', 400], ['SourceSans3-Semibold.ttf', 600], ['SourceSans3-Bold.ttf', 700]]) {
+    const font = fontkit.create(await readFile(new URL(`../assets/fonts/${file}`, import.meta.url)));
+    assert.equal(font.postscriptName, file.replace('.ttf', ''));
+    assert.equal(font['OS/2'].usWeightClass, weight);
+    assert.deepEqual(font.variationAxes, {}, 'Bundled fonts are static TTFs');
+  }
+  const definition = documentDefinition(parsedExample);
+  assert.equal(fonts[definition.defaultStyle.font].normal, 'SourceSans3-Regular.ttf');
+  assert.equal(fonts[definition.defaultStyle.font].bold, 'SourceSans3-Bold.ttf');
+  assert.equal(fonts[definition.content.find(node => node.text === 'RELEVANT EXPERIENCE').font].normal, 'SourceSans3-Semibold.ttf');
+  const resume = structuredClone(parsedExample);
+  resume.summary += ' Greek Δ and Cyrillic Ж remain selectable.';
+  await inspect(resume);
 });
 
 test('paragraph breaks and structural tabs do not trigger glyph errors', async () => {

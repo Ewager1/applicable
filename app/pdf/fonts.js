@@ -1,12 +1,12 @@
-export const fontFiles = ['Poppins-Light.ttf', 'Poppins-SemiBold.ttf', 'Poppins-ExtraLight.ttf'];
+export const fontFiles = ['SourceSans3-Regular.ttf', 'SourceSans3-Semibold.ttf', 'SourceSans3-Bold.ttf'];
 export const fonts = {
-  Poppins: { normal: fontFiles[0], bold: fontFiles[1], italics: fontFiles[0], bolditalics: fontFiles[1] },
-  Heading: { normal: fontFiles[2], bold: fontFiles[2], italics: fontFiles[2], bolditalics: fontFiles[2] },
+  SourceSans3: { normal: fontFiles[0], bold: fontFiles[2], italics: fontFiles[0], bolditalics: fontFiles[2] },
+  SourceSans3Semibold: { normal: fontFiles[1], bold: fontFiles[1], italics: fontFiles[1], bolditalics: fontFiles[1] },
 };
 const fontUrls = [
-  new URL('../../assets/fonts/Poppins-Light.ttf', import.meta.url),
-  new URL('../../assets/fonts/Poppins-SemiBold.ttf', import.meta.url),
-  new URL('../../assets/fonts/Poppins-ExtraLight.ttf', import.meta.url),
+  new URL('../../assets/fonts/SourceSans3-Regular.ttf', import.meta.url),
+  new URL('../../assets/fonts/SourceSans3-Semibold.ttf', import.meta.url),
+  new URL('../../assets/fonts/SourceSans3-Bold.ttf', import.meta.url),
 ];
 
 /** Load only bundled local assets. The caller can retain the resulting map for later exports. */

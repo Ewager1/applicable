@@ -1,6 +1,6 @@
 import { supportedRanges } from './font-coverage.js';
 const accent = '#00786c';
-const heading = (text) => ({ text, font: 'Heading', color: accent, fontSize: 10, margin: [0, 13, 0, 7], headlineLevel: 1, keepOffset: text === 'SKILLS' ? 1 : 2 });
+const heading = (text) => ({ text, font: 'SourceSans3Semibold', color: accent, fontSize: 10, margin: [0, 13, 0, 7], headlineLevel: 1, keepOffset: text === 'SKILLS' ? 1 : 2 });
 const metadata = (left, right) => ({ columns: [{ text: left, width: '*' }, { text: right, width: 180, alignment: 'right' }], columnGap: 12, bold: true, fontSize: 11 });
 function verifyCharacters(resume) {
   const text = [resume.name, ...resume.contact.map(item => item.text), resume.title, resume.summary,
@@ -59,7 +59,7 @@ export function documentDefinition(resume) {
   return {
     info: { title: 'Applicable resume', author: 'Applicable' },
     pageSize: 'LETTER', pageMargins: [43, 43, 43, 43],
-    defaultStyle: { font: 'Poppins', fontSize: 10, lineHeight: 0.86 },
+    defaultStyle: { font: 'SourceSans3', fontSize: 10, lineHeight: 0.86 },
     content,
     // Re-evaluated after pagination so adjacent headings move with their content.
     pageBreakBefore: (node, followingNodesOnPage) => keepNext.has(node.id) && node.pageNumbers.length === 1 && !followingNodesOnPage.some(next => next.id === keepNext.get(node.id)),

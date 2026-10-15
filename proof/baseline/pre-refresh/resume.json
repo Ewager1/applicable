@@ -1,0 +1,99 @@
+{
+  "name": "Alex Morgan",
+  "contact": [
+    {
+      "text": "Portland, OR"
+    },
+    {
+      "text": "555-010-0142"
+    },
+    {
+      "text": "alex@example.com",
+      "link": "mailto:alex@example.com"
+    },
+    {
+      "text": "example.com/alex",
+      "link": "https://example.com/alex"
+    }
+  ],
+  "title": "Full-Stack Software Engineer",
+  "summary": "Product-focused software engineer building reliable web applications and thoughtful interfaces. Experienced in JavaScript, testing, integrations, and translating requirements into useful tools. Preserves source wording: résumé, café, “quoted text”, and an em dash — intact.",
+  "jobs": [
+    {
+      "employer": "Example Organization 1",
+      "role": "Software Engineer",
+      "dates": "2025 - 2026",
+      "location": "Portland, OR",
+      "bullets": [
+        "Project 1.1: Built accessible application screens with JavaScript, reusable components, and careful keyboard interaction.",
+        "Project 1.2: Improved production reliability with focused automated tests, explicit error handling, and practical release checks.",
+        "Project 1.3: Worked with design and operations teams to translate complex requirements into clear, maintainable software.",
+        "Project 1.4: Investigated slow data flows and simplified integration boundaries while preserving existing user behavior."
+      ]
+    },
+    {
+      "employer": "Example Organization 2",
+      "role": "Application Developer",
+      "dates": "2024 - 2025",
+      "location": "Remote",
+      "bullets": [
+        "Project 2.1: Built accessible application screens with JavaScript, reusable components, and careful keyboard interaction.",
+        "Project 2.2: Improved production reliability with focused automated tests, explicit error handling, and practical release checks.",
+        "Project 2.3: Worked with design and operations teams to translate complex requirements into clear, maintainable software.",
+        "Project 2.4: Investigated slow data flows and simplified integration boundaries while preserving existing user behavior."
+      ]
+    },
+    {
+      "employer": "Example Organization 3",
+      "role": "Application Developer",
+      "dates": "2023 - 2024",
+      "location": "Portland, OR",
+      "bullets": [
+        "Project 3.1: Built accessible application screens with JavaScript, reusable components, and careful keyboard interaction.",
+        "Project 3.2: Improved production reliability with focused automated tests, explicit error handling, and practical release checks.",
+        "Project 3.3: Worked with design and operations teams to translate complex requirements into clear, maintainable software.",
+        "Project 3.4: Investigated slow data flows and simplified integration boundaries while preserving existing user behavior."
+      ]
+    },
+    {
+      "employer": "Example Organization 4",
+      "role": "Application Developer",
+      "dates": "2022 - 2023",
+      "location": "Remote",
+      "bullets": [
+        "Project 4.1: Built accessible application screens with JavaScript, reusable components, and careful keyboard interaction.",
+        "Project 4.2: Improved production reliability with focused automated tests, explicit error handling, and practical release checks.",
+        "Project 4.3: Worked with design and operations teams to translate complex requirements into clear, maintainable software.",
+        "Project 4.4: Investigated slow data flows and simplified integration boundaries while preserving existing user behavior."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Example State University",
+      "qualification": "Bachelor of Science, Computer Science",
+      "dates": "2015 - 2019"
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Example Web Accessibility Certificate",
+      "dates": "2024",
+      "issuer": "Example Learning Institute"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Languages",
+      "items": "JavaScript, TypeScript, Python, SQL"
+    },
+    {
+      "category": "Frontend",
+      "items": "HTML, CSS, accessible interfaces, component systems"
+    },
+    {
+      "category": "Engineering",
+      "items": "Automated testing, Git, continuous integration, API integration"
+    }
+  ]
+}
