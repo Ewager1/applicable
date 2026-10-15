@@ -64,7 +64,7 @@ GitHub Actions is configured to run the same checks on pull requests to `main` a
 
 ## Using Applicable
 
-1. Prepare your complete resume using the [input format](docs/input-format.md). The in-app “Need the resume format?” section can copy reusable instructions for your chatbot.
+1. Prepare your complete resume using the [input format](docs/input-format.md). The in-app “Need the resume format?” section copies self-contained instructions asking your chatbot for literal `@@...@@` markers in one text code block. Use that code block’s **Copy** button to preserve its line breaks.
 2. Paste the result into **Your resume**, then select **Create PDF** above the field. You can also press Cmd/Ctrl + Enter while editing.
 3. The app downloads `resume.pdf` and shows the same PDF for review. Use **Download PDF** to download it again. If your browser cannot display PDFs inline, the download remains available without an embedded viewer.
 
@@ -88,7 +88,7 @@ The field grows with your text up to the available viewport, then scrolls. There
 
 Resume text stays in the current browser page; Applicable does not send it to a remote service, store a profile or save resume history. PDFs are generated locally and saved wherever your browser downloads files. Copying chatbot instructions is an explicit clipboard action; no chatbot is contacted by the app.
 
-- Use the documented format and include all seven required groups. Arbitrary free-form resumes and file uploads are unsupported.
+- Use the documented format and include all seven required groups. Prefer standalone `@@CONTACT@@`, `@@PROFESSIONAL_TITLE@@`, `@@SUMMARY@@`, `@@RELEVANT_EXPERIENCE@@`, `@@EDUCATION@@`, `@@CERTIFICATIONS@@`, `@@SKILLS@@`, with `@@JOB@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` entry boundaries. Legacy `#`/`##` markers still work, but unmarked headings are not inferred. Paste the code block’s contents, or one enclosing text code block; extra commentary and nested/unknown fences are rejected. Arbitrary free-form resumes and file uploads are unsupported.
 - Unsupported characters outside the bundled font's coverage produce a correction message instead of silently disappearing. See [template limits](docs/pdf-template.md).
 - Inline PDF viewing and automatic downloads depend on browser capabilities/settings. Use **Download PDF** when needed; no extra viewer installation is required.
 - If installation reports an unsupported Node version, check `node --version` in the same terminal and select a supported version before retrying `npm ci`.

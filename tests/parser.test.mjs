@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { parseResume } from '../app/resume/parse.js';
 
-const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
+const source = await readFile(new URL('./fixtures/legacy-resume.txt', import.meta.url), 'utf8');
 const blocks = source.trim().split(/\n(?=# )/);
 const blockName = block => block.split('\n')[0].slice(2);
 const replaceBlock = (name, replacement) => blocks.map(block => blockName(block) === name ? replacement : block).join('\n');
@@ -17,7 +17,7 @@ function rejected(text, message) {
   return result;
 }
 
-test('complete documented example preserves normalized resume data, links, and entry metadata', () => {
+test('legacy example preserves normalized resume data, links, and entry metadata', () => {
   const result = parseResume(source);
   assert.equal(result.ok, true, JSON.stringify(result.errors));
   assert.deepEqual(result.resume, {
@@ -111,13 +111,13 @@ test('unknown and duplicate sections report their location and never export part
   const unknown = rejected(`${source}\n# Awards\nAn award`, 'Unknown section');
   assert.equal(unknown.errors[0].line, source.split('\n').length + 1);
   rejected(`${source}\n# Skills\nOther: Something`, 'Skills appears more than once');
-  rejected('Unassigned text\n' + source, 'Put this content under a section heading');
+  rejected('Unassigned text\n' + source, 'Put this content under a section marker');
 });
 
 test('malformed/duplicate metadata and unsupported entry boundaries block export', () => {
   rejected(source.replace('Employer: Example Studio', 'Organization: Example Studio'), 'Unrecognized content in this job');
   rejected(source.replace('Role: Software Engineer', 'Role: Software Engineer\nRole: Another Role'), 'role appears more than once');
-  rejected(source.replace('## Job\n', ''), 'Start each job with ## Job');
+  rejected(source.replace('## Job\n', ''), 'Start each job with @@JOB@@');
   rejected(source.replace('## Education', '## University'), 'Start each education entry');
   rejected(source.replace('## Certification', '## Certificate'), 'Start each certification entry');
   rejected(source.replace('Name: Alex Morgan', 'Name: Alex Morgan\nName: Alex Morgan'), 'Name appears more than once');
@@ -162,11 +162,121 @@ test('contact links preserve destinations without inventing or executing markup'
 test('title extra lines, extra summary headings and code fences produce errors', () => {
   rejected(source.replace('Full-Stack Software Engineer', 'Full-Stack Software Engineer\nAnother line'), 'Use one plain-text line');
   rejected(source.replace('Product-focused engineer', '## Extra heading\nProduct-focused engineer'), 'Use plain-text paragraphs');
-  rejected('```text\n' + source + '\n```', 'Put this content under a section heading');
+  rejected('```javascript\n' + source + '\n```', 'Other code-block formats are not supported');
 });
 
 test('failures report the original source line without exposing a partial resume', () => {
   const input = source.replace('Role: Software Engineer', 'Unexpected field');
   const result = rejected(input, 'Unrecognized content in this job');
   assert.ok(result.errors.some(error => error.line === input.split('\n').findIndex(line => line === 'Unexpected field') + 1));
+});
+
+const symbolSource = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
+const symbolSections = ['CONTACT', 'PROFESSIONAL_TITLE', 'SUMMARY', 'RELEVANT_EXPERIENCE', 'EDUCATION', 'CERTIFICATIONS', 'SKILLS'];
+const symbolBlocks = symbolSource.trim().split(/\n(?=@@(?:CONTACT|PROFESSIONAL_TITLE|SUMMARY|RELEVANT_EXPERIENCE|EDUCATION|CERTIFICATIONS|SKILLS)@@)/);
+
+test('preferred symbol markers produce exactly the complete legacy model', () => {
+  assert.deepEqual(parseResume(symbolSource), parseResume(source));
+});
+
+test('symbol sections can reorder and repeat entries without sorting jobs or other content', () => {
+  const experience = symbolBlocks.find(block => block.startsWith('@@RELEVANT_EXPERIENCE@@'));
+  const jobs = experience.split(/\n(?=@@JOB@@)/).slice(1).reverse();
+  const reordered = symbolBlocks.slice().reverse().join('\n').replace(experience, `@@RELEVANT_EXPERIENCE@@\n${jobs.join('\n')}`)
+    .replace('Dates: 2016 - 2020', 'Dates: 2016 - 2020\n@@EDUCATION_ENTRY@@\nInstitution: Another Example School\nQualification: Example Diploma\nDates: 2021')
+    .replace('Dates: 2024', 'Dates: 2024\n@@CERTIFICATION@@\nTitle: Another Example Certificate\nIssuer: Example Institute\nDates: Current');
+  const result = parseResume(reordered);
+  assert.equal(result.ok, true, JSON.stringify(result.errors));
+  assert.deepEqual(result.resume.jobs.map(job => job.employer), ['Example Systems', 'Example Studio']);
+  assert.deepEqual(result.resume.education.map(entry => entry.qualification), ['Bachelor of Science, Computer Science', 'Example Diploma']);
+  assert.deepEqual(result.resume.certifications.map(entry => entry.title), ['Example Web Accessibility Certificate', 'Another Example Certificate']);
+});
+
+test('safe mixed symbol and legacy controls retain case/whitespace and line-ending tolerance', () => {
+  const mixed = symbolSource.replace('@@CONTACT@@', ' # CONTACT ').replace('@@PROFESSIONAL_TITLE@@', '# professional  title')
+    .replace('@@JOB@@', '## JOB').replace('@@EDUCATION@@', '# Education').replace('@@CERTIFICATION@@', '## Certification')
+    .replace('@@SUMMARY@@', '  @@summary@@  ').replace(/\n/g, '\r\n');
+  assert.deepEqual(parseResume(mixed), parseResume(source));
+});
+
+for (const marker of symbolSections) {
+  test(`symbol ${marker}: missing and blank content still blocks export`, () => {
+    const title = marker.toLowerCase().replaceAll('_', ' ');
+    const block = symbolBlocks.find(block => block.startsWith(`@@${marker}@@`));
+    const missing = parseResume(symbolBlocks.filter(value => value !== block).join('\n'));
+    const blank = parseResume(symbolBlocks.map(value => value === block ? `@@${marker}@@\n \t` : value).join('\n'));
+    for (const result of [missing, blank]) {
+      assert.equal(result.ok, false);
+      assert.equal(Object.hasOwn(result, 'resume'), false);
+      assert.ok(result.errors.some(error => error.message.toLowerCase().includes(title)));
+    }
+  });
+}
+
+test('symbol format keeps required fields and rejects malformed or wrong entry boundaries', () => {
+  rejected(symbolSource.replace('Name: Alex Morgan', 'Name:  '), 'Add your name');
+  rejected(symbolSource.replace('Issuer: Example Learning Institute', 'Issuer:  '), 'Add issuer');
+  rejected(symbolSource.replace('Languages: JavaScript, TypeScript, Python, SQL', 'Languages:'), 'Add a skill category');
+  rejected(symbolSource.replace('@@EDUCATION_ENTRY@@', '@@JOB@@'), 'Start each education entry with @@EDUCATION_ENTRY@@');
+  rejected(symbolSource + '\n# Skills\nOther: Something', 'Skills appears more than once');
+});
+
+test('unknown/malformed/start-of-line symbol controls never silently become prose', () => {
+  for (const marker of ['@@AWARDS@@', '@@SUMMARY@', '@SUMMARY@', 'SUMMARY@@', '@@SUMMARY@@ trailing text', '@@ PROFESSIONAL_TITLE @@', '@@JOB@@@@JOB@@']) {
+    const input = symbolSource.replace('@@SUMMARY@@', `@@SUMMARY@@\n${marker}`);
+    const result = rejected(input, 'recognized @@MARKER@@ on its own line');
+    assert.equal(result.errors[0].line, input.split('\n').indexOf(marker) + 1);
+  }
+  rejected(symbolSource.replace('@@SUMMARY@@', '@@SUMMARY@@\n@@JOB@@'), 'Use plain-text paragraphs');
+});
+
+test('inline symbol-looking content remains literal in values, summary, bullets and skills', () => {
+  const input = symbolSource.replace('Name: Alex Morgan', 'Name: Alex @@ Morgan')
+    .replace('Product-focused engineer', 'Explained @@PLACEHOLDER@@ tokens. Product-focused engineer')
+    .replace('- Improved release reliability with focused automated checks.', '- Explained @@JOB@@ tokens without changing them.')
+    .replace('Languages: JavaScript, TypeScript, Python, SQL', 'Languages: JavaScript, @@EXAMPLE@@, JavaScript');
+  const result = parseResume(input);
+  assert.equal(result.ok, true, JSON.stringify(result.errors));
+  assert.equal(result.resume.name, 'Alex @@ Morgan');
+  assert.ok(result.resume.summary.startsWith('Explained @@PLACEHOLDER@@ tokens.'));
+  assert.equal(result.resume.jobs[0].bullets[1], 'Explained @@JOB@@ tokens without changing them.');
+  assert.equal(result.resume.skills[0].items, 'JavaScript, @@EXAMPLE@@, JavaScript');
+});
+
+test('one optional outer plain/text code block works without shifting source line numbers', () => {
+  for (const language of ['', 'text', 'plaintext', 'TEXT']) {
+    assert.deepEqual(parseResume(`\n\u0060\u0060\u0060${language}\n${symbolSource}\n\u0060\u0060\u0060\n`), parseResume(symbolSource));
+  }
+  const input = '\n```text\n' + symbolSource.replace('Role: Software Engineer', 'Role: Software Engineer\nRole: Duplicate role') + '\n```\n';
+  const result = rejected(input, 'role appears more than once');
+  assert.ok(result.errors.some(error => error.line === input.split('\n').indexOf('Role: Duplicate role') + 1));
+});
+
+test('unknown, nested, unclosed and exterior-content fences block the entire resume', () => {
+  const invalid = [
+    '```javascript\n' + symbolSource + '\n```',
+    '```text\n' + symbolSource,
+    'Commentary before\n```text\n' + symbolSource + '\n```',
+    '```text\n' + symbolSource + '\n```\nCommentary after',
+    '~~~text\n' + symbolSource + '\n~~~',
+    '```text\n```text\n' + symbolSource + '\n```\n```',
+  ];
+  for (const input of invalid) {
+    const result = parseResume(input);
+    assert.equal(result.ok, false);
+    assert.equal(Object.hasOwn(result, 'resume'), false);
+    assert.equal(result.errors.length, 1, 'One actionable fence error instead of cascaded warnings');
+    assert.ok(result.errors[0].message.includes('code block'));
+  }
+});
+
+test('unmarked resumes and missing entry controls get concise errors without heading inference', () => {
+  const unmarked = symbolSource.replace(/^@@([^\n]+)@@$/gm, (_, name) => name.replaceAll('_', ' '));
+  const result = rejected(unmarked, 'section marker');
+  assert.equal(result.errors.length, 1);
+  assert.equal(result.errors[0].line, 1);
+  const jobs = rejected(symbolSource.replaceAll('@@JOB@@\n', ''), 'Start each job with @@JOB@@');
+  assert.equal(jobs.errors.length, 1);
+  const preamble = rejected('A name\nA contact detail\nMore commentary\n' + symbolSource, 'section marker');
+  assert.equal(preamble.errors.length, 1);
 });

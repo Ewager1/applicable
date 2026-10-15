@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1–A5 are merged, closed and Done. A6 clean-source verification is complete; final CI, merge and issue closure are tracked in [issue #6](https://github.com/Ewager1/applicable/issues/6). See [verification evidence](verification.md).
+Status: A1–A6 are complete. Post-plan [issue #13](https://github.com/Ewager1/applicable/issues/13) adds copy-safe symbol markers; implementation is awaiting independent review and CI.
 
 ## Workflow
 
@@ -122,6 +122,14 @@ Dependencies: A5.
 | 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) | Merged, closed and Done |
 | 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) | Merged, closed and Done |
 | 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | Merged, closed and Done |
-| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Verification complete; see issue for CI/merge/closure |
+| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Complete |
 
 Completed implementation PRs: [A1 #7](https://github.com/Ewager1/applicable/pull/7), [A2 #8](https://github.com/Ewager1/applicable/pull/8), [A3 #9](https://github.com/Ewager1/applicable/pull/9), [A4 #10](https://github.com/Ewager1/applicable/pull/10), [A5 #11](https://github.com/Ewager1/applicable/pull/11).
+
+## Post-plan fixes
+
+### Issue #13: Chat-safe resume markers
+
+Prefer explicit standalone `@@...@@` section/entry controls so copying rendered Markdown does not remove structural headings. Preserve legacy and mixed-format compatibility, required content checks, source ordering and original line numbers. Accept one enclosing text fence; reject malformed/unknown controls and unsafe fence/exterior content with concise guidance. Update the chatbot instruction, synthetic example, UI help and documentation. Unmarked-heading inference, dependencies, PDF layout changes and personal-data fixtures are out of scope.
+
+Tracking: [issue #13](https://github.com/Ewager1/applicable/issues/13), Applicable project board. Follow the same branch, test, review, CI, merge and cleanup gates as the initial plan.
