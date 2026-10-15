@@ -135,7 +135,7 @@ for (const kind of ['unavailable', 'corrupt']) {
   test(`${kind} local font failure is recoverable by retrying the same text`, async t => {
     const page = await openPage(t);
     let fail = true;
-    await page.route(/Poppins-.*\.ttf/, route => fail ? route.fulfill({ status: kind === 'unavailable' ? 503 : 200, contentType: 'font/ttf', body: 'not a font' }) : route.continue());
+    await page.route(/SourceSans3-.*\.ttf/, route => fail ? route.fulfill({ status: kind === 'unavailable' ? 503 : 200, contentType: 'font/ttf', body: 'not a font' }) : route.continue());
     const input = page.getByLabel('Your resume', { exact: true });
     const downloads = [];
     page.on('download', download => downloads.push(download));
@@ -154,13 +154,13 @@ test('edits during pending fonts discard stale output and repeated submissions d
   const page = await openPage(t);
   let release;
   const held = new Promise(resolve => { release = resolve; });
-  await page.route(/Poppins-Light-.*\.ttf/, async route => { await held; await route.continue(); });
+  await page.route(/SourceSans3-Regular-.*\.ttf/, async route => { await held; await route.continue(); });
   const input = page.getByLabel('Your resume', { exact: true });
   const downloads = [];
   page.on('download', download => downloads.push(download));
   try {
     await input.fill(source);
-    const request = page.waitForRequest(/Poppins-Light-.*\.ttf/);
+    const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
     await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
     await request;
     assert.equal(await page.locator('#create-pdf').isDisabled(), true);

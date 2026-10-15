@@ -15,6 +15,9 @@ for (const [kind, expectedPages] of [['short', 1], ['typical', 2], ['long', 3]])
   test(`${kind}: complete selectable text, local fonts, links, bounds and pagination`, async () => {
     const resume = fixture(kind);
     const bytes = await renderPdf(resume);
+    const raw = Buffer.from(bytes).toString('latin1');
+    for (const weight of ['Regular', 'Semibold', 'Bold']) assert.match(raw, new RegExp(`/BaseFont /[A-Z]+\\+SourceSans3-${weight}\\b`), `Real ${weight} identity is embedded`);
+    assert.doesNotMatch(raw, /Poppins/);
     assert.ok(Buffer.from(bytes).toString('latin1').match(/\/FontFile2/g)?.length >= 3, 'All three TrueType weights are embedded');
     const pdf = await getDocument({ data: Uint8Array.from(bytes), useSystemFonts: false }).promise;
     try {

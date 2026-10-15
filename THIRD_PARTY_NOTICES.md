@@ -4,7 +4,9 @@ Applicable's original code is licensed under [MIT](LICENSE), copyright 2026 Ewag
 
 ## Included fonts
 
-The unchanged Poppins Light, SemiBold and ExtraLight font files in `assets/fonts/` are copyright 2020 The Poppins Project Authors and licensed under SIL Open Font License 1.1. The complete original [copyright and OFL text](assets/fonts/OFL.txt) is retained beside them. Font authors/source: [Poppins](https://github.com/itfoundry/Poppins), distributed through [Google Fonts](https://github.com/google/fonts/tree/main/ofl/poppins). Keep that license when redistributing the font files. Generated PDFs embed subsets of these fonts.
+The unchanged Source Sans 3 Regular, Semibold and Bold static TTFs in `assets/fonts/` are copyright 2010–2022 Adobe and licensed under SIL Open Font License 1.1, with Reserved Font Name “Source”. The complete original [copyright and OFL text](assets/fonts/OFL.txt) is retained beside them. The [source/version record](assets/fonts/SOURCE.md) identifies Adobe’s official 3.052R release, pinned source commit, exact archive and real weight identities. Keep the license when redistributing the font files. Generated PDFs embed subsets of these fonts.
+
+Historical synthetic Poppins PDF baselines are deliberately retained for visual comparison, including the frozen pre-refresh two-page sample in `proof/baseline/pre-refresh/`. Its [original Poppins OFL license](proof/baseline/pre-refresh/Poppins-OFL.txt) is retained separately; no Poppins TTF remains in active assets.
 
 ## Direct dependencies
 

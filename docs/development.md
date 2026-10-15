@@ -6,7 +6,7 @@
 - `app/resume/parse.js`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors.
 - `examples/`: synthetic canonical resume and reusable chatbot instruction.
 - `app/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
-- `assets/fonts/`: bundled Poppins fonts and their OFL license, retained from the rendering investigation.
+- `assets/fonts/`: bundled Source Sans 3 static Regular/Semibold/Bold fonts, source record and OFL license.
 - `proof/`: synthetic PDF renderer, fixtures, baseline and PDF/browser verification. Its data model is not yet the text input contract.
 - `tests/`: browser launch options, temporary-server ownership and a built-artifact smoke test.
 - `vite.config.js`: application root, relative built asset paths, loopback-only servers and `dist/` output.

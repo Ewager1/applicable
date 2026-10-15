@@ -42,7 +42,7 @@ The same document definition and bundled fonts generate the Node verification sa
 
 ### Typography and layout
 
-Local reference inspection found US Letter pages, approximately 43 pt margins, Poppins Light 10 pt body, Poppins SemiBold 18 pt name and 11 pt job headers, and Poppins ExtraLight 10 pt accent headings. The proof uses those weights and sizes with accent `#00786c`, approximately 12 pt body baselines, hanging bullets, right-aligned metadata, and bold flowing skill categories. It follows the reference's single-column structure and heading order. The original reference remains outside this repository.
+Local reference inspection found US Letter pages, approximately 43 pt margins, Poppins Light 10 pt body, Poppins SemiBold 18 pt name and 11 pt job headers, and Poppins ExtraLight 10 pt accent headings. Those original weights are preserved only in the historical pre-refresh baseline. B1 now uses Source Sans 3 Regular body, Semibold section headings and Bold bold text, retaining those sizes with accent `#00786c`, approximately 12 pt body baselines, hanging bullets, right-aligned metadata, and bold flowing skill categories. It follows the reference's single-column structure and heading order. The original reference remains outside this repository.
 
 Every top-level heading/job header is linked to its next content block when pagination is calculated, avoiding orphan headers. Jobs can continue across pages. There is no fixed page limit, no truncation, and no automatic shrinking to hit a page count.
 
@@ -51,7 +51,7 @@ Every top-level heading/job header is linked to its next content block when pagi
 | Dependency | Purpose | License / source |
 | --- | --- | --- |
 | pdfmake 0.2.20 | Only product dependency; browser PDF generation | MIT, installed `node_modules/pdfmake/LICENSE`; [official source](https://github.com/bpampuch/pdfmake/tree/0.2.20), [browser documentation](https://pdfmake.github.io/docs/0.1/getting-started/client-side/) |
-| Poppins Light, SemiBold, ExtraLight | Local fonts, embedded/subset into generated PDFs | SIL OFL 1.1; full license and copyright in `assets/fonts/OFL.txt`; [Google Fonts source](https://github.com/google/fonts/tree/main/ofl/poppins), [upstream authors](https://github.com/itfoundry/Poppins) |
+| Source Sans 3 Regular, Semibold, Bold | Local static TTFs, embedded/subset into generated PDFs | SIL OFL 1.1; full license in `assets/fonts/OFL.txt`; [Adobe release/source record](../assets/fonts/SOURCE.md) |
 | pdfjs-dist 4.10.38 | Test-only text, annotation and geometry inspection | Apache 2.0, installed `node_modules/pdfjs-dist/LICENSE`; [official source](https://github.com/mozilla/pdf.js) |
 | Playwright 1.62.1 | Test-only real browser downloads and preview checks | Apache 2.0, installed `node_modules/playwright/LICENSE`; [official source](https://github.com/microsoft/playwright) |
 
@@ -61,14 +61,14 @@ Font files and the OFL were downloaded from `https://raw.githubusercontent.com/g
 
 - Native PDF preview was verified in desktop Chrome. Other browsers, mobile devices, and browsers configured to download every PDF may not render inline. Download remains available. No separate viewer is needed or included in the product proof.
 - Browser PDF controls, zoom and antialiasing vary. The preview is the exact exported artifact, but viewport appearance need not match other PDF viewers pixel for pixel.
-- Font coverage is bounded by these Poppins files. Accented Latin text, curly quotes and an em dash are verified. A4 adds glyph coverage checks that block unsupported displayed characters with a recoverable message; no glyph is silently dropped. See the production template document.
+- Font coverage is bounded by the bundled Source Sans 3 files. Accented Latin text, curly quotes and an em dash are verified. A4 adds glyph coverage checks that block unsupported displayed characters with a recoverable message; no glyph is silently dropped. See the production template document.
 - A4 verifies long unbroken tokens, long wrapping metadata, a job continued across pages and one bullet continued across three pages. Nonsensical multi-page header blocks remain outside the practical resume-layout claim; no arbitrary-document fidelity claim is made.
 - PDFs are searchable/selectable but are not tagged accessibility PDFs. The proof's automated bounds checks complement visual review; they do not prove the absence of every possible overlap.
 - Styling is a close reference-based baseline, not a claim of exact reproduction for every input. No parsing, rewriting, storage, external AI or resume validation is implemented.
 
 ## Retained baseline and layout checklist
 
-`baseline/typical.pdf` is a reviewed **synthetic-only** visual baseline, intentionally refreshed in A4 for corrected education/certification metadata and bounded wrapping columns after all affected pages were inspected. It is intentionally retained; generated scratch output stays ignored. Regenerate from `fixture('typical')` after a proposed layout change, compare it against this baseline, and update the baseline only after reviewing every affected page. Byte-for-byte identity is not a regression requirement because PDF internal identifiers can vary.
+`baseline/typical.pdf` is a reviewed **synthetic-only** visual baseline, intentionally refreshed in B1 for the real Source Sans 3 weights after short/typical/long pages were inspected. The old exactly two-page Poppins output and identical frozen data remain in `baseline/pre-refresh/` for B2 comparison, with their original license. It is intentionally retained; generated scratch output stays ignored. Regenerate from `fixture('typical')` after a proposed layout change, compare it against this baseline, and update the baseline only after reviewing every affected page. Byte-for-byte identity is not a regression requirement because PDF internal identifiers can vary.
 
 Review recorded on 2026-10-15: all 14 pages in short (1), typical (2), long (3), parsed (1), split-job (2), multi-page-bullet (3) and long-values (2) were rendered with Poppler and visually inspected. The Chrome preview was also inspected. The following checklist passed:
 

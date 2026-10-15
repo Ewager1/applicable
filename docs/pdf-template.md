@@ -15,7 +15,7 @@ The UI parses the entire source, loads/caches local fonts and awaits generation.
 
 ## Reference layout
 
-US Letter, 43 pt margins, Poppins Light 10 pt body, SemiBold 18 pt teal name and 11 pt entry headers, ExtraLight 10 pt teal section headings, accent `#00786c`, and approximately 12 pt body baselines remain the reference baseline. Contact information, title and summary do not acquire visible uppercase headings.
+US Letter, 43 pt margins, Source Sans 3 Regular 10 pt body, Bold 18 pt accent name and 11 pt entry headers, Semibold 10 pt accent section headings, accent `#00786c`, and approximately 12 pt body baselines remain the reference baseline. Contact information, title and summary do not acquire visible uppercase headings.
 
 Experience uses the supplied job order, employer/dates followed by role/location, with hanging bullets. Right metadata occupies a bounded 180 pt column with a 12 pt gap so long supplied metadata wraps without expanding beyond the page or colliding with the left column. Education renders **qualification first**, followed by institution and dates aligned right. Certification renders **title and dates**, followed by issuer. Skills preserve category/item order and use bold labels with flowing text.
 
@@ -25,7 +25,7 @@ All supplied text is selectable/searchable. Explicit links retain their target; 
 
 ## Font coverage and errors
 
-The three bundled Poppins weights share 471 code points. The font files' actual character maps generate a compact intersection table, ensuring that each supplied displayed character can be shown in every template weight. Newlines, carriage returns and tabs used for structural whitespace are allowed. Other control characters and unmapped glyphs cause a recoverable error listing the first unsupported characters and their Unicode code points; nothing is silently removed, replaced with a box, transliterated or downloaded remotely.
+The three bundled Source Sans 3 static weights share 1,614 code points. The font files' actual character maps generate a compact intersection table, ensuring that each supplied displayed character can be shown in every template weight. Newlines, carriage returns and tabs used for structural whitespace are allowed. Other control characters and unmapped glyphs cause a recoverable error listing the first unsupported characters and their Unicode code points; nothing is silently removed, replaced with a box, transliterated or downloaded remotely.
 
 Coverage checks apply to displayed text, **not hidden link destinations**. Latin accents, curly quotes, bullets and em dashes are verified. Many scripts and emoji are outside these bundled fonts; the user must correct those characters in the source before export. A broader fallback-font system would be a separate explicit decision.
 
@@ -36,7 +36,7 @@ npm run fonts:coverage
 npm test
 ```
 
-The development generator uses the font reader already shipped with the pinned pdfmake dependency, not a new runtime package. Tests verify the coverage artifact against SHA-256 hashes of each bundled font. Re-run visual checks and update the baseline after any font change. Font licenses remain in `assets/fonts/OFL.txt`; no new fonts or dependencies were added in A4.
+The development generator uses the font reader already shipped with the pinned pdfmake dependency, not a new runtime package. Tests verify the coverage artifact against SHA-256 hashes of each bundled font. Re-run visual checks and update the baseline after any font change. The current Source Sans 3 license and pinned Adobe source record are in `assets/fonts/`; B1 replaces the fonts without adding runtime dependencies.
 
 ## Reproduce and verify
 
@@ -51,3 +51,9 @@ Browser checks use installed Chrome by default; see the main README to select pi
 Automated checks inspect every fixture field, production order, deliberately reversed jobs, bold education hierarchy, all link targets, embedded fonts, page bounds, same-baseline horizontal overlap, section/header adjacency and glyph rejection. Native-browser checks still verify real downloads, exact preview/download byte identity and no remote network requests. Automated bounds/overlap checks complement visual review; they do not establish every possible visual property for arbitrary input.
 
 Visual review recorded 2026-10-15: all 14 pages from the seven generated fixtures were rendered with Poppler and inspected. No clipping, text overlap, blank pages or missing fixture text was observed. Metadata wraps within its columns, the explicit job/bullet continuations remain readable, and the education/certification hierarchy matches the reference. The reviewed `proof/baseline/typical.pdf` was intentionally refreshed for the corrected education/certification layout and metadata wrapping. Continue using the layout checklist in `proof/README.md` for later changes.
+
+## B1 font-only refresh
+
+Adobe Source Sans 3.052R static Regular 400, Semibold 600 and Bold 700 replace all active Poppins paths. Body uses Regular; section headings use Semibold; existing bold text uses the actual Bold file. Sizes, color, margins, metadata styles and line spacing remain unchanged until B2. Tests verify font identity, static weights, embedded PDF names, exact common glyph coverage, text/link retention, layout bounds and recoverable missing/corrupt-font failures. Greek Δ and Cyrillic Ж now pass real PDF extraction; emoji and CJK remain unsupported. Coverage is a cmap/glyph availability guarantee, not a claim of correct shaping for every writing system.
+
+Before the swap, the identical content-heavy synthetic fixture and exactly two-page Poppins PDF were frozen in `proof/baseline/pre-refresh/`. The current `proof/baseline/typical.pdf` is the reviewed B1 output from identical data. Short/typical/long Source Sans outputs remain 1/2/3 pages. All 14 pages across the seven regenerated fixtures were visually inspected with Poppler, including split-job, multi-page-bullet and long-value stress cases. Review found no clipping, overlap, blank pages or orphaned section/job headers; text wraps more compactly with the new metrics. B2 must use the frozen fixture and old PDF for its comparison rather than resetting the source content.

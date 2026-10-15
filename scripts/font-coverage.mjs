@@ -4,10 +4,10 @@ import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 const require = createRequire(import.meta.url);
 const fontkit = createRequire(require.resolve('pdfmake/package.json'))('@foliojs-fork/fontkit');
-const files = ['Poppins-Light.ttf', 'Poppins-SemiBold.ttf', 'Poppins-ExtraLight.ttf'];
+import { fontFiles } from '../app/pdf/fonts.js';
 const hashes = {};
 let supported;
-for (const file of files) {
+for (const file of fontFiles) {
   const bytes = await readFile(new URL(`../assets/fonts/${file}`, import.meta.url));
   const font = fontkit.create(bytes);
   const codes = font.characterSet.filter(code => font.hasGlyphForCodePoint(code));

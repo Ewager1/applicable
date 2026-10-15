@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1–A6 and the copy-safe marker fix (#13) are complete. Post-plan [issue #15](https://github.com/Ewager1/applicable/issues/15) tracks development PDF-cache recovery and isolated cold-cache verification through the normal review and CI gates.
+Status: A1–A6 and the copy-safe marker fix (#13) are complete. Development-cache fix #15 is complete. B1 [issue #17](https://github.com/Ewager1/applicable/issues/17) implements Source Sans 3 fonts pending review/CI; B2 follows sequentially.
 
 ## Workflow
 
@@ -139,3 +139,13 @@ Tracking: [issue #13](https://github.com/Ewager1/applicable/issues/13), Applicab
 Document safe recovery from `504 Outdated Optimize Dep` without losing the draft: copy source, stop only Applicable, restart with a forced cache rebuild, then reload. Stop before dependency installation/cache removal. Add an actual first-submission development-browser PDF export check using a unique cold temporary cache and owned ephemeral server, preserving the live development cache. Verify no failed/remote requests, one download, PDF text and matching delivered bytes. Keep the existing lazy import and optimizer defaults unless evidence justifies changing them.
 
 Tracking: [issue #15](https://github.com/Ewager1/applicable/issues/15), Applicable project board. Local recovery is confirmed; automated verification and PR integration follow the normal review, CI and cleanup gates.
+
+## PDF visual refresh
+
+### B1 — Source Sans 3 font foundation (#17)
+
+Bundle authoritative Adobe static Regular 400, Semibold 600 and Bold 700 TTFs locally, retain source revision/license, register distinct real weights and update glyph coverage/embedding verification. Body uses Regular and section headings Semibold. Preserve all content, ordering, links and local export behavior. Before changing fonts, retain an exactly two-page synthetic Poppins PDF and identical fixture for B2. Inspect short/typical/long outputs and run the full suite. No UI/parser/data model changes; size/color/dividers are B2. Tracking: [#17](https://github.com/Ewager1/applicable/issues/17), Applicable project.
+
+### B2 — PDF hierarchy and dividers (#18, after B1)
+
+Complete the separately requested size/color/metadata/divider hierarchy using the B1 font foundation. Compare the identical frozen `proof/baseline/pre-refresh/resume.json` against its old Poppins PDF; preserve content and review all page transitions. Implement only after B1 merges, on its own issue branch with the normal tests/review/CI gates. Tracking: [#18](https://github.com/Ewager1/applicable/issues/18), Applicable project; follow its confirmed acceptance details.

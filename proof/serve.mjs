@@ -1,12 +1,13 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { fontFiles } from '../app/pdf/fonts.js';
 const routes = new Map([
   ['/', ['proof/index.html', 'text/html']],
   ...['browser.mjs', 'fixtures.mjs', 'document.mjs'].map(file => [`/proof/${file}`, [`proof/${file}`, 'text/javascript']]),
   ...['document.js', 'fonts.js', 'font-coverage.js', 'render.js'].map(file => [`/app/pdf/${file}`, [`app/pdf/${file}`, 'text/javascript']]),
   ['/node_modules/pdfmake/build/pdfmake.min.js', ['node_modules/pdfmake/build/pdfmake.min.js', 'text/javascript']],
-  ...['Light', 'SemiBold', 'ExtraLight'].map(weight => [`/assets/fonts/Poppins-${weight}.ttf`, [`assets/fonts/Poppins-${weight}.ttf`, 'font/ttf']]),
+  ...fontFiles.map(file => [`/assets/fonts/${file}`, [`assets/fonts/${file}`, 'font/ttf']]),
 ]);
 const root = new URL('../', import.meta.url);
 const server = createServer(async (request, response) => {

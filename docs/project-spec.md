@@ -61,7 +61,7 @@ Required labels, minimum entry values, whitespace normalization, indented bullet
 ### PDF presentation
 
 - Use one fixed template closely matching the supplied reference resumes.
-- Match font appearance, font sizes, spacing, margins, indentation, and teal accents as closely as practical.
+- Use locally bundled Source Sans 3 Regular (body), Semibold (section headings) and Bold, as confirmed for the B1 PDF refresh. B2 separately updates size/color hierarchy, metadata and dividers; keep the fixed template and preserve content.
 - Use a single-column layout with the name and contact details at the top, followed by professional title and summary.
 - Use consistent section headings; align employment dates and locations on the right as in the references.
 - Bold skill categories and render their items as flowing text.
