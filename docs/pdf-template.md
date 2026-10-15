@@ -1,6 +1,6 @@
 # Production PDF template
 
-A4 promotes the verified single-column template into `app/pdf/`. The synthetic proof and production adapter use this same document definition; there is no separate HTML approximation or second layout implementation. The paste interface remains A5 work.
+A4 promotes the verified single-column template into `app/pdf/`. The synthetic proof and production adapter use this same document definition; there is no separate HTML approximation or second layout implementation. A5 connects the paste interface to this shared template and local font loader.
 
 ## Modules and use
 
@@ -11,7 +11,7 @@ A4 promotes the verified single-column template into `app/pdf/`. The synthetic p
 - `proof/document.mjs`: compatibility re-exports of the production template.
 - `proof/pdf.mjs`: Node-only development adapter reading the same fonts from disk.
 
-The UI should load/cache the local fonts, parse the entire source, then await generation. On success it can create one Blob URL for preview and download. If parsing or rendering fails, it must preserve the input, show the error message, and offer no new/partial PDF. `createPdfBytes` rejects with an `Error` for unsupported displayed characters, unusable link destinations, missing/corrupt font data or a stream/engine failure. The pinned pdfmake 0.2 stream API uses the already loaded local VFS synchronously, so creation errors can be caught; stream errors also reject the promise. It deliberately avoids `getBuffer`'s internal asynchronous URL resolver, which otherwise leaves corrupt-font failures outside the caller's promise. The source model is not modified. No rendering API transmits input or requests external resources.
+The UI parses the entire source, loads/caches local fonts and awaits generation. On success it creates one Blob URL for preview and download. Parsing or rendering failures preserve the input, show the error message and offer no new/partial PDF. Unsupported native viewing omits the iframe source and keeps the download available. `createPdfBytes` rejects with an `Error` for unsupported displayed characters, unusable link destinations, missing/corrupt font data or a stream/engine failure. The pinned pdfmake 0.2 stream API uses the already loaded local VFS synchronously, so creation errors can be caught; stream errors also reject the promise. It deliberately avoids `getBuffer`'s internal asynchronous URL resolver, which otherwise leaves corrupt-font failures outside the caller's promise. The source model is not modified. No rendering API transmits input or requests external resources.
 
 ## Reference layout
 
