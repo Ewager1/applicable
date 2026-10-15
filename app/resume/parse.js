@@ -118,7 +118,7 @@ export function parseResume(source) {
       if (match) {
         bullets.push(match[1]?.trim() ?? '');
         if (!bullets.at(-1)) report('Add text after the job bullet marker.', item.line);
-      } else if (/^(?: {2,}|\t+)\S/.test(item.text)) {
+      } else if (/^(?: {2,}| *\t)[ \t]*\S/.test(item.text)) {
         if (!bullets.length) report('Put continued bullet text after a job bullet.', item.line);
         else bullets[bullets.length - 1] += ` ${text}`;
       } else if (bullets.length) report('Indent continued bullet text by at least two spaces, or start a new bullet. Put job fields above the bullets.', item.line);

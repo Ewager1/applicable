@@ -123,6 +123,16 @@ test('malformed/duplicate metadata and unsupported entry boundaries block export
   rejected(source.replace('Name: Alex Morgan', 'Name: Alex Morgan\nName: Alex Morgan'), 'Name appears more than once');
 });
 
+test('bullet continuations accept mixed horizontal indentation but reject a single space', () => {
+  const expected = parseResume(source).resume.jobs[0].bullets[0];
+  for (const indentation of ['\t  ', '  \t', ' \t', ' \t \t ', '\t', '  ']) {
+    const result = parseResume(source.replace('  Worked with design', `${indentation}Worked with design`));
+    assert.equal(result.ok, true, JSON.stringify(result.errors));
+    assert.equal(result.resume.jobs[0].bullets[0], expected);
+  }
+  rejected(source.replace('  Worked with design', ' Worked with design'), 'Indent continued bullet text');
+});
+
 test('empty bullets, missing bullets and unrecognized bullet text are errors', () => {
   rejected(source.replace('- Improved release reliability with focused automated checks.', '-   '), 'Add text after the job bullet marker');
   rejected(source.replace('- Maintained API integrations and investigated production issues.', ''), 'Add at least one bullet');
