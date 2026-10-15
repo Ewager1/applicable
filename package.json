@@ -9,7 +9,7 @@
   "scripts": {
     "proof:generate": "node proof/generate.mjs",
     "proof:serve": "node proof/serve.mjs",
-    "test": "node --test proof/render.test.mjs",
+    "test": "node --test proof/render.test.mjs tests/parser.test.mjs",
     "test:browser": "node tests/run-browser.mjs",
     "dev": "vite",
     "build": "vite build",

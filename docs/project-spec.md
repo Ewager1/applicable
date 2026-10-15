@@ -1,6 +1,6 @@
 # Applicable: Project Specification
 
-Status: Initial draft based on confirmed requirements. PDF technology and distribution details require a small implementation investigation.
+Status: PDF approach verified in A1, development foundation established in A2, and canonical input format/parser implemented in A3. Production rendering, interface integration and final distribution remain planned.
 
 ## Purpose
 
@@ -41,11 +41,11 @@ Contact information, professional title, and summary are content blocks, not add
 
 ### Input contract
 
-Define and document one simple, deterministic text format during the parser phase. A chat agent must be able to produce the format without special software.
+Use the canonical [resume text format](input-format.md), with a complete [synthetic example](../examples/resume.txt) and [reusable chatbot instruction](../examples/chatbot-instruction.md). The pure parser implements this format without guessing at arbitrary free-form resumes.
 
-The contract must include explicit boundaries for contact details, professional title, summary, jobs and their metadata, education entries, certification entries, and skills. Skill rows should support `Category: comma-separated skills`. Job bullets should support a conventional text bullet marker. Section blocks may arrive in a different order.
+The contract uses seven required `#` section headings, repeated `## Job`, `## Education` and `## Certification` boundaries, labeled metadata, and `Category: comma-separated skills` rows. Section blocks may arrive in a different order. Jobs retain source order. Certification title, issuer and dates remain separate fields for the production template.
 
-Document required labels, accepted whitespace, multiline bullet handling, duplicate section behavior, and error messages. Avoid ambiguous parsing of colons in prose or skill category names. Do not promise arbitrary free-form resume import.
+Required labels, minimum entry values, whitespace normalization, indented bullet continuations, duplicate handling and human-language errors are documented in the input contract. Skills use exactly one colon per row; unsupported delimiters and malformed content cause blocking errors rather than silent guessing. No partial resume is exposed on failure.
 
 ### Validation
 

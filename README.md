@@ -6,7 +6,7 @@ Paste a complete resume, submit it, and download a PDF using one consistent temp
 
 ## Project status
 
-The PDF rendering investigation is complete. Synthetic examples demonstrate the fixed template, automatic pagination, direct download and exact PDF preview. The application now has a minimal vanilla JavaScript development/build foundation and automated checks. Resume parsing and the paste-to-PDF interface are still being built; the application currently shows a clearly labeled development shell.
+The PDF rendering investigation is complete. Synthetic examples demonstrate the fixed template, automatic pagination, direct download and exact PDF preview. The application now has a minimal vanilla JavaScript development/build foundation and automated checks. The canonical text format and parser are implemented and tested. The paste-to-PDF interface and production rendering integration are still being built; the application currently shows a clearly labeled development shell.
 
 ## Local development
 
@@ -32,7 +32,7 @@ Open http://127.0.0.1:4173/. See [proof setup, verification, fonts and rendering
 | Command | Purpose |
 | --- | --- |
 | `npm run lint` | ESLint's recommended JavaScript checks plus strict equality and no `eval` |
-| `npm test` | Selectable PDF text, embedded fonts, annotations, order, bounds and pagination |
+| `npm test` | Resume parsing/validation plus selectable PDF text, fonts, links, bounds and pagination |
 | `npm run build` | Bundle the application into `dist/` |
 | `npm run preview` | Serve the built application at http://127.0.0.1:4174/; stop with Ctrl+C |
 | `npm run test:browser` | Own temporary proof/build-preview servers; verify real downloads and local built assets |
@@ -62,6 +62,9 @@ GitHub Actions runs the same checks on pull requests to `main` and pushes to `ma
 
 ## Development documents
 
+- [Resume input format](docs/input-format.md)
+- [Complete synthetic example](examples/resume.txt)
+- [Reusable chatbot instruction](examples/chatbot-instruction.md)
 - [Project specification](docs/project-spec.md)
 - [Development plan](docs/project-plan.md)
 - [Agent instructions](AGENTS.md)

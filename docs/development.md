@@ -3,6 +3,8 @@
 ## Structure
 
 - `app/index.html`, `app/main.js`, `app/styles.css`: native HTML, JavaScript entry point and CSS. This is a development shell until the input/interface issues land.
+- `app/resume/parse.js`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors.
+- `examples/`: synthetic canonical resume and reusable chatbot instruction.
 - `assets/fonts/`: bundled Poppins fonts and their OFL license, retained from the rendering investigation.
 - `proof/`: synthetic PDF renderer, fixtures, baseline and PDF/browser verification. Its data model is not yet the text input contract.
 - `tests/`: browser launch options, temporary-server ownership and a built-artifact smoke test.
@@ -10,7 +12,7 @@
 - `eslint.config.js`: standard recommended JavaScript checks and explicit Node/browser globals.
 - `.github/workflows/checks.yml`: pull request and main-branch checks.
 
-Future parser, rendering and interface modules should remain small and separate. Do not create an abstraction framework or empty module placeholders before their issue needs them. No backend, framework, TypeScript, database, API keys or runtime remote assets are introduced by this setup.
+Parser, rendering and interface modules should remain small and separate. Do not create an abstraction framework or empty module placeholders before their issue needs them. No backend, framework, TypeScript, database, API keys or runtime remote assets are introduced by this setup.
 
 ## Tool choices
 
@@ -28,7 +30,7 @@ The previously selected pdfmake, PDF.js and Playwright remain unchanged. Vite an
 
 ## Verification boundaries
 
-`npm run check` runs lint, existing PDF preservation/layout tests, production build, then two browser tests. One browser test exercises short/typical/long synthetic PDF generation and actual downloads; the other loads the production build, confirms JavaScript/CSS resolve without execution or network errors, and rejects remote HTTP/WebSocket requests. Browser tests own and clean up the two temporary servers. The application shell has no input behavior to unit-test yet; avoid assertions that merely repeat its wording.
+`npm run check` runs lint, parser/validation and existing PDF preservation/layout tests, production build, then two browser tests. One browser test exercises short/typical/long synthetic PDF generation and actual downloads; the other loads the production build, confirms JavaScript/CSS resolve without execution or network errors, and rejects remote HTTP/WebSocket requests. Browser tests own and clean up the two temporary servers. The parser tests cover required content, ordering, wording, multiline bullets and blocking malformed input. The application shell has no input behavior to unit-test yet; avoid assertions that merely repeat its wording.
 
 The built shell is the application artifact; the separate developer proof is intentionally not bundled into `dist/`. Fonts and the PDF renderer will enter that artifact when A4 connects the production template. Production packaging and clean-download checks remain A6 work. A build is not a release or deployment.
 
