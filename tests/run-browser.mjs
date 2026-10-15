@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { stripVTControlCharacters } from 'node:util';
 
 // Own both local servers; readiness comes from these processes, not another app on a busy port.
 const servers = [
@@ -21,7 +22,9 @@ function ready(server, url) {
     server.stderr.pipe(process.stderr);
     server.stdout.on('data', chunk => {
       output += chunk;
-      if (output.includes(url)) {
+      // Vite may color parts of the URL separately in CI; normalize accumulated
+      // output so an escape sequence split across chunks is handled as well.
+      if (stripVTControlCharacters(output).includes(url)) {
         clearTimeout(timer);
         server.removeListener('exit', failed);
         resolve();
