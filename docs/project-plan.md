@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1–A6 are complete. Post-plan [issue #13](https://github.com/Ewager1/applicable/issues/13) adds copy-safe symbol markers; implementation is awaiting independent review and CI.
+Status: A1–A6 and the copy-safe marker fix (#13) are complete. Post-plan [issue #15](https://github.com/Ewager1/applicable/issues/15) tracks development PDF-cache recovery and isolated cold-cache verification through the normal review and CI gates.
 
 ## Workflow
 
@@ -133,3 +133,9 @@ Completed implementation PRs: [A1 #7](https://github.com/Ewager1/applicable/pull
 Prefer explicit standalone `@@...@@` section/entry controls so copying rendered Markdown does not remove structural headings. Preserve legacy and mixed-format compatibility, required content checks, source ordering and original line numbers. Accept one enclosing text fence; reject malformed/unknown controls and unsafe fence/exterior content with concise guidance. Update the chatbot instruction, synthetic example, UI help and documentation. Unmarked-heading inference, dependencies, PDF layout changes and personal-data fixtures are out of scope.
 
 Tracking: [issue #13](https://github.com/Ewager1/applicable/issues/13), Applicable project board. Follow the same branch, test, review, CI, merge and cleanup gates as the initial plan.
+
+### Issue #15: Development PDF-cache recovery
+
+Document safe recovery from `504 Outdated Optimize Dep` without losing the draft: copy source, stop only Applicable, restart with a forced cache rebuild, then reload. Stop before dependency installation/cache removal. Add an actual first-submission development-browser PDF export check using a unique cold temporary cache and owned ephemeral server, preserving the live development cache. Verify no failed/remote requests, one download, PDF text and matching delivered bytes. Keep the existing lazy import and optimizer defaults unless evidence justifies changing them.
+
+Tracking: [issue #15](https://github.com/Ewager1/applicable/issues/15), Applicable project board. Local recovery is confirmed; automated verification and PR integration follow the normal review, CI and cleanup gates.

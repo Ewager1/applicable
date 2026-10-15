@@ -34,7 +34,7 @@ function ready(server, url) {
 }
 try {
   await Promise.all([ready(servers[0], 'http://127.0.0.1:4173'), ready(servers[1], 'http://127.0.0.1:4174')]);
-  tests = spawn(process.execPath, ['--test', 'proof/browser.test.mjs', 'tests/build.browser.test.mjs'], { stdio: 'inherit' });
+  tests = spawn(process.execPath, ['--test', 'proof/browser.test.mjs', 'tests/build.browser.test.mjs', 'tests/dev.browser.test.mjs'], { stdio: 'inherit' });
   process.exitCode = await new Promise((resolve, reject) => {
     tests.once('error', reject);
     tests.once('exit', code => resolve(code ?? 1));
