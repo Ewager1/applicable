@@ -1,14 +1,16 @@
 # Development foundation
 
+For routine changes, start with [the maintenance guide](maintenance.md). This document records tooling choices, verification boundaries and cache recovery; current work status is in GitHub.
+
 ## Structure
 
 - `app/index.html`, `app/main.js`, `app/styles.css`: native HTML, JavaScript entry point and CSS. The paste form, local generation coordinator, copyable format help and same-file PDF preview/download live here.
-- `app/resume/parse.js`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors.
+- `app/resume/parse.js`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors. `types.js` supplies shared editor-visible JSDoc contracts.
 - `examples/`: synthetic canonical resume and reusable chatbot instruction.
 - `app/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
 - `assets/fonts/`: bundled Source Sans 3 static Regular/Semibold/Bold fonts, source record and OFL license.
-- `proof/`: synthetic PDF renderer, fixtures, baseline and PDF/browser verification. Its data model is not yet the text input contract.
-- `tests/`: browser launch options, temporary-server ownership and a built-artifact smoke test.
+- `proof/`: synthetic PDF renderer, fixtures, baseline and PDF/browser verification. Direct synthetic fixtures and parsed canonical fixtures use the shared Resume shape.
+- `tests/`: browser launch options, temporary-server ownership, actual development/production exports and recovery tests.
 - `vite.config.js`: application root, relative built asset paths, loopback-only servers and `dist/` output.
 - `eslint.config.js`: standard recommended JavaScript checks and explicit Node/browser globals.
 - `.github/workflows/checks.yml`: pull request and main-branch checks.
@@ -35,9 +37,9 @@ The previously selected pdfmake, PDF.js and Playwright remain unchanged. Vite an
 
 The production build is the application artifact; the separate developer proof is intentionally not bundled into `dist/`. The application imports the shared production PDF adapter and Vite bundles all three fonts locally. The larger pdfmake module is lazy-loaded only after valid submission; the initial application JavaScript stays small. Its approximately 1.3 MB minified PDF engine chunk produces the expected Vite size advisory; this is the already selected engine, not an additional dependency. A6 verifies clean-source installation/startup and source distribution; see [verification evidence](verification.md). No native packaging or release publication is included. A build is not a release or deployment.
 
-No PDF layout was intentionally changed in A2, so its reviewed synthetic baseline remains unchanged. The A1 visual checklist continues to apply to later PDF changes. A4 adds explicit split-job, multi-page-bullet, long metadata/token and unsupported-character cases; see [production PDF verification](pdf-template.md).
+Historically, A2 did not change the PDF layout. The current reviewed baseline includes the intentional B1/B2 font and style refresh. The A1 visual checklist continues to apply to later PDF changes. A4 adds explicit split-job, multi-page-bullet, long metadata/token and unsupported-character cases; see [production PDF verification](pdf-template.md).
 
-Local checks do not establish that GitHub Actions has passed. The first remote workflow run must finish successfully on the PR's latest commit before merge.
+Local checks do not establish that GitHub Actions has passed. The remote workflow must finish successfully on the PR's latest commit before merge.
 
 ## Interface state and recovery
 
@@ -47,7 +49,7 @@ Fonts load lazily and only successful data is cached. Missing/corrupt font error
 
 A successful export creates one byte Blob and one object URL. Native PDF viewing is gated by `navigator.pdfViewerEnabled`; browsers without it get the normal download/link and an explanatory message, without assigning an iframe source that might cause an extra automatic download. With native viewing available the iframe and download use exactly the same URL. Editing, failure and page departure remove the old artifact and release its URL.
 
-CI uses Playwright’s `chromium` channel (full/new headless mode), rather than its older headless shell, to exercise the native PDF viewer. A capability-disabled application test separately verifies exactly one automatic download and a usable repeat-download link. Desktop/mobile UI screenshots are written under ignored `output/ui/`; an actual browser-downloaded synthetic resume is retained under ignored `output/pdf/application-resume.pdf` for visual QA. The PDF template baseline is unchanged by A5.
+CI uses Playwright’s `chromium` channel (full/new headless mode), rather than its older headless shell, to exercise the native PDF viewer. A capability-disabled application test separately verifies exactly one automatic download and a usable repeat-download link. Desktop/mobile UI screenshots are written under ignored `output/ui/`; an actual browser-downloaded synthetic resume is retained under ignored `output/pdf/application-resume.pdf` for visual QA. A5 did not change the PDF layout; the current baseline and later changes are documented in the template notes.
 
 ## Development dependency-cache recovery
 

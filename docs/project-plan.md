@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1–A6 and the copy-safe marker fix (#13) are complete. Development-cache fix #15 is complete. B1 [issue #17](https://github.com/Ewager1/applicable/issues/17) is merged, closed and Done via PR #19. B2 [issue #18](https://github.com/Ewager1/applicable/issues/18) implements the PDF visual identity; local work awaits review/CI.
+This plan records agreed scope and sequence. [GitHub issues](https://github.com/Ewager1/applicable/issues), [merged PRs](https://github.com/Ewager1/applicable/pulls?q=is%3Apr+is%3Amerged) and [the Applicable board](https://github.com/users/Ewager1/projects/6) are the source of current status; dated verification records apply to their recorded commits. See [the maintenance guide](maintenance.md) for the implemented module/check map.
 
 ## Workflow
 
@@ -113,18 +113,16 @@ Dependencies: A5.
 
 - Public repository: https://github.com/Ewager1/applicable
 - Dedicated project: https://github.com/users/Ewager1/projects/6
-- The initial main branch contains planning and workflow files only. Feature implementation uses issue branches and PRs.
+- The initial bootstrap contained planning and workflow files only. Implementation uses issue branches and PRs.
 
-| Order | Plan | GitHub issue | Status |
-| --- | --- | --- | --- |
-| 1 | A1 | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1) | Merged, closed and Done |
-| 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) | Merged, closed and Done |
-| 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) | Merged, closed and Done |
-| 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) | Merged, closed and Done |
-| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | Merged, closed and Done |
-| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Complete |
-
-Completed implementation PRs: [A1 #7](https://github.com/Ewager1/applicable/pull/7), [A2 #8](https://github.com/Ewager1/applicable/pull/8), [A3 #9](https://github.com/Ewager1/applicable/pull/9), [A4 #10](https://github.com/Ewager1/applicable/pull/10), [A5 #11](https://github.com/Ewager1/applicable/pull/11).
+| Order | Plan | GitHub issue |
+| --- | --- | --- |
+| 1 | A1 | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1) |
+| 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) |
+| 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) |
+| 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) |
+| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) |
+| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) |
 
 ## Post-plan fixes
 
@@ -144,17 +142,17 @@ Tracking: [issue #15](https://github.com/Ewager1/applicable/issues/15), Applicab
 
 ### B1 — Source Sans 3 font foundation (#17)
 
-Bundle authoritative Adobe static Regular 400, Semibold 600 and Bold 700 TTFs locally, retain source revision/license, register distinct real weights and update glyph coverage/embedding verification. Body uses Regular and section headings Semibold. Preserve all content, ordering, links and local export behavior. Before changing fonts, retain an exactly two-page synthetic Poppins PDF and identical fixture for B2. Inspect short/typical/long outputs and run the full suite. No UI/parser/data model changes; size/color/dividers are B2. Tracking: [#17](https://github.com/Ewager1/applicable/issues/17), Applicable project. Complete: merged [PR #19](https://github.com/Ewager1/applicable/pull/19), closed and Done.
+Bundle authoritative Adobe static Regular 400, Semibold 600 and Bold 700 TTFs locally, retain source revision/license, register distinct real weights and update glyph coverage/embedding verification. Body uses Regular and section headings Semibold. Preserve all content, ordering, links and local export behavior. Before changing fonts, retain an exactly two-page synthetic Poppins PDF and identical fixture for B2. Inspect short/typical/long outputs and run the full suite. No UI/parser/data model changes; size/color/dividers are B2. Tracking: [#17](https://github.com/Ewager1/applicable/issues/17), Applicable project. See [the font implementation PR #19](https://github.com/Ewager1/applicable/pull/19).
 
 ### B2 — PDF hierarchy and dividers (#18, after B1)
 
 Complete the separately requested size/color/metadata/divider hierarchy using the B1 font foundation. Compare the identical frozen `proof/baseline/pre-refresh/resume.json` against its old Poppins PDF; preserve content and review all page transitions. Implement only after B1 merges, on its own issue branch with the normal tests/review/CI gates. Tracking: [#18](https://github.com/Ewager1/applicable/issues/18), Applicable project; follow its confirmed acceptance details.
 
-B2 implementation evidence: centralized semantic styles and the confirmed palette, shared Semibold dates, adaptive real divider rules, measured 1.326 em body baselines, repeated-entry rendered font/color tests and identical-data two-page comparison. All 14 generated pages were visually reviewed; the current synthetic baseline is refreshed and the historical PDF/data remain unchanged. No UI, parser, source content or model changes. Integration remains subject to review and latest-commit CI.
+B2 implementation evidence: centralized semantic styles and the confirmed palette, shared Semibold dates, adaptive real divider rules, measured 1.326 em body baselines, repeated-entry rendered font/color tests and identical-data two-page comparison. All 14 generated pages were visually reviewed; the current synthetic baseline is refreshed and the historical PDF/data remain unchanged. No UI, parser, source content or model changes. Issue and PR links record integration and verification status.
 
 ## Approved professional cleanup
 
-The six focused issues below run sequentially, each with its own branch, checks, review and merge lifecycle. GitHub issues and the [Applicable project](https://github.com/users/Ewager1/projects/6) carry current status; this list records scope rather than duplicating live status. C6 reconciles the historical documentation after implementation.
+The six focused issues below run sequentially, each with its own branch, checks, review and merge lifecycle. GitHub issues and the [Applicable project](https://github.com/users/Ewager1/projects/6) carry current status; this list records scope rather than duplicating live status. C6 covers documentation reconciliation and developer handoff.
 
 1. [C1 #21: Resume contracts](https://github.com/Ewager1/applicable/issues/21): shared editor-visible JSDoc data/result/error definitions and clearer parser/UI code, with unchanged behavior.
 2. [C2 #22: PDF presentation](https://github.com/Ewager1/applicable/issues/22): organize PDF styles/presentation without changing the approved design.
@@ -162,3 +160,9 @@ The six focused issues below run sequentially, each with its own branch, checks,
 4. [C4 #24: PDF pagination](https://github.com/Ewager1/applicable/issues/24): clarify pagination responsibilities and verification.
 5. [C5 #25: Oversized PDF headers](https://github.com/Ewager1/applicable/issues/25): handle oversized metadata/header blocks explicitly within the issue's bounded requirements.
 6. [C6 #26: Developer handoff](https://github.com/Ewager1/applicable/issues/26): reconcile documentation and provide the final developer handoff.
+
+## Subsequent approved work
+
+After the cleanup sequence, [D1 #31](https://github.com/Ewager1/applicable/issues/31) covers public-facing copy and [D2 #32](https://github.com/Ewager1/applicable/issues/32) covers optional company-based filenames. These are separate work items, not capabilities delivered by the cleanup documentation.
+
+The subsequent workflow work is **agent/model usage tracking only**, not application analytics. Future TypeScript/React migration **planning issues** are to be created after that work; migration implementation has not been authorized. No hosting or release/deployment is implied. Use GitHub for execution status and the individual issues for acceptance details.
