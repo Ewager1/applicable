@@ -53,25 +53,28 @@ async function artifactUrls(page) {
 }
 
 // This replaces the shell smoke test: exercise the built application end to end.
-test('warnings preserve source; correction exports complete ordered text with exact preview bytes', async t => {
+test('symbol markers and an outer text code block export complete ordered PDF content after correction', async t => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
-  const invalid = source.replace(/# Education[\s\S]*?(?=# Certifications)/, '');
+  const invalid = source.replace(/@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/, '');
   const downloads = [];
   page.on('download', event => downloads.push(event));
   await input.fill(invalid);
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
-  await page.getByText('Education is missing. Add # Education.', { exact: true }).waitFor();
+  await page.getByText('Education is missing. Add @@EDUCATION@@.', { exact: true }).waitFor();
   assert.equal(await input.inputValue(), invalid);
   assert.equal(await input.getAttribute('aria-invalid'), 'true');
   assert.equal(await page.evaluate(() => document.activeElement.id), 'error-summary');
   assert.equal(await page.locator('#result').isVisible(), false);
   assert.equal(downloads.length, 0);
-  await input.fill(source);
+  const corrected = '```text\n' + source + '\n```';
+  await input.fill(corrected);
   const event = page.waitForEvent('download');
   await input.press('Control+Enter');
   const pdf = await readPdf(await event);
-  assert.equal(await input.inputValue(), source);
+  assert.equal(pdf.text.includes('@@CONTACT@@'), false, 'Structural markers do not print');
+  assert.equal(pdf.text.includes('```'), false, 'Outer code fences do not print');
+  assert.equal(await input.inputValue(), corrected);
   const fields = [parsedExample.name, ...parsedExample.contact.map(item => item.text), parsedExample.title, parsedExample.summary,
     ...parsedExample.jobs.flatMap(job => [job.employer, job.role, job.dates, job.location, ...job.bullets]),
     ...parsedExample.education.flatMap(entry => Object.values(entry)), ...parsedExample.certifications.flatMap(entry => Object.values(entry)),

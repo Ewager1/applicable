@@ -6,6 +6,13 @@ const sections = new Map([
 const label = text => text.trim().replace(/\s+/g, ' ').toLowerCase();
 const bullet = /^(?:-|\*|•)(?:[ \t]+(.*)|$)/;
 const reserved = /^(?:#{1,6}(?:\s|$)|```|~~~)/;
+const symbolMarkers = new Map([
+  ['@@CONTACT@@', '# Contact'], ['@@PROFESSIONAL_TITLE@@', '# Professional Title'],
+  ['@@SUMMARY@@', '# Summary'], ['@@RELEVANT_EXPERIENCE@@', '# Relevant Experience'],
+  ['@@EDUCATION@@', '# Education'], ['@@CERTIFICATIONS@@', '# Certifications'], ['@@SKILLS@@', '# Skills'],
+  ['@@JOB@@', '## Job'], ['@@EDUCATION_ENTRY@@', '## Education'], ['@@CERTIFICATION@@', '## Certification'],
+]);
+const sectionMarker = key => `@@${key.toUpperCase().replaceAll(' ', '_')}@@`;
 
 /**
  * Parse the documented Applicable text format without rewriting supplied content.
@@ -18,24 +25,50 @@ export function parseResume(source) {
   }
   const errors = [];
   const report = (message, line = null) => errors.push({ message, line });
+  let lines = source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').split('\n').map((text, index) => ({ text, line: index + 1 }));
+  const nonblank = lines.filter(item => item.text.trim());
+  const fence = /^(?:`{3,}|~{3,})/;
+  if (nonblank.some(item => fence.test(item.text.trim()))) {
+    const first = nonblank[0];
+    const last = nonblank.at(-1);
+    if (first === last || !/^```(?:text|plaintext)?$/i.test(first.text.trim()) || last.text.trim() !== '```') {
+      return { ok: false, errors: [{ message: 'Use one enclosing text code block with no commentary outside it, or copy only the resume text. Other code-block formats are not supported.', line: first.line }] };
+    }
+    lines = lines.filter(item => item.line > first.line && item.line < last.line);
+    const nested = lines.find(item => fence.test(item.text.trim()));
+    if (nested) return { ok: false, errors: [{ message: 'Keep the resume inside one text code block. Remove nested or extra code fences.', line: nested.line }] };
+  }
+  // Normalize standalone controls only; leave inline wording unchanged.
+  // Malformed control lines are reported rather than treated as resume content.
+  lines = lines.map(item => {
+    const text = item.text.trim();
+    if (!text.startsWith('@@') && !/^@+[A-Z_]+@+$/i.test(text) && !/^[A-Z_]+@@$/i.test(text)) return item;
+    const marker = symbolMarkers.get(text.toUpperCase());
+    if (!marker) report('Use a recognized @@MARKER@@ on its own line. Copy the exact section and entry markers from Applicable’s format instructions.', item.line);
+    return marker ? { ...item, text: marker } : item;
+  });
+  if (errors.length) return { ok: false, errors };
   const blocks = new Map();
   let current;
-  source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').split('\n').forEach((text, index) => {
-    const line = index + 1;
+  let preambleLine;
+  for (const item of lines) {
+    const { text, line } = item;
     const heading = text.trim().match(/^#(?:\s+(.*)|$)/);
     if (heading) {
       const key = label(heading[1] ?? '');
       current = { lines: [], line, title: sections.get(key) };
-      if (!sections.has(key)) report('Unknown section. Use one of the seven section headings in the resume format.', line);
-      else if (blocks.has(key)) report(`${current.title} appears more than once. Combine its content under one heading.`, line);
+      if (!sections.has(key)) report('Unknown section. Use one of the seven section markers in the resume format.', line);
+      else if (blocks.has(key)) report(`${current.title} appears more than once. Combine its content under one marker.`, line);
       else blocks.set(key, current);
-    } else if (current) current.lines.push({ text, line });
-    else if (text.trim()) report('Put this content under a section heading, starting with # Contact or another required section.', line);
-  });
+    } else if (current) current.lines.push(item);
+    else if (text.trim() && preambleLine === undefined) preambleLine = line;
+  }
+  if (preambleLine !== undefined) report('Put this content under a section marker, such as @@CONTACT@@. Copy the complete resume using the chatbot code block’s Copy button; plain headings are not recognized.', preambleLine);
+  if (!blocks.size) return { ok: false, errors: errors.length ? errors : [{ message: 'Paste a complete resume with its @@CONTACT@@ and other required markers.', line: nonblank[0]?.line ?? null }] };
 
   const content = key => {
     const block = blocks.get(key);
-    if (!block) { report(`${sections.get(key)} is missing. Add # ${sections.get(key)}.`); return []; }
+    if (!block) { report(`${sections.get(key)} is missing. Add ${sectionMarker(key)}.`); return []; }
     const lines = block.lines.filter(item => item.text.trim());
     if (!lines.length) report(`Add content under ${block.title}.`, block.line);
     return lines;
@@ -69,12 +102,15 @@ export function parseResume(source) {
   const entries = (lines, marker, context) => {
     const result = [];
     let entry;
+    let reportedPreamble = false;
     for (const item of lines) {
       if (label(item.text) === `## ${marker}`) {
         entry = { line: item.line, lines: [] };
         result.push(entry);
-      } else if (!entry) report(`Start each ${context} with ## ${marker[0].toUpperCase() + marker.slice(1)}.`, item.line);
-      else entry.lines.push(item);
+      } else if (!entry) {
+        if (!reportedPreamble) report(`Start each ${context} with ${marker === 'education' ? '@@EDUCATION_ENTRY@@' : `@@${marker.toUpperCase()}@@`}.`, item.line);
+        reportedPreamble = true;
+      } else entry.lines.push(item);
     }
     return result;
   };

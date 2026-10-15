@@ -43,7 +43,7 @@ Contact information, professional title, and summary are content blocks, not add
 
 Use the canonical [resume text format](input-format.md), with a complete [synthetic example](../examples/resume.txt) and [reusable chatbot instruction](../examples/chatbot-instruction.md). The pure parser implements this format without guessing at arbitrary free-form resumes.
 
-The contract uses seven required `#` section headings, repeated `## Job`, `## Education` and `## Certification` boundaries, labeled metadata, and `Category: comma-separated skills` rows. Section blocks may arrive in a different order. Jobs retain source order. Certification title, issuer and dates remain separate fields for the production template.
+The preferred contract uses seven required standalone `@@...@@` section markers, repeated `@@JOB@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` boundaries, labeled metadata, and `Category: comma-separated skills` rows. Legacy `#`/`##` controls remain compatible, including safe mixed formats. A single optional outer plain-text code fence is accepted without changing source line numbers; unknown/nested fences and exterior content block export. Unmarked headings are not inferred. Section blocks may arrive in a different order. Jobs retain source order. Certification title, issuer and dates remain separate fields for the production template.
 
 Required labels, minimum entry values, whitespace normalization, indented bullet continuations, duplicate handling and human-language errors are documented in the input contract. Skills use exactly one colon per row; unsupported delimiters and malformed content cause blocking errors rather than silent guessing. No partial resume is exposed on failure.
 

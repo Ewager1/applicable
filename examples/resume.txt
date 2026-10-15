@@ -1,19 +1,19 @@
-# Contact
+@@CONTACT@@
 Name: Alex Morgan
 Contact: Portland, OR
 Contact: 555-010-0142
 Contact: [alex@example.com](mailto:alex@example.com)
 Contact: [example.com/alex](https://example.com/alex)
 
-# Professional Title
+@@PROFESSIONAL_TITLE@@
 Full-Stack Software Engineer
 
-# Summary
+@@SUMMARY@@
 Product-focused engineer building reliable web applications and accessible interfaces.
 Experienced with integrations, automated tests, and clear technical communication.
 
-# Relevant Experience
-## Job
+@@RELEVANT_EXPERIENCE@@
+@@JOB@@
 Employer: Example Studio
 Role: Software Engineer
 Dates: 2023 - Present
@@ -22,26 +22,26 @@ Location: Portland, OR
   Worked with design partners to preserve keyboard navigation and clear error messages.
 - Improved release reliability with focused automated checks.
 
-## Job
+@@JOB@@
 Employer: Example Systems
 Role: Application Developer
 Dates: 2020 - 2023
 Location: Remote
 - Maintained API integrations and investigated production issues.
 
-# Education
-## Education
+@@EDUCATION@@
+@@EDUCATION_ENTRY@@
 Institution: Example State University
 Qualification: Bachelor of Science, Computer Science
 Dates: 2016 - 2020
 
-# Certifications
-## Certification
+@@CERTIFICATIONS@@
+@@CERTIFICATION@@
 Title: Example Web Accessibility Certificate
 Issuer: Example Learning Institute
 Dates: 2024
 
-# Skills
+@@SKILLS@@
 Languages: JavaScript, TypeScript, Python, SQL
 Frontend: HTML, CSS, accessible interfaces
 Engineering: Automated testing, Git, API integrations
