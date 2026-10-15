@@ -293,3 +293,58 @@ test('missing or corrupt local fonts reject recoverably instead of leaving gener
     return true;
   });
 });
+
+test('large headers retain every word through the measured one-page boundary', async () => {
+  for (const count of [250, 269]) {
+    const resume = structuredClone(parsedExample);
+    resume.jobs[0].employer = `BEGIN ${'Longword '.repeat(count)} ENDMARKER`;
+    const original = structuredClone(resume);
+    const pages = await inspect(resume);
+    const headerPage = pages.findIndex(page => page.text.includes('BEGIN'));
+    assert.equal(pages.findIndex(page => page.text.includes('ENDMARKER')), headerPage);
+    assert.equal(pages.findIndex(page => page.text.includes('RELEVANTEXPERIENCE')), headerPage);
+    assert.equal(pages.findIndex(page => page.text.includes('Builtaccessibleinterfaces')), headerPage, 'Header stays with beginning of first bullet');
+    assert.deepEqual(resume, original, 'Measuring and rendering do not modify supplied content');
+  }
+});
+
+test('overflowing unbreakable job details reject recoverably without character-count or text-matching guesses', async () => {
+  for (const [field, count] of [['employer', 270], ['employer', 287], ['employer', 300], ['role', 600], ['dates', 600], ['location', 600]]) {
+    const resume = structuredClone(parsedExample);
+    resume.jobs[0][field] = `BEGIN ${'Longword '.repeat(count)} ENDMARKER`;
+    // The same text elsewhere must not disguise a dropped header.
+    resume.summary = resume.jobs[0][field];
+    const original = structuredClone(resume);
+    await assert.rejects(renderPdf(resume), /top of job 1.*too long to fit with the beginning.*one page/);
+    assert.deepEqual(resume, original, 'Original source data remains available for correction');
+  }
+  const resume = structuredClone(parsedExample);
+  resume.jobs[0].employer = 'Longword '.repeat(180);
+  resume.jobs[0].role = 'Longword '.repeat(180);
+  await assert.rejects(renderPdf(resume), /top of job 1.*too long to fit with the beginning.*one page/);
+});
+
+test('long body text, a multi-page first bullet and Unicode metadata retain natural continuation', async () => {
+  const resume = structuredClone(parsedExample);
+  resume.summary = 'Longword '.repeat(300);
+  resume.jobs[0].employer = 'Équipe Δ Ж '.repeat(80);
+  resume.jobs[0].bullets[0] = 'Long first bullet '.repeat(400);
+  await inspect(resume);
+});
+
+test('education and certification headings reject impossible keep-groups coherently', async () => {
+  const resume = structuredClone(parsedExample);
+  resume.education[0].qualification = 'Long qualification '.repeat(400);
+  await assert.rejects(renderPdf(resume), /education entry 1.*too long to fit with the beginning/);
+  resume.education[0].qualification = parsedExample.education[0].qualification;
+  resume.certifications[0].title = 'Long certificate '.repeat(400);
+  await assert.rejects(renderPdf(resume), /certification entry 1.*too long to fit with the beginning/);
+});
+
+test('unavailable pinned layout metadata blocks export and cleans up the measurement stream', async () => {
+  const fontData = Object.fromEntries(fontFiles.map(file => [file, 'placeholder']));
+  let destroyed = false;
+  const engine = { createPdf: () => ({ getStream: () => ({ destroy: () => { destroyed = true; } }) }) };
+  await assert.rejects(createPdfBytes(parsedExample, engine, fontData), /PDF layout could not be checked.*no PDF was created/);
+  assert.equal(destroyed, true);
+});

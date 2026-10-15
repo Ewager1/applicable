@@ -5,7 +5,7 @@ import { fontFiles } from '../app/pdf/fonts.js';
 const routes = new Map([
   ['/', ['proof/index.html', 'text/html']],
   ...['browser.mjs', 'fixtures.mjs', 'document.mjs'].map(file => [`/proof/${file}`, [`proof/${file}`, 'text/javascript']]),
-  ...['document.js', 'fonts.js', 'font-coverage.js', 'render.js', 'pagination.js'].map(file => [`/app/pdf/${file}`, [`app/pdf/${file}`, 'text/javascript']]),
+  ...['document.js', 'fonts.js', 'font-coverage.js', 'render.js', 'pagination.js', 'header-fit.js'].map(file => [`/app/pdf/${file}`, [`app/pdf/${file}`, 'text/javascript']]),
   ['/node_modules/pdfmake/build/pdfmake.min.js', ['node_modules/pdfmake/build/pdfmake.min.js', 'text/javascript']],
   ...fontFiles.map(file => [`/assets/fonts/${file}`, [`assets/fonts/${file}`, 'font/ttf']]),
 ]);

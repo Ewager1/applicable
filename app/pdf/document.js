@@ -112,8 +112,8 @@ export function documentDefinition(resume) {
       unbreakable: true,
     };
     const bullets = job.bullets.map(bullet => ({ ul: [bullet], margin: bulletMargins }));
-    pagination.keepWith(header, bullets[0]);
-    if (jobIndex === 0) pagination.keepWith(experienceHeading, bullets[0]);
+    pagination.keepWith(header, bullets[0], `job ${jobIndex + 1}`);
+    if (jobIndex === 0) pagination.keepWith(experienceHeading, bullets[0], 'job 1');
     content.push(header, ...bullets);
   }
   const educationHeading = sectionHeading('EDUCATION');
@@ -124,8 +124,8 @@ export function documentDefinition(resume) {
       ...entryRow(entry.institution, entry.dates, 'body', 'date'),
       margin: [0, 0, 0, entryBottomMargin],
     };
-    pagination.keepWith(qualification, institution);
-    if (entryIndex === 0) pagination.keepWith(educationHeading, institution);
+    pagination.keepWith(qualification, institution, `education entry ${entryIndex + 1}`);
+    if (entryIndex === 0) pagination.keepWith(educationHeading, institution, 'education entry 1');
     content.push(qualification, institution);
   }
   const certificationsHeading = sectionHeading('CERTIFICATIONS');
@@ -136,8 +136,8 @@ export function documentDefinition(resume) {
       headlineLevel: 1,
     };
     const issuer = { text: entry.issuer, margin: [0, 0, 0, entryBottomMargin] };
-    pagination.keepWith(title, issuer);
-    if (entryIndex === 0) pagination.keepWith(certificationsHeading, issuer);
+    pagination.keepWith(title, issuer, `certification entry ${entryIndex + 1}`);
+    if (entryIndex === 0) pagination.keepWith(certificationsHeading, issuer, 'certification entry 1');
     content.push(title, issuer);
   }
   const skillsHeading = sectionHeading('SKILLS');
@@ -147,7 +147,7 @@ export function documentDefinition(resume) {
       text: [{ text: `${row.category}: `, style: 'skillsCategory' }, row.items],
       margin: [0, 0, 0, 3],
     };
-    if (rowIndex === 0) pagination.keepWith(skillsHeading, skills);
+    if (rowIndex === 0) pagination.keepWith(skillsHeading, skills, 'the Skills section');
     content.push(skills);
   }
   return {
@@ -157,6 +157,8 @@ export function documentDefinition(resume) {
     defaultStyle: styles.body,
     styles,
     content,
+    // Application-only fit-check metadata; pdfmake renders only `content`.
+    keepGroups: pagination.groups,
     pageBreakBefore: pagination.pageBreakBefore,
   };
 }

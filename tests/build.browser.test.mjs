@@ -131,6 +131,29 @@ test('unsupported displayed glyphs block download and allow correction without l
   assert.ok((await readPdf(await submit(page))).text.includes('AlexMorgan'));
 });
 
+test('oversized job details block delivery, retain source and allow corrected resubmission', async t => {
+  const page = await openPage(t);
+  const input = page.getByLabel('Your resume', { exact: true });
+  const oversized = source.replace('Employer: Example Studio', `Employer: BEGIN ${'Longword '.repeat(300)} ENDMARKER`);
+  assert.notEqual(oversized, source);
+  const downloads = [];
+  page.on('download', download => downloads.push(download));
+  await input.fill(oversized);
+  await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
+  await page.locator('#error-list').filter({ hasText: 'top of job 1 are too long to fit with the beginning' }).waitFor();
+  assert.equal(await input.inputValue(), oversized);
+  assert.equal(downloads.length, 0);
+  assert.equal(await page.locator('#result').isVisible(), false);
+  assert.equal(await page.locator('#download').getAttribute('href'), null);
+  assert.equal(await page.locator('#preview').getAttribute('src'), null);
+  assert.equal(await page.getByRole('button', { name: 'Create PDF', exact: true }).isEnabled(), true);
+  await input.fill(source);
+  const pdf = await readPdf(await submit(page));
+  assert.ok(pdf.text.includes('ExampleStudio'));
+  assert.equal(downloads.length, 1);
+  assert.equal(await page.locator('#error-summary').isVisible(), false);
+});
+
 for (const kind of ['unavailable', 'corrupt']) {
   test(`${kind} local font failure is recoverable by retrying the same text`, async t => {
     const page = await openPage(t);
