@@ -6,7 +6,9 @@ Paste a complete resume, submit it, and download a PDF using one consistent temp
 
 ## Project status
 
-Planning only. The application, installation commands, and PDF generator have not been implemented yet.
+The first PDF-rendering proof is implemented. It demonstrates the fixed template, automatic pagination, PDF download, and exact PDF preview using synthetic resumes. The paste-and-validate application is still being built.
+
+See [proof setup, verification, and rendering decisions](proof/README.md). Local development requires Node.js 22 or newer and npm. The proof runs with `npm ci` followed by `npm run proof:serve`.
 
 ## Planned experience
 
