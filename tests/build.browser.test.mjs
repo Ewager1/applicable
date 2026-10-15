@@ -31,8 +31,8 @@ async function submit(page) {
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
   return event;
 }
-async function readPdf(download) {
-  assert.equal(download.suggestedFilename(), 'resume.pdf');
+async function readPdf(download, filename = 'Full-Stack Software Engineer Resume.pdf') {
+  assert.equal(download.suggestedFilename(), filename);
   const bytes = await readFile(await download.path());
   const pdf = await getDocument({ data: Uint8Array.from(bytes) }).promise;
   try {
@@ -52,6 +52,63 @@ async function artifactUrls(page) {
     return { download, preview, bytes: Array.from(new Uint8Array(await (await fetch(preview)).arrayBuffer())) };
   });
 }
+
+test('optional company names automatic and repeat downloads without entering PDF content', async t => {
+  const page = await openPage(t);
+  const input = page.getByLabel('Your resume', { exact: true });
+  const company = page.getByLabel('Company you’re applying to', { exact: false });
+  await input.fill(source);
+  await company.fill('   ');
+  const blank = await readPdf(await submit(page));
+  await company.fill('  Société / West: Team?  ');
+  assert.equal(await page.locator('#result').isVisible(), false);
+  assert.equal(await page.locator('#download').getAttribute('download'), null);
+  const filename = 'Full-Stack Software Engineer at Société West Team Resume.pdf';
+  const named = await readPdf(await submit(page), filename);
+  assert.equal(named.text, blank.text);
+  assert.equal(named.text.includes('Société'), false);
+  const repeat = page.waitForEvent('download');
+  await page.getByRole('link', { name: 'Download PDF' }).click();
+  const repeated = await readPdf(await repeat, filename);
+  assert.deepEqual(repeated.bytes, named.bytes);
+  assert.deepEqual(Buffer.from((await artifactUrls(page)).bytes), named.bytes);
+  const longCompany = 'Company '.repeat(90);
+  await company.fill(longCompany);
+  const longDownload = await submit(page);
+  assert.ok(Buffer.byteLength(longDownload.suggestedFilename(), 'utf8') <= 180);
+  assert.ok(longDownload.suggestedFilename().endsWith(' Resume.pdf'));
+  await input.fill(source.replace('Full-Stack Software Engineer', 'Lead: Platform / Engineer'));
+  await company.fill('Corrected');
+  const corrected = await readPdf(await submit(page), 'Lead Platform Engineer at Corrected Resume.pdf');
+  assert.ok(corrected.text.includes('Lead:Platform/Engineer'));
+  assert.equal(await company.inputValue(), 'Corrected');
+});
+
+test('company edits during generation discard obsolete names and allow corrected submission', async t => {
+  const page = await openPage(t);
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route(/SourceSans3-Regular-.*\.ttf/, async route => { await held; await route.continue(); });
+  const company = page.getByLabel('Company you’re applying to', { exact: false });
+  const input = page.getByLabel('Your resume', { exact: true });
+  const downloads = [];
+  page.on('download', download => downloads.push(download));
+  try {
+    await input.fill(source);
+    await company.fill('Old Company');
+    const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
+    await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
+    await request;
+    await company.fill('Current Company');
+    release();
+    await page.waitForFunction(() => !document.querySelector('#create-pdf').disabled);
+    assert.equal(downloads.length, 0);
+    assert.equal(await page.locator('#result').isVisible(), false);
+    assert.equal(await input.inputValue(), source);
+    await readPdf(await submit(page), 'Full-Stack Software Engineer at Current Company Resume.pdf');
+    assert.equal(downloads.length, 1);
+  } finally { release(); }
+});
 
 test('visible chatbot workflow copies the complete literal instructions with keyboard activation', async t => {
   const page = await openPage(t);

@@ -1,5 +1,7 @@
 # Applicable resume text format
 
+The optional **Company you’re applying to** field is entered separately in the app. It affects only the download filename, is never required, and must not be added as a resume marker or field.
+
 Applicable accepts a complete resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; use the chat code block’s Copy button and paste the entire result into the application. The parser, paste interface and shared production PDF integration are implemented. The application can copy the reusable chatbot instruction from its collapsible format help.
 
 See the complete [synthetic example](../examples/resume.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).

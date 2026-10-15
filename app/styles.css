@@ -119,7 +119,7 @@ label {
   font-weight: 650;
 }
 
-#resume-help {
+#resume-help, #company-help {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.6;
@@ -163,6 +163,30 @@ button span, .download span {
 :focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 4px;
+}
+
+.company-field {
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+.optional {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+#company {
+  width: 100%;
+  margin-top: 9px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cddad2;
+  border-radius: 7px;
+  background: #fcfdfb;
+  color: #243e34;
+  font: inherit;
+  font-size: 16px;
 }
 
 textarea {

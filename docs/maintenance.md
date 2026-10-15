@@ -10,7 +10,8 @@ Start with the [input contract](input-format.md), [project specification](projec
 | Shared data/result/error shape | [types.js](../app/resume/types.js): editor-visible JSDoc `Resume`, nested entries, `ParseResult` and `ValidationError`; no runtime imports or build-time type checker |
 | Website wording and structure | [index.html](../app/index.html): visible chatbot steps before the paste form; the chatbot instruction is imported into the copy control, with a labeled/focused fallback when clipboard access fails |
 | Website appearance | [styles.css](../app/styles.css): variables/base, page, form, help/errors, result, responsive rules |
-| Submission, recovery, download and preview | [main.js](../app/main.js): revision guards, busy state, warnings and Blob URL lifecycle |
+| Portable PDF filename | [download-filename.js](../app/download-filename.js): parsed professional title plus optional company, sanitized/bounded only for filenames; never modify the resume model |
+| Submission, recovery, download and preview | [main.js](../app/main.js): resume/company revision guards, busy state, warnings and Blob URL lifecycle |
 | PDF typography, palette, dimensions and entry rows | [document.js](../app/pdf/document.js): fixed semantic styles and section order; [current template details](pdf-template.md) |
 | Header/content relationships | [pagination.js](../app/pdf/pagination.js) and explicit `keepWith` calls in `document.js`; keep links target actual nodes, including intermediate content |
 | Oversized heading groups | [header-fit.js](../app/pdf/header-fit.js): same-engine, fresh-page measurement of those explicit keep-groups |
@@ -33,6 +34,7 @@ Use the supported Node/npm version and browser setup in the [README](../README.m
 
 | Area | Focused check |
 | --- | --- |
+| Download filename sanitization | `node --test tests/download-filename.test.mjs` |
 | Parser/input contract | `node --test tests/parser.test.mjs` |
 | PDF rendering, fonts, pagination or fit guard | `node --test proof/render.test.mjs tests/production-pdf.test.mjs` |
 | Development dependency loading | `node --test tests/dev.browser.test.mjs` (owns an ephemeral server and isolated cache) |
