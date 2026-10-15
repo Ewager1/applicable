@@ -60,11 +60,12 @@ Required labels, minimum entry values, whitespace normalization, indented bullet
 
 ### PDF presentation
 
-- Use one fixed template closely matching the supplied reference resumes.
-- Use locally bundled Source Sans 3 Regular (body), Semibold (section headings) and Bold, as confirmed for the B1 PDF refresh. B2 separately updates size/color hierarchy, metadata and dividers; keep the fixed template and preserve content.
+- Use one fixed, conservative Applicable PDF template; B2’s visual identity supersedes the initial reference-matching typography while retaining the successful single-column structure.
+- Use locally bundled Source Sans 3 Regular 9.75 pt body (measured 1.326 em baselines), Bold 20 pt name and Semibold headings/metadata. All date values share the Semibold 9.5 pt style, independently of institutions/issuers. See [the exact role sizes and colors](pdf-template.md).
+- Use primary `#20252B`, secondary `#4B5563`, accent `#1F4E5F` and thin inline `#D8DEE6` section dividers on white. Headings use about 0.07 em tracking and retain following content. The web interface remains outside this PDF refresh.
 - Use a single-column layout with the name and contact details at the top, followed by professional title and summary.
 - Use consistent section headings; align employment dates and locations on the right as in the references.
-- Bold skill categories and render their items as flowing text.
+- Use Semibold skill categories and render their items as flowing text.
 - Use automatic pagination without a page-count limit. Never truncate content to fit a target page count.
 - Keep headings with following content and job headers with at least the beginning of their bullets. A job may continue on another page.
 - Preserve selectable and searchable text. Do not export the resume as a screenshot. Unsupported displayed glyphs must block generation with a recoverable explanation instead of being silently lost.

@@ -42,7 +42,7 @@ The same document definition and bundled fonts generate the Node verification sa
 
 ### Typography and layout
 
-Local reference inspection found US Letter pages, approximately 43 pt margins, Poppins Light 10 pt body, Poppins SemiBold 18 pt name and 11 pt job headers, and Poppins ExtraLight 10 pt accent headings. Those original weights are preserved only in the historical pre-refresh baseline. B1 now uses Source Sans 3 Regular body, Semibold section headings and Bold bold text, retaining those sizes with accent `#00786c`, approximately 12 pt body baselines, hanging bullets, right-aligned metadata, and bold flowing skill categories. It follows the reference's single-column structure and heading order. The original reference remains outside this repository.
+The original reference-matching look is preserved in the historical pre-refresh baseline. The current B2 template uses Source Sans 3 Regular 9.75 pt body with measured 12.9285 pt baselines, Bold 20 pt name, Semibold 9.75 pt tracked section headings, Semibold 10.75/10.25 pt employer/role, and the same Semibold 9.5 pt style for every date. Contact/location text is secondary `#4B5563`, body is primary `#20252B`, accents are `#1F4E5F`, and inline vector dividers are `#D8DEE6`. US Letter, 43 pt margins, hanging bullets, right-aligned metadata and source ordering remain. See [the complete semantic style and measurement record](../docs/pdf-template.md).
 
 Every top-level heading/job header is linked to its next content block when pagination is calculated, avoiding orphan headers. Jobs can continue across pages. There is no fixed page limit, no truncation, and no automatic shrinking to hit a page count.
 
@@ -55,7 +55,7 @@ Every top-level heading/job header is linked to its next content block when pagi
 | pdfjs-dist 4.10.38 | Test-only text, annotation and geometry inspection | Apache 2.0, installed `node_modules/pdfjs-dist/LICENSE`; [official source](https://github.com/mozilla/pdf.js) |
 | Playwright 1.62.1 | Test-only real browser downloads and preview checks | Apache 2.0, installed `node_modules/playwright/LICENSE`; [official source](https://github.com/microsoft/playwright) |
 
-Font files and the OFL were downloaded from `https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/` on 2026-10-15. The license text is preserved, with trailing whitespace normalized. The copies in this repository are the runtime sources; no font request goes to that URL. Any later distribution must preserve dependency notices, and font redistribution must retain `OFL.txt`. The npm lockfile records all transitive packages and integrity hashes. pdfmake's package installation currently emits upstream deprecation notices for `crypto-js` and `jpeg-exif`; the 2026-10-15 production dependency audit reported no known vulnerabilities. This snapshot is not a guarantee about future advisories.
+Current static TTFs come from Adobe’s pinned 3.052R release, with exact source revision and original OFL recorded in `assets/fonts/SOURCE.md`. Poppins is retained only as embedded historical PDF subsets with its separate license. The bundled copies are the runtime sources; generation makes no font request to an external host. Any later distribution must preserve dependency notices, and font redistribution must retain `OFL.txt`. The npm lockfile records all transitive packages and integrity hashes. pdfmake's package installation currently emits upstream deprecation notices for `crypto-js` and `jpeg-exif`; the 2026-10-15 production dependency audit reported no known vulnerabilities. This snapshot is not a guarantee about future advisories.
 
 ### Limits and deferred work
 
@@ -64,23 +64,24 @@ Font files and the OFL were downloaded from `https://raw.githubusercontent.com/g
 - Font coverage is bounded by the bundled Source Sans 3 files. Accented Latin text, curly quotes and an em dash are verified. A4 adds glyph coverage checks that block unsupported displayed characters with a recoverable message; no glyph is silently dropped. See the production template document.
 - A4 verifies long unbroken tokens, long wrapping metadata, a job continued across pages and one bullet continued across three pages. Nonsensical multi-page header blocks remain outside the practical resume-layout claim; no arbitrary-document fidelity claim is made.
 - PDFs are searchable/selectable but are not tagged accessibility PDFs. The proof's automated bounds checks complement visual review; they do not prove the absence of every possible overlap.
-- Styling is a close reference-based baseline, not a claim of exact reproduction for every input. No parsing, rewriting, storage, external AI or resume validation is implemented.
+- Styling uses the fixed Applicable visual identity, with no claim of exact reproduction for every possible input. No parsing, rewriting, storage, external AI or resume validation is implemented.
 
 ## Retained baseline and layout checklist
 
-`baseline/typical.pdf` is a reviewed **synthetic-only** visual baseline, intentionally refreshed in B1 for the real Source Sans 3 weights after short/typical/long pages were inspected. The old exactly two-page Poppins output and identical frozen data remain in `baseline/pre-refresh/` for B2 comparison, with their original license. It is intentionally retained; generated scratch output stays ignored. Regenerate from `fixture('typical')` after a proposed layout change, compare it against this baseline, and update the baseline only after reviewing every affected page. Byte-for-byte identity is not a regression requirement because PDF internal identifiers can vary.
+`baseline/typical.pdf` is a reviewed **synthetic-only** visual baseline, intentionally refreshed in B2 after all 14 fixture pages were inspected for the new hierarchy, shared dates and inline rules. The old exactly two-page Poppins output and identical frozen data remain in `baseline/pre-refresh/` for B2 comparison, with their original license. It is intentionally retained; generated scratch output stays ignored. Regenerate from `fixture('typical')` after a proposed layout change, compare it against this baseline, and update the baseline only after reviewing every affected page. Byte-for-byte identity is not a regression requirement because PDF internal identifiers can vary.
 
-Review recorded on 2026-10-15: all 14 pages in short (1), typical (2), long (3), parsed (1), split-job (2), multi-page-bullet (3) and long-values (2) were rendered with Poppler and visually inspected. The Chrome preview was also inspected. The following checklist passed:
+B2 review recorded on 2026-10-15: all 14 pages in short (1), typical (2), long (3), parsed (1), split-job (2), multi-page-bullet (3) and long-values (2) were rendered with Poppler and visually inspected. The browser checks verify the actual downloaded/previewed PDF bytes. The following checklist passed:
 
 - [x] Text stays within page margins; no clipping, overlap or missing glyphs in the fixtures.
-- [x] Name/title hierarchy, accent headings and body typography resemble the supplied reference.
-- [x] Dates and locations align to the right, with separation from left metadata.
+- [x] Name/title hierarchy, tracked Semibold headings and readable body follow the Applicable PDF style.
+- [x] All date groups use matching Semibold size/color; locations align right in secondary color, separate from left metadata.
+- [x] Real section dividers fill remaining width without crossing heading text; headings/rules stay with following content.
 - [x] Wrapped bullets use consistent hanging indentation and readable line spacing.
 - [x] Section headings and job headers share a page with following content.
 - [x] Page transitions preserve continued job content without duplicate headers or blank pages.
-- [x] Categorized skills use bold labels and flowing text in source order.
+- [x] Categorized skills use Semibold labels and flowing text in source order.
 - [x] Selectable/searchable text preserves every fixture field and punctuation; link annotations target the intended email and URL.
 - [x] Direct download works; preview and download share exactly the same bytes.
 - [x] Generation makes no remote network requests after local installation.
 
-Automated verification now includes parser tests, the three original rendering tests, production-template tests and two browser tests. See the production template document for exact cases. The browser check continues to compare actual downloaded bytes with the preview artifact and to reject remote HTTP/WebSocket requests.
+Automated verification includes parser, original rendering and production-template tests plus development/production browser checks. See the production template document for exact cases. The browser check continues to compare actual downloaded bytes with the preview artifact and to reject remote HTTP/WebSocket requests.

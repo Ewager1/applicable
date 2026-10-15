@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1–A6 and the copy-safe marker fix (#13) are complete. Development-cache fix #15 is complete. B1 [issue #17](https://github.com/Ewager1/applicable/issues/17) implements Source Sans 3 fonts pending review/CI; B2 follows sequentially.
+Status: A1–A6 and the copy-safe marker fix (#13) are complete. Development-cache fix #15 is complete. B1 [issue #17](https://github.com/Ewager1/applicable/issues/17) is merged, closed and Done via PR #19. B2 [issue #18](https://github.com/Ewager1/applicable/issues/18) implements the PDF visual identity; local work awaits review/CI.
 
 ## Workflow
 
@@ -144,8 +144,10 @@ Tracking: [issue #15](https://github.com/Ewager1/applicable/issues/15), Applicab
 
 ### B1 — Source Sans 3 font foundation (#17)
 
-Bundle authoritative Adobe static Regular 400, Semibold 600 and Bold 700 TTFs locally, retain source revision/license, register distinct real weights and update glyph coverage/embedding verification. Body uses Regular and section headings Semibold. Preserve all content, ordering, links and local export behavior. Before changing fonts, retain an exactly two-page synthetic Poppins PDF and identical fixture for B2. Inspect short/typical/long outputs and run the full suite. No UI/parser/data model changes; size/color/dividers are B2. Tracking: [#17](https://github.com/Ewager1/applicable/issues/17), Applicable project.
+Bundle authoritative Adobe static Regular 400, Semibold 600 and Bold 700 TTFs locally, retain source revision/license, register distinct real weights and update glyph coverage/embedding verification. Body uses Regular and section headings Semibold. Preserve all content, ordering, links and local export behavior. Before changing fonts, retain an exactly two-page synthetic Poppins PDF and identical fixture for B2. Inspect short/typical/long outputs and run the full suite. No UI/parser/data model changes; size/color/dividers are B2. Tracking: [#17](https://github.com/Ewager1/applicable/issues/17), Applicable project. Complete: merged [PR #19](https://github.com/Ewager1/applicable/pull/19), closed and Done.
 
 ### B2 — PDF hierarchy and dividers (#18, after B1)
 
 Complete the separately requested size/color/metadata/divider hierarchy using the B1 font foundation. Compare the identical frozen `proof/baseline/pre-refresh/resume.json` against its old Poppins PDF; preserve content and review all page transitions. Implement only after B1 merges, on its own issue branch with the normal tests/review/CI gates. Tracking: [#18](https://github.com/Ewager1/applicable/issues/18), Applicable project; follow its confirmed acceptance details.
+
+B2 implementation evidence: centralized semantic styles and the confirmed palette, shared Semibold dates, adaptive real divider rules, measured 1.326 em body baselines, repeated-entry rendered font/color tests and identical-data two-page comparison. All 14 generated pages were visually reviewed; the current synthetic baseline is refreshed and the historical PDF/data remain unchanged. No UI, parser, source content or model changes. Integration remains subject to review and latest-commit CI.
