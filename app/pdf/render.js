@@ -5,6 +5,10 @@ import { fontFiles, fonts } from './fonts.js';
  * Generate one byte buffer for both preview and download. Supply pdfmake's local
  * browser bundle and font data returned by loadBrowserFonts (or local Node reads).
  * Failures reject with an Error; the UI must retain source and offer no new PDF.
+ * @param {import('../resume/types.js').Resume} resume
+ * @param {typeof import('pdfmake/build/pdfmake.js')} pdfMake Local browser engine.
+ * @param {Record<string, string>} fontData Bundled TTF filenames to base64 data.
+ * @returns {Promise<Uint8Array>}
  */
 export async function createPdfBytes(resume, pdfMake, fontData) {
   const definition = documentDefinition(resume);

@@ -151,3 +151,14 @@ Bundle authoritative Adobe static Regular 400, Semibold 600 and Bold 700 TTFs lo
 Complete the separately requested size/color/metadata/divider hierarchy using the B1 font foundation. Compare the identical frozen `proof/baseline/pre-refresh/resume.json` against its old Poppins PDF; preserve content and review all page transitions. Implement only after B1 merges, on its own issue branch with the normal tests/review/CI gates. Tracking: [#18](https://github.com/Ewager1/applicable/issues/18), Applicable project; follow its confirmed acceptance details.
 
 B2 implementation evidence: centralized semantic styles and the confirmed palette, shared Semibold dates, adaptive real divider rules, measured 1.326 em body baselines, repeated-entry rendered font/color tests and identical-data two-page comparison. All 14 generated pages were visually reviewed; the current synthetic baseline is refreshed and the historical PDF/data remain unchanged. No UI, parser, source content or model changes. Integration remains subject to review and latest-commit CI.
+
+## Approved professional cleanup
+
+The six focused issues below run sequentially, each with its own branch, checks, review and merge lifecycle. GitHub issues and the [Applicable project](https://github.com/users/Ewager1/projects/6) carry current status; this list records scope rather than duplicating live status. C6 reconciles the historical documentation after implementation.
+
+1. [C1 #21: Resume contracts](https://github.com/Ewager1/applicable/issues/21): shared editor-visible JSDoc data/result/error definitions and clearer parser/UI code, with unchanged behavior.
+2. [C2 #22: PDF presentation](https://github.com/Ewager1/applicable/issues/22): organize PDF styles/presentation without changing the approved design.
+3. [C3 #23: Web styles](https://github.com/Ewager1/applicable/issues/23): clarify the existing web stylesheet structure without redesigning the interface.
+4. [C4 #24: PDF pagination](https://github.com/Ewager1/applicable/issues/24): clarify pagination responsibilities and verification.
+5. [C5 #25: Oversized PDF headers](https://github.com/Ewager1/applicable/issues/25): handle oversized metadata/header blocks explicitly within the issue's bounded requirements.
+6. [C6 #26: Developer handoff](https://github.com/Ewager1/applicable/issues/26): reconcile documentation and provide the final developer handoff.

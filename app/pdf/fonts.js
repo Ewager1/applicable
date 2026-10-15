@@ -9,7 +9,10 @@ const fontUrls = [
   new URL('../../assets/fonts/SourceSans3-Bold.ttf', import.meta.url),
 ];
 
-/** Load only bundled local assets. The caller can retain the resulting map for later exports. */
+/**
+ * Load only bundled local assets. The caller can retain the map for later exports.
+ * @returns {Promise<Record<string, string>>} Bundled filenames to base64 TTF data.
+ */
 export async function loadBrowserFonts() {
   try {
     return Object.fromEntries(await Promise.all(fontUrls.map(async (url, index) => {

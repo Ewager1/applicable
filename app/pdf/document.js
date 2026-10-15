@@ -30,6 +30,7 @@ const metadata = (left, right, leftStyle, rightStyle = 'date') => ({
   columns: [{ text: left, style: leftStyle, width: '*' }, { text: right, style: rightStyle, width: 180, alignment: 'right' }],
   columnGap: 12,
 });
+/** @param {import('../resume/types.js').Resume} resume */
 function verifyCharacters(resume) {
   const text = [resume.name, ...resume.contact.map(item => item.text), resume.title, resume.summary,
     ...resume.jobs.flatMap(job => [job.employer, job.role, job.dates, job.location, ...job.bullets]),
@@ -47,7 +48,10 @@ function verifyCharacters(resume) {
   }
 }
 
-/** Render a complete successful parser result; unsupported glyphs block generation. */
+/**
+ * Render a complete successful parser result; unsupported glyphs block generation.
+ * @param {import('../resume/types.js').Resume} resume
+ */
 export function documentDefinition(resume) {
   verifyCharacters(resume);
   let contact;
