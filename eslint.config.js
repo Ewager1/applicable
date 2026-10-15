@@ -12,7 +12,7 @@ export default [
   },
   {
     files: ['app/**/*.js', 'proof/browser.mjs'],
-    languageOptions: { globals: readonly(['window', 'document', 'fetch', 'URL', 'Blob', 'btoa', 'console']) },
+    languageOptions: { globals: readonly(['window', 'document', 'fetch', 'URL', 'Blob', 'btoa', 'console', 'navigator']) },
   },
   {
     files: ['**/*.test.mjs', 'tests/**/*.mjs', 'proof/pdf.mjs', 'proof/generate.mjs', 'proof/serve.mjs', 'proof/production-fixtures.mjs', 'scripts/**/*.mjs'],
@@ -21,6 +21,6 @@ export default [
   {
     files: ['**/*.test.mjs'],
     // Browser callbacks are serialized by Playwright and execute in the page.
-    languageOptions: { globals: readonly(['document', 'fetch']) },
+    languageOptions: { globals: readonly(['document', 'fetch', 'window', 'navigator']) },
   },
 ];

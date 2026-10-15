@@ -1,6 +1,6 @@
 # Applicable resume text format
 
-Applicable accepts a complete resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; copy the entire result into the eventual application input. The parser is implemented now; the paste interface and production PDF integration are later issues.
+Applicable accepts a complete resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; copy the entire result into the eventual application input. The parser, paste interface and shared production PDF integration are implemented. The application can copy the reusable chatbot instruction from its collapsible format help.
 
 See the complete [synthetic example](../examples/resume.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
 

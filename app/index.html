@@ -3,15 +3,66 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A local tool for formatting a pasted resume as a PDF.">
-    <title>Applicable</title>
+    <meta name="description" content="Paste your resume and receive a polished PDF, processed privately on your device.">
+    <title>Applicable — Resume to PDF</title>
     <script type="module" src="./main.js"></script>
   </head>
   <body>
     <main>
-      <h1>Applicable</h1>
-      <p>Resume formatting, kept simple.</p>
-      <p>The application is under development. Resume input and PDF export are coming next.</p>
+      <header class="masthead">
+        <a class="brand" href="./" aria-label="Applicable home">Applicable<span aria-hidden="true">.</span></a>
+        <span class="privacy"><span aria-hidden="true">●</span> On your device. Just for you.</span>
+      </header>
+
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">READY FOR YOUR NEXT OPPORTUNITY</p>
+        <h1 id="page-title">Your words.<br>A polished PDF.</h1>
+        <p>Paste your complete resume. Get a consistent, carefully formatted PDF, ready to send.</p>
+      </section>
+
+      <form id="resume-form" novalidate aria-busy="false">
+        <div class="form-top">
+          <div>
+            <label for="resume">Your resume</label>
+            <p id="resume-help">Paste the full text in Applicable’s format. <span class="shortcut">⌘ / Ctrl + Enter to create.</span></p>
+          </div>
+          <button id="create-pdf" type="submit">Create PDF</button>
+        </div>
+
+        <section id="error-summary" class="errors" tabindex="-1" role="alert" aria-labelledby="error-title" hidden>
+          <h2 id="error-title">A few details need your attention</h2>
+          <ul id="error-list"></ul>
+        </section>
+
+        <textarea id="resume" name="resume" rows="13" aria-describedby="resume-help" spellcheck="false" placeholder="Paste your complete resume here…"></textarea>
+
+        <details class="format-help">
+          <summary>Need the resume format?</summary>
+          <div class="help-content">
+            <p>Ask your chatbot to use these instructions, then paste its complete resume here. Include Contact, Professional Title, Summary, Relevant Experience, Education, Certifications and Skills.</p>
+            <p>Use <code>#</code> section headings, <code>## Job</code> / <code>## Education</code> / <code>## Certification</code> entry markers, labeled details and ordinary bullets. Skills use <code>Category: skill, skill</code>.</p>
+            <button id="copy-instructions" class="secondary" type="button">Copy chatbot instructions</button>
+            <p id="copy-status" role="status" aria-live="polite"></p>
+            <pre id="instructions-fallback" tabindex="0" hidden></pre>
+          </div>
+        </details>
+      </form>
+
+      <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+      <section id="result" class="result" aria-labelledby="result-title" hidden>
+        <div class="result-top">
+          <div>
+            <p class="eyebrow">READY TO SEND</p>
+            <h2 id="result-title" tabindex="-1">Your resume PDF</h2>
+          </div>
+          <a id="download" class="download" download="resume.pdf">Download PDF <span aria-hidden="true">↓</span></a>
+        </div>
+        <p id="preview-note">Preview the same file you download. If your browser cannot show the preview, use Download PDF to open it.</p>
+        <iframe id="preview" title="Your generated resume PDF" aria-describedby="preview-note"></iframe>
+      </section>
+
+      <footer>Your resume is processed privately on your device.</footer>
     </main>
   </body>
 </html>

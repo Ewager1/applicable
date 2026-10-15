@@ -2,7 +2,7 @@
 
 ## Structure
 
-- `app/index.html`, `app/main.js`, `app/styles.css`: native HTML, JavaScript entry point and CSS. This is a development shell until the input/interface issues land.
+- `app/index.html`, `app/main.js`, `app/styles.css`: native HTML, JavaScript entry point and CSS. The paste form, local generation coordinator, copyable format help and same-file PDF preview/download live here.
 - `app/resume/parse.js`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors.
 - `examples/`: synthetic canonical resume and reusable chatbot instruction.
 - `app/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
@@ -31,10 +31,20 @@ The previously selected pdfmake, PDF.js and Playwright remain unchanged. Vite an
 
 ## Verification boundaries
 
-`npm run check` runs lint, parser/validation and existing PDF preservation/layout tests, production build, then two browser tests. One browser test exercises short/typical/long synthetic PDF generation and actual downloads; the other loads the production build, confirms JavaScript/CSS resolve without execution or network errors, and rejects remote HTTP/WebSocket requests. Browser tests own and clean up the two temporary servers. The parser tests cover required content, ordering, wording, multiline bullets and blocking malformed input. The application shell has no input behavior to unit-test yet; avoid assertions that merely repeat its wording.
+`npm run check` runs lint, parser/validation and existing PDF preservation/layout tests, production build, then the browser checks. The retained proof exercises short/typical/long PDFs and actual downloads. Built-application tests cover missing-section warnings, correction and keyboard submission, complete downloaded PDF content/order/links, exact preview bytes, repeat downloads, native-viewer fallback, glyph/font failure recovery, pending-font edit races, duplicate submit guards, stale URL cleanup and responsive layout. Every browser case rejects remote HTTP/WebSocket requests and uncaught page errors. Browser tests own and clean up the two temporary servers. The parser tests cover required content, ordering, wording, multiline bullets and blocking malformed input. Browser checks verify user-visible behavior rather than repeating the interface wording.
 
-The built shell is the application artifact; the separate developer proof is intentionally not bundled into `dist/`. The application shell does not import the production PDF adapter yet; A5 connects it with the paste interface and Vite will bundle its fonts locally. Production packaging and clean-download checks remain A6 work. A build is not a release or deployment.
+The production build is the application artifact; the separate developer proof is intentionally not bundled into `dist/`. The application imports the shared production PDF adapter and Vite bundles all three fonts locally. The larger pdfmake module is lazy-loaded only after valid submission; the initial application JavaScript stays small. Its approximately 1.3 MB minified PDF engine chunk produces the expected Vite size advisory; this is the already selected engine, not an additional dependency. Production packaging and clean-download checks remain A6 work. A build is not a release or deployment.
 
 No PDF layout was intentionally changed in A2, so its reviewed synthetic baseline remains unchanged. The A1 visual checklist continues to apply to later PDF changes. A4 adds explicit split-job, multi-page-bullet, long metadata/token and unsupported-character cases; see [production PDF verification](pdf-template.md).
 
 Local checks do not establish that GitHub Actions has passed. The first remote workflow run must finish successfully on the PR's latest commit before merge.
+
+## Interface state and recovery
+
+`app/main.js` owns a single pending submission. Every input event advances a revision, clears warnings and removes/revokes any generated Blob URL. A submission captures the current source and revision; after each asynchronous boundary it checks both before creating an artifact or downloading. Editing while fonts or generation are pending therefore cannot deliver an old resume. The form exposes busy state, disables duplicate submissions, and restores the button in `finally`.
+
+Fonts load lazily and only successful data is cached. Missing/corrupt font errors discard that cache, so the same source can be retried without a page reload. User source is never replaced or stored. Errors use text content, a focusable alert summary and the original line numbers. A live status region announces progress; Cmd/Ctrl + Enter is available in the labeled input.
+
+A successful export creates one byte Blob and one object URL. Native PDF viewing is gated by `navigator.pdfViewerEnabled`; browsers without it get the normal download/link and an explanatory message, without assigning an iframe source that might cause an extra automatic download. With native viewing available the iframe and download use exactly the same URL. Editing, failure and page departure remove the old artifact and release its URL.
+
+CI uses Playwright’s `chromium` channel (full/new headless mode), rather than its older headless shell, to exercise the native PDF viewer. A capability-disabled application test separately verifies exactly one automatic download and a usable repeat-download link. Desktop/mobile UI screenshots are written under ignored `output/ui/`; an actual browser-downloaded synthetic resume is retained under ignored `output/pdf/application-resume.pdf` for visual QA. The PDF template baseline is unchanged by A5.
