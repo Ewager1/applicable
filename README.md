@@ -24,7 +24,7 @@ Paste a complete resume, submit it, and download a PDF using one consistent temp
 
 Installation needs internet access to download dependencies. After installation, the app processes your resume using local code and bundled fonts. It binds to your own machine only and does not require an account or paid service.
 
-To stop, press **Ctrl+C** in the terminal running Applicable. To start it again, open the same folder and run `npm run dev`; reinstalling is unnecessary unless the project dependencies changed. Keep that terminal open while using the app. Do not open `index.html` directly: the local server is required.
+To stop, press **Ctrl+C** in the terminal running Applicable. To start it again, open the same folder and run `npm run dev`; reinstalling is unnecessary unless the project dependencies changed. Stop Applicable before running `npm ci` or removing its dependency/cache folders: replacing files while it runs can interrupt PDF creation. Keep that terminal open while using the app. Do not open `index.html` directly: the local server is required.
 
 For a production build served locally:
 
@@ -93,7 +93,7 @@ Resume text stays in the current browser page; Applicable does not send it to a 
 - Inline PDF viewing and automatic downloads depend on browser capabilities/settings. Use **Download PDF** when needed; no extra viewer installation is required.
 - If installation reports an unsupported Node version, check `node --version` in the same terminal and select a supported version before retrying `npm ci`.
 - If a port is busy, stop the previous Applicable process with Ctrl+C. Startup reports the conflict rather than silently choosing another address.
-- If local assets cannot load, stop the server, run `npm ci` in the project folder, start again and reload the page. Your unsaved browser input may need to be copied somewhere safe before reloading.
+- If PDF creation cannot load, or the browser reports **504 Outdated Optimize Dep**, first copy your resume somewhere safe. Stop Applicable with Ctrl+C in its own terminal, run `npm run dev -- --force` in the project folder, then reload the page and paste your resume back. This rebuilds the local development cache; reloading alone may keep requesting an obsolete file. If dependencies are missing, stop the server before running `npm ci`, then start it again. Avoid stopping another application's server if it uses a similar address.
 
 Manual clean-source testing covered macOS; the application checks also run in Linux CI. Windows, Safari and physical mobile devices have not been manually verified. Desktop browser viewport tests cover narrow and wide layouts. Full results and exact limitations are in the verification record.
 
