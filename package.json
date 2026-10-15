@@ -1,0 +1,22 @@
+{
+  "name": "applicable",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "proof:generate": "node proof/generate.mjs",
+    "proof:serve": "node proof/serve.mjs",
+    "test": "node --test proof/render.test.mjs",
+    "test:browser": "node --test proof/browser.test.mjs"
+  },
+  "dependencies": {
+    "pdfmake": "0.2.20"
+  },
+  "devDependencies": {
+    "pdfjs-dist": "4.10.38",
+    "playwright": "1.62.1"
+  }
+}

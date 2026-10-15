@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: GitHub setup complete. Issues are tracked in the Applicable project board; implementation has not started.
+Status: GitHub setup complete. Issues are tracked in the Applicable project board; issue #1 is in progress with a rendering proof ready for independent review.
 
 ## Workflow
 
@@ -60,7 +60,7 @@ Acceptance criteria:
 
 - Document the canonical text format and provide a complete synthetic example suitable for chat-generated output.
 - Define required fields, repeated entry boundaries, multiline bullets, skill separators, and duplicate or unknown section behavior.
-- Resolve required versus optional groups with the user before implementation; fixed presentation order alone does not make certifications or any other unconfirmed group mandatory.
+- Require all seven fixed groups. Missing or blank content blocks export with a clear human-language warning naming what is missing; preserve the pasted text for correction.
 - Accept different section orders and normalize only group ordering.
 - Preserve job, bullet, category, and skill item order and original wording.
 - Reject missing names, empty skills, malformed entries, and unrecognized content with useful feedback.

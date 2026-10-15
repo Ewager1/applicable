@@ -51,8 +51,9 @@ Document required labels, accepted whitespace, multiline bullet handling, duplic
 
 - Use programmatic checks without AI or external requests.
 - Reject empty input and missing or whitespace-only required values, including contact name and skills.
-- Contact name and non-empty skills are confirmed validation examples. Before implementing the parser, confirm which other groups are required, which may be omitted, and the minimum fields for each entry. Fixed group order does not establish that every group must contain content.
+- Every fixed group is required: contact information (including name), professional title, summary, Relevant Experience, Education, Certifications, and Skills. Missing or whitespace-only content blocks export.
 - A heading by itself does not count as content.
+- Show clear human-language warnings naming what is missing, such as "Education is missing" or "Add at least one skill under Skills." Keep the source text available for correction; do not expose parser jargon or raw exceptions as validation feedback.
 - Report missing fields and malformed or unrecognized blocks with useful locations where practical.
 - Do not generate a partial PDF after a parsing failure.
 - Do not introduce scoring, content advice, or speculative resume-quality checks.
