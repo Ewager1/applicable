@@ -1,5 +1,7 @@
 # Local distribution verification
 
+This is the **historical A6 verification record** for the commit and date below. Its test counts, fonts and observations are not a fresh run of the current checkout. Consult [the maintenance guide](maintenance.md), [current template limits](pdf-template.md) and [GitHub checks/status](https://github.com/Ewager1/applicable/actions) for subsequent work.
+
 Verified on 2026-10-15 against committed application source [`338fcfc`](https://github.com/Ewager1/applicable/commit/338fcfca5468a8ec12cbc126e1d47206acae2fdb), the merged [A5 PR #11](https://github.com/Ewager1/applicable/pull/11). A6 adds documentation and license notices only; no application code, dependencies or layout changes are included.
 
 ## Clean-source method
@@ -39,11 +41,11 @@ The 9 browser checks use synthetic content only. They include native PDF viewing
 
 ## Platforms and limits
 
-The clean-source run above used **macOS 15.6**, Node **24.19.0**, npm **10.8.2**, and installed desktop Chrome. Existing GitHub Actions checks for the implemented application use **Ubuntu 24.04**, Node **22**, and pinned Playwright Chromium; see [PR #11 checks](https://github.com/Ewager1/applicable/pull/11/checks) and the [workflow](../.github/workflows/checks.yml). A6's latest-commit CI run and merge/issue closure remain integration gates tracked in [issue #6](https://github.com/Ewager1/applicable/issues/6), rather than being claimed by this local report.
+The clean-source run above used **macOS 15.6**, Node **24.19.0**, npm **10.8.2**, and installed desktop Chrome. Existing GitHub Actions checks for the implemented application use **Ubuntu 24.04**, Node **22**, and pinned Playwright Chromium; see [PR #11 checks](https://github.com/Ewager1/applicable/pull/11/checks) and the [workflow](../.github/workflows/checks.yml). This local report did not establish A6's later CI/merge/closure result; [issue #6](https://github.com/Ewager1/applicable/issues/6) and its linked PR record that lifecycle.
 
 Windows, Safari and physical mobile devices were not manually tested. Narrow/wide layouts were checked through desktop browser viewport sizes; that does not establish a full mobile-browser compatibility matrix. Normal use needs a modern browser, not specifically Chrome; Chrome/Chromium is the developer test prerequisite. Native PDF viewing/controls depend on the browser, and download remains available when native viewing is absent or automatic downloads are blocked.
 
-Installation requires internet access for npm dependencies, and downloading a development test browser also requires internet. The installed application's generation path uses bundled fonts/code and no remote service. The app accepts the canonical input format, requires all seven groups, and has bounded bundled-font glyph coverage (Source Sans 3 after B1); unsupported displayed characters block generation with a correction message. Practical long metadata is tested; arbitrary multi-page header blocks are outside the supported layout claim. Resume processing is not persisted by Applicable; downloaded files remain wherever the user/browser saves them.
+Installation requires internet access for npm dependencies, and downloading a development test browser also requires internet. The installed application's generation path uses bundled fonts/code and no remote service. The app accepts the canonical input format, requires all seven groups, and that snapshot used bounded Poppins glyph coverage; unsupported displayed characters block generation with a correction message. Practical long metadata was tested; arbitrary multi-page header blocks were outside that snapshot's supported layout claim. The later Source Sans 3 and C5 fit safeguards are documented separately in the current template notes. Resume processing is not persisted by Applicable; downloaded files remain wherever the user/browser saves them.
 
 The known build advisory about the approximately 1.3 MB PDF engine chunk is expected: it is lazy-loaded, while initial application JavaScript is approximately 18 KB. Installation also reports upstream `crypto-js` and `jpeg-exif` deprecation notices; these did not prevent installation or the checks. No warning was suppressed and no runtime dependency changed during A6.
 

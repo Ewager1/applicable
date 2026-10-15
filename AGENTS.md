@@ -3,6 +3,7 @@
 ## Sources of truth
 
 - Read `docs/project-spec.md` before making application or architecture changes.
+- Use [the maintenance guide](docs/maintenance.md) to locate modules, invariants and focused verification commands.
 - Read `docs/project-plan.md` for phases, dependencies, and acceptance criteria.
 - Follow the assigned GitHub issue when issues have been created.
 - Follow `docs/agent-workflow.md` for bounded delegation and independent review.

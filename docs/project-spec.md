@@ -1,6 +1,6 @@
 # Applicable: Project Specification
 
-Status: PDF approach verified in A1, development foundation established in A2, and canonical input format/parser implemented in A3. The shared production template is implemented in A4; A5 implements interface integration; A6 clean-source/distribution verification has passed, with final integration tracked in issue #6. Distribution is public source under MIT; no release or deployment is implied.
+This document records the application contract. Use [GitHub issues](https://github.com/Ewager1/applicable/issues) and [the project board](https://github.com/users/Ewager1/projects/6) for current delivery status, and [the maintenance guide](maintenance.md) for edit points and verification. Distribution is public source under MIT; no release, deployment or framework migration is implied.
 
 ## Purpose
 
@@ -56,6 +56,7 @@ Required labels, minimum entry values, whitespace normalization, indented bullet
 - Show clear human-language warnings naming what is missing, such as "Education is missing" or "Add at least one skill under Skills." Keep the source text available for correction; do not expose parser jargon or raw exceptions as validation feedback.
 - Report missing fields and malformed or unrecognized blocks with useful locations where practical.
 - Do not generate a partial PDF after a parsing failure.
+- Before export, measure required heading/content keep-groups with the same local PDF engine. Groups that cannot fit on a fresh page receive a recoverable warning; retain source, provide no artifact, and do not impose a blanket parser character cap.
 - Do not introduce scoring, content advice, or speculative resume-quality checks.
 
 ### PDF presentation
@@ -91,7 +92,7 @@ Prefer displaying the same generated PDF bytes that are offered for download, af
 
 Start with native HTML/CSS and small JavaScript modules. A UI framework is not required by this workflow. Keep parsing, validation, PDF rendering, and interface handling separate enough to test without introducing a general template engine.
 
-Before committing to a PDF library or local runtime, prove that the chosen approach can deliver deterministic typography, pagination, selectable text, local fonts, and a direct downloadable file. Investigate a browser-only solution first; a local generation process remains an option if it materially improves fidelity. Record the tradeoff and installation burden before finalizing that choice. TypeScript and build tooling remain implementation decisions, not product requirements.
+The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. The current implementation is plain JavaScript with shared editor-visible JSDoc contracts, not TypeScript or React. Future migration planning is tracked separately from delivered functionality.
 
 ## Privacy and examples
 
