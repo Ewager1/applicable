@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1–A3 are merged, closed and Done. A4 production template and targeted verification are implemented locally, awaiting independent review and CI.
+Status: A1–A4 are merged, closed and Done. A5 paste-to-PDF interface and end-to-end verification are implemented locally, awaiting independent review and CI.
 
 ## Workflow
 
@@ -120,6 +120,6 @@ Dependencies: A5.
 | 1 | A1 | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1) | Merged, closed and Done |
 | 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) | Merged, closed and Done |
 | 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) | Merged, closed and Done |
-| 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) | In progress |
-| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | Planned |
+| 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) | Merged, closed and Done |
+| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | In progress |
 | 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Planned |

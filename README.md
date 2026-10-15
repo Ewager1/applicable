@@ -6,7 +6,7 @@ Paste a complete resume, submit it, and download a PDF using one consistent temp
 
 ## Project status
 
-The PDF rendering investigation is complete. Synthetic examples demonstrate the fixed template, automatic pagination, direct download and exact PDF preview. The application now has a minimal vanilla JavaScript development/build foundation and automated checks. The canonical text format and parser are implemented and tested. The production PDF template now consumes parsed resumes and shares its layout with the proof. The paste-to-PDF interface is still being built; the application currently shows a clearly labeled development shell.
+The complete paste-to-PDF flow is implemented: validation, local generation, an automatic `resume.pdf` download and an exact preview where native PDF viewing is supported. The interface preserves your source text through errors and requires no template settings. Final clean-download/distribution verification is the remaining project phase; no release has been published.
 
 ## Local development
 
@@ -35,7 +35,7 @@ Open http://127.0.0.1:4173/. See [proof setup, verification, fonts and rendering
 | `npm test` | Resume parsing/validation plus selectable PDF text, fonts, links, bounds and pagination |
 | `npm run build` | Bundle the application into `dist/` |
 | `npm run preview` | Serve the built application at http://127.0.0.1:4174/; stop with Ctrl+C |
-| `npm run test:browser` | Own temporary proof/build-preview servers; verify real downloads and local built assets |
+| `npm run test:browser` | Own temporary servers; verify paste, warnings, correction, real downloads, preview and recovery |
 | `npm run check` | Lint, PDF tests, build, then browser tests |
 | `npm run proof:generate` | Generate synthetic PDFs in ignored `output/pdf/` |
 
@@ -50,15 +50,17 @@ PLAYWRIGHT_BROWSER=chromium npm run check
 
 The environment-variable form above works in macOS/Linux shells. In PowerShell, use `$env:PLAYWRIGHT_BROWSER = "chromium"` and then `npm run check`. Alternatively set `CHROME_PATH` to a Chromium executable's absolute path. On Linux, Playwright's `install --with-deps chromium` command can install the system libraries needed for testing. Browser downloads are development-only and are not needed to run the application.
 
-GitHub Actions runs the same checks on pull requests to `main` and pushes to `main`, using Node 22 on Ubuntu 24.04 and the pinned Playwright Chromium. Dependency/browser installation requires an internet connection; resume PDF generation uses local assets. No TypeScript or separate type-check command is configured for this small JavaScript application. See [tooling and module structure](docs/development.md).
+GitHub Actions runs the same checks on pull requests to `main` and pushes to `main`, using Node 22 on Ubuntu 24.04 and the pinned Playwright Chromium in its full/new headless mode (including native PDF viewing). Dependency/browser installation requires an internet connection; resume PDF generation uses local assets. No TypeScript or separate type-check command is configured for this small JavaScript application. See [tooling and module structure](docs/development.md).
 
-## Planned experience
+## Using Applicable
 
-- One expanding text box with a submit button above it.
-- Clear warnings that block export when required content is missing or empty.
-- One carefully tuned PDF template with automatic pagination.
-- Local processing without accounts, AI services, or a database.
-- A preview using the same generated PDF offered for download, where the browser supports inline viewing.
+1. Prepare your complete resume using the [input format](docs/input-format.md). The in-app “Need the resume format?” section can copy reusable instructions for your chatbot.
+2. Paste the result into **Your resume**, then select **Create PDF** above the field. You can also press Cmd/Ctrl + Enter while editing.
+3. The app downloads `resume.pdf` and shows the same PDF for review. Use **Download PDF** to download it again. If your browser cannot display PDFs inline, the download remains available without an embedded viewer.
+
+Missing, blank or malformed content blocks export with clear warnings and source lines where applicable. Your pasted text stays available for correction. Editing it removes the old preview/download so an earlier file is not mistaken for the updated resume. During generation the button is disabled; edits remain possible, and an outdated result will not download.
+
+The field grows with your text up to the available viewport, then scrolls. There are no upload controls, profiles, accounts, saved resume history, AI calls or remote processing. A browser may require you to use the visible download link if it blocks automatic downloads. Native PDF controls and rendering vary by browser; no separate viewer library is included.
 
 ## Development documents
 
