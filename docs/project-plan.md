@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1 merged in PR #7; issue #1 is closed and Done. A2 development/build tooling and checks are implemented locally and awaiting independent review and the first CI run.
+Status: A1 and A2 are merged, closed and Done. A3 input contract and parser are implemented locally and awaiting independent review and CI.
 
 ## Workflow
 
@@ -118,8 +118,8 @@ Dependencies: A5.
 | Order | Plan | GitHub issue | Status |
 | --- | --- | --- | --- |
 | 1 | A1 | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1) | Merged, closed and Done |
-| 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) | In progress |
-| 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) | Planned |
+| 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) | Merged, closed and Done |
+| 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) | In progress |
 | 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) | Planned |
 | 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | Planned |
 | 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Planned |
