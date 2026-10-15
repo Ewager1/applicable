@@ -6,6 +6,7 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { parsedExample } from '../proof/production-fixtures.mjs';
 const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
+const chatbotInstructions = await readFile(new URL('../examples/chatbot-instruction.md', import.meta.url), 'utf8');
 const compact = text => text.replace(/\s/g, '');
 let browser;
 before(async () => { browser = await chromium.launch(browserOptions()); });
@@ -51,6 +52,42 @@ async function artifactUrls(page) {
     return { download, preview, bytes: Array.from(new Uint8Array(await (await fetch(preview)).arrayBuffer())) };
   });
 }
+
+test('visible chatbot workflow copies the complete literal instructions with keyboard activation', async t => {
+  const page = await openPage(t);
+  await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', {
+    value: { writeText: async text => { window.copiedInstructions = text; } },
+  }));
+  await page.reload();
+  await page.getByRole('heading', { name: 'Turn chatbot text into a polished resume.', exact: true }).waitFor();
+  const copy = page.getByRole('button', { name: 'Copy chatbot instructions', exact: true });
+  assert.equal(await copy.isVisible(), true, 'Beginner workflow is visible without opening hidden help');
+  await copy.focus();
+  await copy.press('Enter');
+  await page.getByText('Instructions copied. Paste them into ChatGPT or another chatbot with your current resume.', { exact: true }).waitFor();
+  assert.equal(await page.evaluate(() => window.copiedInstructions), chatbotInstructions);
+  assert.ok(chatbotInstructions.includes('@@CONTACT@@') && chatbotInstructions.includes('@@JOB@@'));
+  assert.equal(await page.locator('#instructions-fallback').isVisible(), false);
+});
+
+test('clipboard denial exposes focused complete instructions without changing the pasted resume', async t => {
+  const page = await openPage(t);
+  await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', {
+    value: { writeText: async () => { throw new Error('Synthetic clipboard denial'); } },
+  }));
+  await page.reload();
+  const input = page.getByLabel('Your resume', { exact: true });
+  await input.fill(source);
+  await page.getByRole('button', { name: 'Copy chatbot instructions', exact: true }).click();
+  const fallback = page.getByRole('region', { name: 'Chatbot instructions to copy', exact: true });
+  await fallback.waitFor();
+  assert.equal(await fallback.textContent(), chatbotInstructions);
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'instructions-fallback');
+  assert.equal(await input.inputValue(), source);
+  await page.getByText('Select and copy the instructions below.', { exact: true }).waitFor();
+  await mkdir('output/ui', { recursive: true });
+  await page.screenshot({ path: 'output/ui/chatbot-fallback.png', fullPage: true });
+});
 
 // This replaces the shell smoke test: exercise the built application end to end.
 test('symbol markers and an outer text code block export complete ordered PDF content after correction', async t => {

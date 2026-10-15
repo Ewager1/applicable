@@ -1,6 +1,6 @@
 # Applicable
 
-A lightweight local tool for turning a pasted resume into a professionally formatted PDF.
+Turn chatbot text into a polished resume with a lightweight browser PDF formatter.
 
 Paste a complete resume, submit it, and download a PDF using one consistent template. Section order is fixed, while jobs appear in the order supplied in the source text. All wording comes from the pasted resume.
 
@@ -64,9 +64,9 @@ GitHub Actions is configured to run the same checks on pull requests to `main` a
 
 ## Using Applicable
 
-1. Prepare your complete resume using the [input format](docs/input-format.md). The in-app “Need the resume format?” section copies self-contained instructions asking your chatbot for literal `@@...@@` markers in one text code block. Use that code block’s **Copy** button to preserve its line breaks.
-2. Paste the result into **Your resume**, then select **Create PDF** above the field. You can also press Cmd/Ctrl + Enter while editing.
-3. The app downloads `resume.pdf` and shows the same PDF for review. Use **Download PDF** to download it again. If your browser cannot display PDFs inline, the download remains available without an embedded viewer.
+1. Open **Start with your chatbot** and choose **Copy chatbot instructions**. Paste those instructions together with your current resume into ChatGPT or another chatbot. If clipboard access is blocked, the complete instructions appear for manual copying.
+2. Ask the chatbot to format your complete resume. Use the returned text code block’s **Copy** button, then paste the formatted resume into **Your resume** in Applicable. The [input format](docs/input-format.md) describes its literal markers; you do not need to rebuild sections by hand.
+3. Select **Create PDF** above the field, or press Cmd/Ctrl + Enter while editing. The app downloads `resume.pdf` and shows the same PDF for review. Use **Download PDF** to download it again. If your browser cannot display PDFs inline, the download remains available without an embedded viewer.
 
 Missing, blank or malformed content blocks export with clear warnings and source lines where applicable. Your pasted text stays available for correction. Editing it removes the old preview/download so an earlier file is not mistaken for the updated resume. During generation the button is disabled; edits remain possible, and an outdated result will not download.
 
@@ -87,7 +87,7 @@ The field grows with your text up to the available viewport, then scrolls. There
 
 ## Privacy, limits and troubleshooting
 
-Resume text stays in the current browser page; Applicable does not send it to a remote service, store a profile or save resume history. PDFs are generated locally and saved wherever your browser downloads files. Copying chatbot instructions is an explicit clipboard action; no chatbot is contacted by the app.
+Resume text stays in the current browser page; Applicable does not send it to a remote service, store a profile or save resume history. PDFs are generated locally and saved wherever your browser downloads files. Copying chatbot instructions is an explicit clipboard action; no chatbot is contacted by the app. If the static app is served on a website, loading its code/fonts makes ordinary hosting requests; resume text is still processed in the browser rather than uploaded.
 
 - Use the documented format and include all seven required groups. Prefer standalone `@@CONTACT@@`, `@@PROFESSIONAL_TITLE@@`, `@@SUMMARY@@`, `@@RELEVANT_EXPERIENCE@@`, `@@EDUCATION@@`, `@@CERTIFICATIONS@@`, `@@SKILLS@@`, with `@@JOB@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` entry boundaries. Legacy `#`/`##` markers still work, but unmarked headings are not inferred. Paste the code block’s contents, or one enclosing text code block; extra commentary and nested/unknown fences are rejected. Arbitrary free-form resumes and file uploads are unsupported.
 - Unsupported characters outside the bundled font's coverage produce a correction message instead of silently disappearing. See [template limits](docs/pdf-template.md).

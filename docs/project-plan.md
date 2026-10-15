@@ -163,6 +163,6 @@ The six focused issues below run sequentially, each with its own branch, checks,
 
 ## Subsequent approved work
 
-After the cleanup sequence, [D1 #31](https://github.com/Ewager1/applicable/issues/31) covers public-facing copy and [D2 #32](https://github.com/Ewager1/applicable/issues/32) covers optional company-based filenames. These are separate work items, not capabilities delivered by the cleanup documentation.
+After the cleanup sequence, [D1 #31](https://github.com/Ewager1/applicable/issues/31) covers public-facing copy and [D2 #32](https://github.com/Ewager1/applicable/issues/32) covers optional company-based filenames. These are separate work items, not capabilities delivered by the cleanup documentation. D1 defines the visible chatbot-to-paste workflow, accurate browser-local privacy copy and accessible prompt copying; its issue records review/verification status. Publishing remains separate from this preparation.
 
 The subsequent workflow work is **agent/model usage tracking only**, not application analytics. Future TypeScript/React migration **planning issues** are to be created after that work; migration implementation has not been authorized. No hosting or release/deployment is implied. Use GitHub for execution status and the individual issues for acceptance details.
