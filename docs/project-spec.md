@@ -1,6 +1,6 @@
 # Applicable: Project Specification
 
-Status: PDF approach verified in A1, development foundation established in A2, and canonical input format/parser implemented in A3. The shared production template is implemented in A4; A5 implements interface integration; final clean-download/distribution verification remains planned.
+Status: PDF approach verified in A1, development foundation established in A2, and canonical input format/parser implemented in A3. The shared production template is implemented in A4; A5 implements interface integration; A6 clean-source/distribution verification has passed, with final integration tracked in issue #6. Distribution is public source under MIT; no release or deployment is implied.
 
 ## Purpose
 

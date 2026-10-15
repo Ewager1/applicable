@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: A1–A4 are merged, closed and Done. A5 paste-to-PDF interface and end-to-end verification are implemented locally, awaiting independent review and CI.
+Status: A1–A5 are merged, closed and Done. A6 clean-source verification is complete; final CI, merge and issue closure are tracked in [issue #6](https://github.com/Ewager1/applicable/issues/6). See [verification evidence](verification.md).
 
 ## Workflow
 
@@ -121,5 +121,7 @@ Dependencies: A5.
 | 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) | Merged, closed and Done |
 | 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) | Merged, closed and Done |
 | 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) | Merged, closed and Done |
-| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | In progress |
-| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Planned |
+| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | Merged, closed and Done |
+| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Verification complete; see issue for CI/merge/closure |
+
+Completed implementation PRs: [A1 #7](https://github.com/Ewager1/applicable/pull/7), [A2 #8](https://github.com/Ewager1/applicable/pull/8), [A3 #9](https://github.com/Ewager1/applicable/pull/9), [A4 #10](https://github.com/Ewager1/applicable/pull/10), [A5 #11](https://github.com/Ewager1/applicable/pull/11).
