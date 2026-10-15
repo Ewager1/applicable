@@ -1,6 +1,6 @@
 # PDF rendering investigation (A1)
 
-This is a synthetic, developer-only proof, not the finished paste-to-PDF application. The fixture objects do not define the future text input contract. No reference resumes or personal information are included.
+This is a synthetic, developer-only proof, not the finished paste-to-PDF application. A4 promotes its template into shared production modules under `app/pdf/`; see [the production template and verification record](../docs/pdf-template.md). The fixture objects do not define the future text input contract. No reference resumes or personal information are included.
 
 ## Reproduce
 
@@ -24,7 +24,7 @@ npm run test:browser
 
 Playwright uses installed Chrome by default. To use another Chromium executable, set `CHROME_PATH` to its absolute path. To use the version-matched browser used in CI, run `npx --no-install playwright install chromium` and set `PLAYWRIGHT_BROWSER=chromium`. No browser download occurs automatically when running the checks. PDF.js and Playwright are test-only dependencies, not product assets. The browser test saves an ignored screenshot to `output/pdf/browser-preview.png`.
 
-The three generated PDFs are written to `output/pdf/` (ignored). To render every page for visual review, install Poppler and run:
+The seven generated PDFs are written to `output/pdf/` (ignored), including the parsed canonical example and targeted split-job, multi-page-bullet and long-value fixtures. To render every page for visual review, install Poppler and run:
 
 ```sh
 pdftoppm -scale-to 1200 -png output/pdf/short.pdf output/pdf/short
@@ -61,16 +61,16 @@ Font files and the OFL were downloaded from `https://raw.githubusercontent.com/g
 
 - Native PDF preview was verified in desktop Chrome. Other browsers, mobile devices, and browsers configured to download every PDF may not render inline. Download remains available. No separate viewer is needed or included in the product proof.
 - Browser PDF controls, zoom and antialiasing vary. The preview is the exact exported artifact, but viewport appearance need not match other PDF viewers pixel for pixel.
-- Font coverage is bounded by these Poppins files. Accented Latin text, curly quotes and an em dash are verified; arbitrary scripts and emoji are not promised. Production handling of unsupported characters belongs in the later template/validation work.
-- This proof covers normal-length job metadata and flowing multi-line bullets. Extremely long unbroken tokens, multi-page individual bullets, or metadata exceeding a page need production edge-case decisions and tests in A4. No arbitrary-input fidelity claim is made.
+- Font coverage is bounded by these Poppins files. Accented Latin text, curly quotes and an em dash are verified. A4 adds glyph coverage checks that block unsupported displayed characters with a recoverable message; no glyph is silently dropped. See the production template document.
+- A4 verifies long unbroken tokens, long wrapping metadata, a job continued across pages and one bullet continued across three pages. Nonsensical multi-page header blocks remain outside the practical resume-layout claim; no arbitrary-document fidelity claim is made.
 - PDFs are searchable/selectable but are not tagged accessibility PDFs. The proof's automated bounds checks complement visual review; they do not prove the absence of every possible overlap.
 - Styling is a close reference-based baseline, not a claim of exact reproduction for every input. No parsing, rewriting, storage, external AI or resume validation is implemented.
 
 ## Retained baseline and layout checklist
 
-`baseline/typical.pdf` is a reviewed **synthetic-only** visual baseline. It is intentionally retained; generated scratch output stays ignored. Regenerate from `fixture('typical')` after a proposed layout change, compare it against this baseline, and update the baseline only after reviewing every affected page. Byte-for-byte identity is not a regression requirement because PDF internal identifiers can vary.
+`baseline/typical.pdf` is a reviewed **synthetic-only** visual baseline, intentionally refreshed in A4 for corrected education/certification metadata and bounded wrapping columns after all affected pages were inspected. It is intentionally retained; generated scratch output stays ignored. Regenerate from `fixture('typical')` after a proposed layout change, compare it against this baseline, and update the baseline only after reviewing every affected page. Byte-for-byte identity is not a regression requirement because PDF internal identifiers can vary.
 
-Review recorded on 2026-10-15: all pages in short (1), typical (2), and long (3) were rendered with Poppler and visually inspected. The Chrome preview was also inspected. The following checklist passed:
+Review recorded on 2026-10-15: all 14 pages in short (1), typical (2), long (3), parsed (1), split-job (2), multi-page-bullet (3) and long-values (2) were rendered with Poppler and visually inspected. The Chrome preview was also inspected. The following checklist passed:
 
 - [x] Text stays within page margins; no clipping, overlap or missing glyphs in the fixtures.
 - [x] Name/title hierarchy, teal headings and body typography resemble the supplied reference.
@@ -83,4 +83,4 @@ Review recorded on 2026-10-15: all pages in short (1), typical (2), and long (3)
 - [x] Direct download works; preview and download share exactly the same bytes.
 - [x] Generation makes no remote network requests after local installation.
 
-Automated verification: three rendering tests and one browser test pass. Tests extract every fixture field, verify job order and heading/header adjacency, page counts, annotation targets and text bounds; the browser test checks all three real downloads, byte identity, object URL cleanup and absence of remote HTTP/WebSocket requests. The synthetic fixtures deliberately exercise 1-, 2-, and 3-page layouts. A4 must broaden cases for the production template.
+Automated verification now includes parser tests, the three original rendering tests, production-template tests and two browser tests. See the production template document for exact cases. The browser check continues to compare actual downloaded bytes with the preview artifact and to reject remote HTTP/WebSocket requests.

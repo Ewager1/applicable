@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 const routes = new Map([
   ['/', ['proof/index.html', 'text/html']],
   ...['browser.mjs', 'fixtures.mjs', 'document.mjs'].map(file => [`/proof/${file}`, [`proof/${file}`, 'text/javascript']]),
+  ...['document.js', 'fonts.js', 'font-coverage.js', 'render.js'].map(file => [`/app/pdf/${file}`, [`app/pdf/${file}`, 'text/javascript']]),
   ['/node_modules/pdfmake/build/pdfmake.min.js', ['node_modules/pdfmake/build/pdfmake.min.js', 'text/javascript']],
   ...['Light', 'SemiBold', 'ExtraLight'].map(weight => [`/assets/fonts/Poppins-${weight}.ttf`, [`assets/fonts/Poppins-${weight}.ttf`, 'font/ttf']]),
 ]);

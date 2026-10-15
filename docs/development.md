@@ -5,6 +5,7 @@
 - `app/index.html`, `app/main.js`, `app/styles.css`: native HTML, JavaScript entry point and CSS. This is a development shell until the input/interface issues land.
 - `app/resume/parse.js`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors.
 - `examples/`: synthetic canonical resume and reusable chatbot instruction.
+- `app/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
 - `assets/fonts/`: bundled Poppins fonts and their OFL license, retained from the rendering investigation.
 - `proof/`: synthetic PDF renderer, fixtures, baseline and PDF/browser verification. Its data model is not yet the text input contract.
 - `tests/`: browser launch options, temporary-server ownership and a built-artifact smoke test.
@@ -32,8 +33,8 @@ The previously selected pdfmake, PDF.js and Playwright remain unchanged. Vite an
 
 `npm run check` runs lint, parser/validation and existing PDF preservation/layout tests, production build, then two browser tests. One browser test exercises short/typical/long synthetic PDF generation and actual downloads; the other loads the production build, confirms JavaScript/CSS resolve without execution or network errors, and rejects remote HTTP/WebSocket requests. Browser tests own and clean up the two temporary servers. The parser tests cover required content, ordering, wording, multiline bullets and blocking malformed input. The application shell has no input behavior to unit-test yet; avoid assertions that merely repeat its wording.
 
-The built shell is the application artifact; the separate developer proof is intentionally not bundled into `dist/`. Fonts and the PDF renderer will enter that artifact when A4 connects the production template. Production packaging and clean-download checks remain A6 work. A build is not a release or deployment.
+The built shell is the application artifact; the separate developer proof is intentionally not bundled into `dist/`. The application shell does not import the production PDF adapter yet; A5 connects it with the paste interface and Vite will bundle its fonts locally. Production packaging and clean-download checks remain A6 work. A build is not a release or deployment.
 
-No PDF layout was intentionally changed in A2, so its reviewed synthetic baseline remains unchanged. The A1 visual checklist continues to apply to later PDF changes. A4 must add an explicit fixture with one job split across pages, alongside oversized token/bullet and unsupported-character handling before claiming production edge-case coverage.
+No PDF layout was intentionally changed in A2, so its reviewed synthetic baseline remains unchanged. The A1 visual checklist continues to apply to later PDF changes. A4 adds explicit split-job, multi-page-bullet, long metadata/token and unsupported-character cases; see [production PDF verification](pdf-template.md).
 
 Local checks do not establish that GitHub Actions has passed. The first remote workflow run must finish successfully on the PR's latest commit before merge.

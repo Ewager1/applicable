@@ -6,7 +6,7 @@ Paste a complete resume, submit it, and download a PDF using one consistent temp
 
 ## Project status
 
-The PDF rendering investigation is complete. Synthetic examples demonstrate the fixed template, automatic pagination, direct download and exact PDF preview. The application now has a minimal vanilla JavaScript development/build foundation and automated checks. The canonical text format and parser are implemented and tested. The paste-to-PDF interface and production rendering integration are still being built; the application currently shows a clearly labeled development shell.
+The PDF rendering investigation is complete. Synthetic examples demonstrate the fixed template, automatic pagination, direct download and exact PDF preview. The application now has a minimal vanilla JavaScript development/build foundation and automated checks. The canonical text format and parser are implemented and tested. The production PDF template now consumes parsed resumes and shares its layout with the proof. The paste-to-PDF interface is still being built; the application currently shows a clearly labeled development shell.
 
 ## Local development
 
@@ -62,6 +62,7 @@ GitHub Actions runs the same checks on pull requests to `main` and pushes to `ma
 
 ## Development documents
 
+- [Production PDF template](docs/pdf-template.md)
 - [Resume input format](docs/input-format.md)
 - [Complete synthetic example](examples/resume.txt)
 - [Reusable chatbot instruction](examples/chatbot-instruction.md)
