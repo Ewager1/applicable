@@ -1,6 +1,6 @@
 # Applicable: Development Plan
 
-Status: GitHub setup complete. Issues are tracked in the Applicable project board; issue #1 is in progress with a rendering proof ready for independent review.
+Status: A1 merged in PR #7; issue #1 is closed and Done. A2 development/build tooling and checks are implemented locally and awaiting independent review and the first CI run.
 
 ## Workflow
 
@@ -77,7 +77,7 @@ Acceptance criteria:
 - Render the parsed resume using the single verified template.
 - Support automatic page counts without clipping or truncation.
 - Keep headings and entry headers with following content.
-- Verify text completeness and visually inspect short, typical, and long outputs.
+- Verify text completeness and visually inspect short, typical, and long outputs. Include an explicit fixture with one job split across pages; this was identified during A1 independent review.
 
 Dependencies: A1, A3.
 
@@ -115,11 +115,11 @@ Dependencies: A5.
 - Dedicated project: https://github.com/users/Ewager1/projects/6
 - The initial main branch contains planning and workflow files only. Feature implementation uses issue branches and PRs.
 
-| Order | Plan | GitHub issue |
-| --- | --- | --- |
-| 1 | A1 | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1) |
-| 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) |
-| 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) |
-| 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) |
-| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) |
-| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) |
+| Order | Plan | GitHub issue | Status |
+| --- | --- | --- | --- |
+| 1 | A1 | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1) | Merged, closed and Done |
+| 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) | In progress |
+| 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) | Planned |
+| 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) | Planned |
+| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) | Planned |
+| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) | Planned |

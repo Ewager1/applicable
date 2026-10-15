@@ -4,7 +4,7 @@ This is a synthetic, developer-only proof, not the finished paste-to-PDF applica
 
 ## Reproduce
 
-Prerequisites: Node.js 22 or newer and npm. Use a current desktop Chrome installation for the browser check. Installation downloads dependencies; generation itself uses only local assets.
+Prerequisites: Node.js 22.13+ in the 22.x series, or Node.js 24+, and npm. Use a current desktop Chrome installation for the browser check. Installation downloads dependencies; generation itself uses only local assets.
 
 ```sh
 npm ci
@@ -15,13 +15,14 @@ npm run proof:serve
 
 Open http://127.0.0.1:4173/, select an example, generate, inspect the actual embedded PDF, and download it. The tiny development server binds only to the loopback address and serves an explicit asset list. Stop it with Ctrl+C. It does not receive or generate resume content; all PDF generation happens in the browser. Opening the HTML directly with `file://` is unsupported because JavaScript modules and font loading need a local origin.
 
-With that server still running, in a second terminal:
+For automated browser verification, stop the manual proof server first; the test command now owns its temporary servers. Build the application, then run:
 
 ```sh
+npm run build
 npm run test:browser
 ```
 
-Playwright uses installed Chrome. To use another Chromium executable, set `CHROME_PATH` to its absolute path. No browser download occurs automatically. PDF.js and Playwright are test-only dependencies, not product assets. The browser test saves an ignored screenshot to `output/pdf/browser-preview.png`.
+Playwright uses installed Chrome by default. To use another Chromium executable, set `CHROME_PATH` to its absolute path. To use the version-matched browser used in CI, run `npx --no-install playwright install chromium` and set `PLAYWRIGHT_BROWSER=chromium`. No browser download occurs automatically when running the checks. PDF.js and Playwright are test-only dependencies, not product assets. The browser test saves an ignored screenshot to `output/pdf/browser-preview.png`.
 
 The three generated PDFs are written to `output/pdf/` (ignored). To render every page for visual review, install Poppler and run:
 
@@ -31,7 +32,7 @@ pdftoppm -scale-to 1200 -png output/pdf/typical.pdf output/pdf/typical
 pdftoppm -scale-to 1200 -png output/pdf/long.pdf output/pdf/long
 ```
 
-No lint, build, TypeScript, CI, parser, user resume form, or packaging setup is claimed here; A2 establishes the application tooling.
+A2 adds application development/build scripts, lint and CI; see the [main README](../README.md). This proof does not implement the parser, user resume form or final packaging. No TypeScript is configured.
 
 ## Decision
 

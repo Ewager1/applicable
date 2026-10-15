@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 import { readFile, mkdir } from 'node:fs/promises';
+import { browserOptions } from '../tests/browser-options.mjs';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-// Start `npm run proof:serve` first. Playwright uses installed Chrome by default.
+// Servers are owned by npm run test:browser; no manual startup is needed.
 test('browser generates local PDFs; preview and real downloads use identical bytes', async () => {
-  const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'chrome' });
+  const browser = await chromium.launch(browserOptions());
   const page = await browser.newPage({ acceptDownloads: true });
   const remoteRequests = [];
   const errors = [];
