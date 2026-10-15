@@ -141,4 +141,4 @@ The successful `resume` has this shape:
 }
 ```
 
-Skill items remain a validated string to preserve original separators/spacing and to fit the flowing reference layout. The model mostly matches the A1 rendering proof; certification strings in that proof must become these structured objects in A4. The proof's existing renderer must not be used directly on parsed data until that change lands. No UI or PDF generation is performed by the parser, and failures deliberately expose no partial `resume`.
+Skill items remain a validated string to preserve original separators/spacing and to fit the flowing reference layout. The shared production template now consumes this complete model, including structured certification fields. See [PDF template behavior and verification](pdf-template.md). No UI or PDF generation is performed by the parser, and failures deliberately expose no partial `resume`.

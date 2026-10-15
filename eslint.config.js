@@ -15,8 +15,8 @@ export default [
     languageOptions: { globals: readonly(['window', 'document', 'fetch', 'URL', 'Blob', 'btoa', 'console']) },
   },
   {
-    files: ['**/*.test.mjs', 'tests/**/*.mjs', 'proof/pdf.mjs', 'proof/generate.mjs', 'proof/serve.mjs'],
-    languageOptions: { globals: readonly(['process', 'Buffer', 'console', 'URL', 'fetch', 'setTimeout', 'clearTimeout']) },
+    files: ['**/*.test.mjs', 'tests/**/*.mjs', 'proof/pdf.mjs', 'proof/generate.mjs', 'proof/serve.mjs', 'proof/production-fixtures.mjs', 'scripts/**/*.mjs'],
+    languageOptions: { globals: readonly(['process', 'Buffer', 'console', 'URL', 'fetch', 'setTimeout', 'clearTimeout', 'structuredClone']) },
   },
   {
     files: ['**/*.test.mjs'],

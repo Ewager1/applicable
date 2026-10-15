@@ -8,7 +8,7 @@ const normalize = value => value.replace(/\s+/g, ' ').trim();
 function expectedText(resume) {
   return [resume.name, ...resume.contact.map(item => item.text), resume.title, resume.summary,
     ...resume.jobs.flatMap(job => [job.employer, job.role, job.dates, job.location, ...job.bullets]),
-    ...resume.education.flatMap(entry => Object.values(entry)), ...resume.certifications,
+    ...resume.education.flatMap(entry => Object.values(entry)), ...resume.certifications.flatMap(entry => Object.values(entry)),
     ...resume.skills.flatMap(row => [`${row.category}:`, row.items])];
 }
 for (const [kind, expectedPages] of [['short', 1], ['typical', 2], ['long', 3]]) {
@@ -46,7 +46,7 @@ for (const [kind, expectedPages] of [['short', 1], ['typical', 2], ['long', 3]])
         const headerPage = pageTexts.findIndex(text => text.includes(job.employer));
         assert.ok(pageTexts[headerPage].includes(`Project ${resume.jobs.indexOf(job) + 1}.1:`), `Orphaned job header: ${job.employer}`);
       }
-      for (const [heading, following] of [['RELEVANT EXPERIENCE', resume.jobs[0].employer], ['EDUCATION', resume.education[0].institution], ['CERTIFICATIONS', resume.certifications[0]], ['SKILLS', 'Languages:']]) {
+      for (const [heading, following] of [['RELEVANT EXPERIENCE', resume.jobs[0].employer], ['EDUCATION', resume.education[0].institution], ['CERTIFICATIONS', resume.certifications[0].title], ['SKILLS', 'Languages:']]) {
         const page = pageTexts.find(text => text.includes(heading));
         assert.ok(page?.includes(following), `Orphaned section: ${heading}`);
       }

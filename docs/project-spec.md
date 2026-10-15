@@ -1,6 +1,6 @@
 # Applicable: Project Specification
 
-Status: PDF approach verified in A1, development foundation established in A2, and canonical input format/parser implemented in A3. Production rendering, interface integration and final distribution remain planned.
+Status: PDF approach verified in A1, development foundation established in A2, and canonical input format/parser implemented in A3. The shared production template is implemented in A4; interface integration and final distribution remain planned.
 
 ## Purpose
 
@@ -67,7 +67,7 @@ Required labels, minimum entry values, whitespace normalization, indented bullet
 - Bold skill categories and render their items as flowing text.
 - Use automatic pagination without a page-count limit. Never truncate content to fit a target page count.
 - Keep headings with following content and job headers with at least the beginning of their bullets. A job may continue on another page.
-- Preserve selectable and searchable text. Do not export the resume as a screenshot.
+- Preserve selectable and searchable text. Do not export the resume as a screenshot. Unsupported displayed glyphs must block generation with a recoverable explanation instead of being silently lost.
 - Preserve explicit website and email link destinations.
 - Bundle appropriately licensed fonts/assets needed for reliable local output. Do not depend on runtime font downloads.
 

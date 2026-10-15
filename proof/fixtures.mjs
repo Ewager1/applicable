@@ -25,7 +25,7 @@ export function fixture(kind = 'typical') {
       bullets: bullets.slice(0, kind === 'short' ? 2 : 4).map((text, j) => `Project ${i + 1}.${j + 1}: ${text}`),
     })),
     education: [{ institution: 'Example State University', qualification: 'Bachelor of Science, Computer Science', dates: '2015 - 2019' }],
-    certifications: ['Example Web Accessibility Certificate'],
+    certifications: [{ title: 'Example Web Accessibility Certificate', dates: '2024', issuer: 'Example Learning Institute' }],
     skills: [
       { category: 'Languages', items: 'JavaScript, TypeScript, Python, SQL' },
       { category: 'Frontend', items: 'HTML, CSS, accessible interfaces, component systems' },

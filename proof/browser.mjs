@@ -1,27 +1,18 @@
 import { fixture } from './fixtures.mjs';
-import { documentDefinition, fontFiles, fonts } from './document.mjs';
+import { loadBrowserFonts } from '../app/pdf/fonts.js';
+import { createPdfBytes } from '../app/pdf/render.js';
 const button = document.querySelector('#generate');
 const status = document.querySelector('#status');
 const preview = document.querySelector('#preview');
 const download = document.querySelector('#download');
 let currentUrl;
-const vfs = await Promise.all(fontFiles.map(async file => {
-  const response = await fetch(`/assets/fonts/${file}`);
-  if (!response.ok) throw new Error(`Font unavailable: ${file}`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return [file, btoa(binary)];
-})).then(Object.fromEntries).catch(error => { status.textContent = error.message; button.disabled = true; });
+const vfs = await loadBrowserFonts().catch(error => { status.textContent = error.message; button.disabled = true; });
 if (vfs) button.disabled = false;
 button.addEventListener('click', async () => {
   button.disabled = true;
   status.textContent = 'Generating…';
   try {
-    const bytes = await new Promise((resolve, reject) => {
-      try { window.pdfMake.createPdf(documentDefinition(fixture(document.querySelector('#sample').value)), undefined, fonts, vfs).getBuffer(resolve); }
-      catch (error) { reject(error); }
-    });
+    const bytes = await createPdfBytes(fixture(document.querySelector('#sample').value), window.pdfMake, vfs);
     const oldUrl = currentUrl;
     currentUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
     download.href = currentUrl;
