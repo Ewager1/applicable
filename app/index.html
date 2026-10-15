@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Paste your resume and receive a polished PDF, processed privately on your device.">
+    <meta name="description" content="Turn chatbot text into a polished resume PDF. Your resume text stays in your browser.">
     <title>Applicable — Resume to PDF</title>
     <script type="module" src="./main.js"></script>
   </head>
@@ -11,20 +11,34 @@
     <main>
       <header class="masthead">
         <a class="brand" href="./" aria-label="Applicable home">Applicable<span aria-hidden="true">.</span></a>
-        <span class="privacy"><span aria-hidden="true">●</span> On your device. Just for you.</span>
+        <span class="privacy">No resume uploads</span>
       </header>
 
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">READY FOR YOUR NEXT OPPORTUNITY</p>
-        <h1 id="page-title">Your words.<br>A polished PDF.</h1>
-        <p>Paste your complete resume. Get a consistent, carefully formatted PDF, ready to send.</p>
+        <h1 id="page-title">Turn chatbot text into a polished resume.</h1>
+        <p>Use ChatGPT or another chatbot to format your current resume with our instructions. Paste the formatted resume here to create your PDF.</p>
       </section>
+
+      <details class="format-help" open>
+        <summary>Start with your chatbot</summary>
+        <div class="help-content">
+          <ol>
+            <li>Copy the instructions below. Paste them into ChatGPT or another chatbot together with your current resume.</li>
+            <li>Ask the chatbot to format your complete resume. Use its code block’s Copy button to copy all of the returned text.</li>
+            <li>Paste that text into <strong>Your resume</strong> below, then choose <strong>Create PDF</strong>.</li>
+          </ol>
+          <button id="copy-instructions" class="secondary" type="button">Copy chatbot instructions</button>
+          <p id="copy-status" role="status" aria-live="polite"></p>
+          <pre id="instructions-fallback" tabindex="0" role="region" aria-label="Chatbot instructions to copy" hidden></pre>
+        </div>
+      </details>
 
       <form id="resume-form" novalidate aria-busy="false">
         <div class="form-top">
           <div>
             <label for="resume">Your resume</label>
-            <p id="resume-help">Paste the full text in Applicable’s format. <span class="shortcut">⌘ / Ctrl + Enter to create.</span></p>
+            <p id="resume-help">Paste the complete text from your chatbot. <span class="shortcut">⌘ / Ctrl + Enter to create.</span></p>
           </div>
           <button id="create-pdf" type="submit">Create PDF</button>
         </div>
@@ -34,18 +48,7 @@
           <ul id="error-list"></ul>
         </section>
 
-        <textarea id="resume" name="resume" rows="13" aria-describedby="resume-help" spellcheck="false" placeholder="Paste your complete resume here…"></textarea>
-
-        <details class="format-help">
-          <summary>Need the resume format?</summary>
-          <div class="help-content">
-            <p>Ask your chatbot to use these instructions. Use the code block’s Copy button, then paste the complete resume here. Include Contact, Professional Title, Summary, Relevant Experience, Education, Certifications and Skills.</p>
-            <p>Keep standalone section markers such as <code>@@CONTACT@@</code> and <code>@@SKILLS@@</code>, plus <code>@@JOB@@</code> / <code>@@EDUCATION_ENTRY@@</code> / <code>@@CERTIFICATION@@</code> for each entry. Include labeled details and ordinary bullets. Skills use <code>Category: skill, skill</code>.</p>
-            <button id="copy-instructions" class="secondary" type="button">Copy chatbot instructions</button>
-            <p id="copy-status" role="status" aria-live="polite"></p>
-            <pre id="instructions-fallback" tabindex="0" hidden></pre>
-          </div>
-        </details>
+        <textarea id="resume" name="resume" rows="13" aria-describedby="resume-help" spellcheck="false" placeholder="Paste the complete resume text from your chatbot here…"></textarea>
       </form>
 
       <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
@@ -62,7 +65,7 @@
         <iframe id="preview" title="Your generated resume PDF" aria-describedby="preview-note"></iframe>
       </section>
 
-      <footer>Your resume is processed privately on your device.</footer>
+      <footer>Your resume text stays in this browser. Applicable does not upload it.</footer>
     </main>
   </body>
 </html>

@@ -60,12 +60,6 @@ main {
   font-size: 12px;
 }
 
-.privacy span {
-  color: var(--accent);
-  margin-right: 7px;
-  font-size: 9px;
-}
-
 .intro {
   padding: 48px 0 30px;
 }
@@ -196,7 +190,7 @@ textarea[aria-invalid='true'] {
 /* Format help and validation feedback */
 .format-help {
   border-top: 1px solid #e9eeea;
-  margin-top: 18px;
+  margin: 0 0 24px;
   padding-top: 16px;
 }
 
@@ -214,6 +208,15 @@ summary {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.65;
+}
+
+.help-content ol {
+  padding-left: 20px;
+  margin: 0 0 14px;
+}
+
+.help-content li + li {
+  margin-top: 7px;
 }
 
 code {

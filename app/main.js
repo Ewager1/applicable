@@ -135,7 +135,7 @@ copyButton.addEventListener('click', async () => {
   const copyStatus = document.querySelector('#copy-status');
   try {
     await navigator.clipboard.writeText(chatbotInstructions);
-    copyStatus.textContent = 'Instructions copied. Paste them into your chatbot conversation.';
+    copyStatus.textContent = 'Instructions copied. Paste them into ChatGPT or another chatbot with your current resume.';
   } catch {
     const fallback = document.querySelector('#instructions-fallback');
     fallback.textContent = chatbotInstructions;

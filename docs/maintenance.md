@@ -8,7 +8,7 @@ Start with the [input contract](input-format.md), [project specification](projec
 | --- | --- |
 | Accepted text, validation and source lines | [parse.js](../app/resume/parse.js), [input format](input-format.md), [synthetic example](../examples/resume.txt), [chatbot instruction](../examples/chatbot-instruction.md) |
 | Shared data/result/error shape | [types.js](../app/resume/types.js): editor-visible JSDoc `Resume`, nested entries, `ParseResult` and `ValidationError`; no runtime imports or build-time type checker |
-| Website wording and structure | [index.html](../app/index.html); the chatbot instruction is imported into the copy control |
+| Website wording and structure | [index.html](../app/index.html): visible chatbot steps before the paste form; the chatbot instruction is imported into the copy control, with a labeled/focused fallback when clipboard access fails |
 | Website appearance | [styles.css](../app/styles.css): variables/base, page, form, help/errors, result, responsive rules |
 | Submission, recovery, download and preview | [main.js](../app/main.js): revision guards, busy state, warnings and Blob URL lifecycle |
 | PDF typography, palette, dimensions and entry rows | [document.js](../app/pdf/document.js): fixed semantic styles and section order; [current template details](pdf-template.md) |
