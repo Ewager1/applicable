@@ -90,6 +90,7 @@ Resume text stays in the current browser page; Applicable does not send it to a 
 
 - Use the documented format and include all seven required groups. Prefer standalone `@@CONTACT@@`, `@@PROFESSIONAL_TITLE@@`, `@@SUMMARY@@`, `@@RELEVANT_EXPERIENCE@@`, `@@EDUCATION@@`, `@@CERTIFICATIONS@@`, `@@SKILLS@@`, with `@@JOB@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` entry boundaries. Legacy `#`/`##` markers still work, but unmarked headings are not inferred. Paste the code block’s contents, or one enclosing text code block; extra commentary and nested/unknown fences are rejected. Arbitrary free-form resumes and file uploads are unsupported.
 - Unsupported characters outside the bundled font's coverage produce a correction message instead of silently disappearing. See [template limits](docs/pdf-template.md).
+- If an entry’s heading details cannot fit together with the beginning of their following content on one page, export stops with a correction message. Your pasted text remains available; shorten the oversized details and try again. Content is never shortened automatically.
 - Inline PDF viewing and automatic downloads depend on browser capabilities/settings. Use **Download PDF** when needed; no extra viewer installation is required.
 - If installation reports an unsupported Node version, check `node --version` in the same terminal and select a supported version before retrying `npm ci`.
 - If a port is busy, stop the previous Applicable process with Ctrl+C. Startup reports the conflict rather than silently choosing another address.

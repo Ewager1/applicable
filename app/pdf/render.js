@@ -1,5 +1,6 @@
 import { documentDefinition } from './document.js';
 import { fontFiles, fonts } from './fonts.js';
+import { HeaderFitError, verifyHeaderFit } from './header-fit.js';
 
 /**
  * Generate one byte buffer for both preview and download. Supply pdfmake's local
@@ -19,6 +20,7 @@ export async function createPdfBytes(resume, pdfMake, fontData) {
     let stream;
     const fail = cause => reject(new Error('The PDF could not be created. Check the local font files and try again.', { cause }));
     try {
+      verifyHeaderFit(resume, pdfMake, fontData);
       // With all fonts in VFS, the synchronous stream API exposes creation errors.
       // getBuffer's async URL-resolution path can otherwise reject outside our promise.
       stream = pdfMake.createPdf(definition, undefined, fonts, fontData).getStream();
@@ -33,6 +35,10 @@ export async function createPdfBytes(resume, pdfMake, fontData) {
         resolve(bytes);
       });
       stream.end();
-    } catch (error) { stream?.destroy(); fail(error); }
+    } catch (error) {
+      stream?.destroy();
+      if (error instanceof HeaderFitError) reject(error);
+      else fail(error);
+    }
   });
 }
