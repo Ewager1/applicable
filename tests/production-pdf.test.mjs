@@ -5,7 +5,7 @@ import { createPdfBytes } from '../app/pdf/render.js';
 import { fontFiles } from '../app/pdf/fonts.js';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { renderPdf } from '../proof/pdf.mjs';
 import { parsedExample, stressFixture } from '../proof/production-fixtures.mjs';
 import { fontHashes, supportedRanges } from '../app/pdf/font-coverage.js';
@@ -121,10 +121,104 @@ test('static Source Sans 3 files and PDF semantic styles use distinct real weigh
   const definition = documentDefinition(parsedExample);
   assert.equal(fonts[definition.defaultStyle.font].normal, 'SourceSans3-Regular.ttf');
   assert.equal(fonts[definition.defaultStyle.font].bold, 'SourceSans3-Bold.ttf');
-  assert.equal(fonts[definition.content.find(node => node.text === 'RELEVANT EXPERIENCE').font].normal, 'SourceSans3-Semibold.ttf');
+  assert.equal(fonts[definition.styles.sectionHeading.font].normal, 'SourceSans3-Semibold.ttf');
   const resume = structuredClone(parsedExample);
   resume.summary += ' Greek Δ and Cyrillic Ж remain selectable.';
   await inspect(resume);
+});
+
+test('rendered hierarchy and shared dates use real semantic weights, sizes and palette across repeated entries', async () => {
+  const resume = structuredClone(parsedExample);
+  resume.name = 'CandidateName';
+  resume.title = 'ProfessionalTitle';
+  resume.summary = 'Measured line one.\nMeasured line two.';
+  resume.jobs.forEach((job, index) => {
+    job.employer = `Employer${index}`;
+    job.role = `Role${index}`;
+    job.location = `Location${index}`;
+    job.dates = `0${index + 1}/2021-0${index + 1}/2023`;
+  });
+  resume.education = [0, 1].map(index => ({ qualification: `Qualification${index}`, institution: `Institution${index}`, dates: `0${index + 3}/2011-0${index + 3}/2015` }));
+  resume.certifications = [0, 1].map(index => ({ title: `Certificate${index}`, issuer: `Issuer${index}`, dates: `0${index + 5}/2024` }));
+  const pdf = await getDocument({ data: await renderPdf(resume), useSystemFonts: false }).promise;
+  const items = [], paint = [], dividers = [];
+  try {
+    for (let number = 1; number <= pdf.numPages; number++) {
+      const page = await pdf.getPage(number);
+      const operators = await page.getOperatorList();
+      const visible = (await page.getTextContent()).items.filter(item => item.str.trim());
+      items.push(...visible.map(item => ({ ...item, identity: page.commonObjs.get(item.fontName).name })));
+      let fill, stroke, fontSize, width, path;
+      for (let index = 0; index < operators.fnArray.length; index++) {
+        const op = operators.fnArray[index], args = operators.argsArray[index];
+        if (op === OPS.setFillRGBColor) fill = Array.from(args);
+        if (op === OPS.setStrokeRGBColor) stroke = Array.from(args);
+        if (op === OPS.setFont) fontSize = args[1];
+        if (op === OPS.setLineWidth) width = args[0];
+        if (op === OPS.constructPath) path = args;
+        if (op === OPS.showText) paint.push({ text: args[0].map(glyph => typeof glyph === 'object' ? glyph.unicode : '').join(''), fill, fontSize });
+        if (op === OPS.stroke && stroke?.join() === '216,222,230') {
+          assert.deepEqual(path[0], [OPS.moveTo, OPS.lineTo], 'Divider is a vector line');
+          const [x1, y1, x2, y2] = path[1];
+          assert.equal(width, 0.5);
+          assert.equal(y1, y2);
+          assert.equal(x2, 569, 'Rule extends to right content margin');
+          const y = page.view[3] - y1;
+          const adjacent = visible.filter(item => Math.abs(item.transform[5] - y) < 5);
+          assert.ok(adjacent.length, 'Rule remains alongside its heading');
+          const textRight = Math.max(...adjacent.map(item => item.transform[4] + item.width));
+          assert.ok(Math.abs(x1 - textRight - 9) < 0.1, 'Rule begins after heading with a modest gap');
+          for (const item of visible) {
+            if (y >= item.transform[5] - 2 && y <= item.transform[5] + item.height) assert.ok(item.transform[4] + item.width < x1 || item.transform[4] > x2, `Rule overlaps ${item.str}`);
+          }
+          dividers.push(path);
+        }
+      }
+    }
+    const check = (text, weight, size, color) => {
+      const item = items.find(item => item.str === text);
+      assert.ok(item, `Missing text: ${text}`);
+      assert.ok(item.identity.endsWith(`SourceSans3-${weight}`), `${text} uses actual ${weight}`);
+      assert.equal(item.transform[0], size);
+      const painted = paint.find(item => item.text.trim() === text);
+      assert.deepEqual(painted?.fill, color, `${text} uses the intended color`);
+    };
+    check('CandidateName', 'Bold', 20, [31, 78, 95]);
+    check('ProfessionalTitle', 'Semibold', 11.5, [32, 37, 43]);
+    check('Portland,', 'Regular', 9.5, [75, 85, 99]);
+    check('Measured', 'Regular', 9.75, [32, 37, 43]);
+    check('Languages:', 'Semibold', 9.75, [32, 37, 43]);
+    for (const job of resume.jobs) {
+      check(job.employer, 'Semibold', 10.75, [32, 37, 43]);
+      check(job.role, 'Semibold', 10.25, [32, 37, 43]);
+      check(job.location, 'Semibold', 9.5, [75, 85, 99]);
+    }
+    for (const entry of [...resume.jobs, ...resume.education, ...resume.certifications]) check(entry.dates, 'Semibold', 9.5, [32, 37, 43]);
+    for (const entry of resume.education) check(entry.institution, 'Regular', 9.75, [32, 37, 43]);
+    for (const entry of resume.certifications) check(entry.issuer, 'Regular', 9.75, [32, 37, 43]);
+    for (const heading of ['RELEVANT', 'EXPERIENCE', 'EDUCATION', 'CERTIFICATIONS', 'SKILLS']) check(heading, 'Semibold', 9.75, [31, 78, 95]);
+    const headingFont = fontkit.create(await readFile(new URL('../assets/fonts/SourceSans3-Semibold.ttf', import.meta.url)));
+    const education = items.find(item => item.str === 'EDUCATION');
+    const untrackedWidth = headingFont.layout('EDUCATION').advanceWidth * 9.75 / headingFont.unitsPerEm;
+    assert.ok(Math.abs(education.width - untrackedWidth - 8 * 0.68) < 0.001, 'Rendered heading tracking is approximately 0.07em');
+    assert.equal(dividers.length, 4, 'Every section has its real remaining-width divider');
+    assert.ok(paint.every(item => ['31,78,95', '32,37,43', '75,85,99'].includes(item.fill?.join())), 'All visible text uses the new palette');
+    const first = items.find(item => item.str === 'Measured');
+    assert.ok(first.identity.endsWith('SourceSans3-Regular'));
+    const baselines = [...new Set(items.filter(item => item.str === 'Measured').map(item => item.transform[5]))];
+    assert.equal(baselines.length, 2);
+    assert.ok(Math.abs((baselines[0] - baselines[1]) / 9.75 - 1.326) < 0.001, 'Actual body baselines meet the 1.3–1.35em target');
+    await inspect(resume);
+  } finally { await pdf.destroy(); }
+});
+
+test('frozen pre-refresh data retains complete content and approximately two pages after restyling', async () => {
+  const resume = JSON.parse(await readFile(new URL('../proof/baseline/pre-refresh/resume.json', import.meta.url), 'utf8'));
+  const old = await readFile(new URL('../proof/baseline/pre-refresh/poppins.pdf', import.meta.url));
+  assert.equal(createHash('sha256').update(old).digest('hex'), '7213c5c4d8b49726cf9796eda75cdd58cd8a73949e5d697a5df2739ad4bdc02c', 'Old PDF is unchanged');
+  const before = await getDocument({ data: Uint8Array.from(old) }).promise;
+  try { assert.equal(before.numPages, 2); } finally { await before.destroy(); }
+  assert.equal((await inspect(resume)).length, 2, 'Identical complete content still occupies two pages');
 });
 
 test('paragraph breaks and structural tabs do not trigger glyph errors', async () => {
