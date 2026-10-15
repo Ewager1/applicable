@@ -42,7 +42,7 @@ The same document definition and bundled fonts generate the Node verification sa
 
 ### Typography and layout
 
-Local reference inspection found US Letter pages, approximately 43 pt margins, Poppins Light 10 pt body, Poppins SemiBold 18 pt name and 11 pt job headers, and Poppins ExtraLight 10 pt teal headings. The proof uses those weights and sizes with accent `#00786c`, approximately 12 pt body baselines, hanging bullets, right-aligned metadata, and bold flowing skill categories. It follows the reference's single-column structure and heading order. The original reference remains outside this repository.
+Local reference inspection found US Letter pages, approximately 43 pt margins, Poppins Light 10 pt body, Poppins SemiBold 18 pt name and 11 pt job headers, and Poppins ExtraLight 10 pt accent headings. The proof uses those weights and sizes with accent `#00786c`, approximately 12 pt body baselines, hanging bullets, right-aligned metadata, and bold flowing skill categories. It follows the reference's single-column structure and heading order. The original reference remains outside this repository.
 
 Every top-level heading/job header is linked to its next content block when pagination is calculated, avoiding orphan headers. Jobs can continue across pages. There is no fixed page limit, no truncation, and no automatic shrinking to hit a page count.
 
@@ -73,7 +73,7 @@ Font files and the OFL were downloaded from `https://raw.githubusercontent.com/g
 Review recorded on 2026-10-15: all 14 pages in short (1), typical (2), long (3), parsed (1), split-job (2), multi-page-bullet (3) and long-values (2) were rendered with Poppler and visually inspected. The Chrome preview was also inspected. The following checklist passed:
 
 - [x] Text stays within page margins; no clipping, overlap or missing glyphs in the fixtures.
-- [x] Name/title hierarchy, teal headings and body typography resemble the supplied reference.
+- [x] Name/title hierarchy, accent headings and body typography resemble the supplied reference.
 - [x] Dates and locations align to the right, with separation from left metadata.
 - [x] Wrapped bullets use consistent hanging indentation and readable line spacing.
 - [x] Section headings and job headers share a page with following content.
