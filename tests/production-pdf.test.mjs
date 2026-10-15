@@ -12,6 +12,7 @@ import { fontHashes, supportedRanges } from '../app/pdf/font-coverage.js';
 import { createRequire } from 'node:module';
 import { fonts } from '../app/pdf/fonts.js';
 import { documentDefinition } from '../app/pdf/document.js';
+import { createPagination } from '../app/pdf/pagination.js';
 const require = createRequire(import.meta.url);
 const fontkit = createRequire(require.resolve('pdfmake/package.json'))('@foliojs-fork/fontkit');
 
@@ -73,6 +74,49 @@ test('production PDF preserves deliberately reversed job order', async () => {
   resume.jobs.reverse();
   const all = (await inspect(resume)).map(page => page.text).join('');
   assert.ok(all.indexOf(compact(resume.jobs[0].employer)) < all.indexOf(compact(resume.jobs[1].employer)));
+});
+
+test('a heading keeps its meaningful content across a page boundary despite an inserted spacer', async () => {
+  const fontData = Object.fromEntries(await Promise.all(fontFiles.map(async file => [file, (await readFile(new URL(`../assets/fonts/${file}`, import.meta.url))).toString('base64')])));
+  for (const linked of [false, true]) {
+    const heading = { text: 'Boundary heading' };
+    const firstContent = { text: 'First meaningful content' };
+    const pagination = createPagination();
+    if (linked) pagination.keepWith(heading, firstContent);
+    const definition = {
+      pageSize: { width: 612, height: 220 },
+      pageMargins: [43, 43, 43, 43],
+      defaultStyle: { font: 'SourceSans3', fontSize: 9.75 },
+      content: [
+        { text: 'Preceding content', margin: [0, 0, 0, 90] },
+        heading,
+        { text: '', margin: [0, 0, 0, 10] },
+        firstContent,
+      ],
+      pageBreakBefore: pagination.pageBreakBefore,
+    };
+    const bytes = await new Promise((resolve, reject) => {
+      const stream = pdfMake.createPdf(definition, undefined, fonts, fontData).getStream();
+      const chunks = [];
+      stream.on('data', chunk => chunks.push(chunk));
+      stream.once('error', reject);
+      stream.once('end', () => resolve(Buffer.concat(chunks)));
+      stream.end();
+    });
+    const pdf = await getDocument({ data: Uint8Array.from(bytes) }).promise;
+    try {
+      assert.equal(pdf.numPages, 2);
+      const pages = [];
+      for (let number = 1; number <= pdf.numPages; number++) {
+        pages.push(compact((await (await pdf.getPage(number)).getTextContent()).items.map(item => item.str).join('')));
+      }
+      assert.ok(pages[0].includes('Precedingcontent'));
+      const headingPage = pages.findIndex(text => text.includes('Boundaryheading'));
+      const contentPage = pages.findIndex(text => text.includes('Firstmeaningfulcontent'));
+      assert.equal(contentPage, 1, 'Fixture forces the meaningful content onto the next page');
+      assert.equal(headingPage, linked ? contentPage : 0, 'Explicit relationship moves heading past the boundary rather than keeping only the spacer');
+    } finally { await pdf.destroy(); }
+  }
 });
 
 for (const kind of ['split-job', 'multi-page-bullet', 'long-values']) {

@@ -1,4 +1,5 @@
 import { supportedRanges } from './font-coverage.js';
+import { createPagination } from './pagination.js';
 const palette = { primary: '#20252B', secondary: '#4B5563', accent: '#1F4E5F', divider: '#D8DEE6' };
 const semibold = { font: 'SourceSans3Semibold' };
 const pageMargins = [43, 43, 43, 43];
@@ -47,7 +48,6 @@ const sectionHeading = text => ({
   columnGap: sectionColumnGap,
   margin: sectionMargins,
   headlineLevel: 1,
-  keepOffset: text === 'SKILLS' ? 1 : 2,
   unbreakable: true,
 });
 const entryRow = (left, right, leftStyle, rightStyle) => ({
@@ -81,6 +81,7 @@ function verifyCharacters(resume) {
  */
 export function documentDefinition(resume) {
   verifyCharacters(resume);
+  const pagination = createPagination();
   let contact;
   try {
     // PDF URI annotations need ASCII serialization (including Unicode URL paths).
@@ -88,6 +89,7 @@ export function documentDefinition(resume) {
   } catch {
     throw new Error('A contact link is not a usable web or email address. Check its destination before exporting.');
   }
+  const experienceHeading = sectionHeading('RELEVANT EXPERIENCE');
   const content = [
     { text: resume.name, style: 'name', margin: [0, 0, 0, 3] },
     {
@@ -97,10 +99,10 @@ export function documentDefinition(resume) {
     },
     { text: resume.title, style: 'title', margin: [0, 0, 0, 10] },
     { text: resume.summary },
-    sectionHeading('RELEVANT EXPERIENCE'),
+    experienceHeading,
   ];
-  for (const job of resume.jobs) {
-    content.push({
+  for (const [jobIndex, job] of resume.jobs.entries()) {
+    const header = {
       stack: [
         entryRow(job.employer, job.dates, 'entryHeading', 'date'),
         entryRow(job.role, job.location, 'role', 'location'),
@@ -108,39 +110,46 @@ export function documentDefinition(resume) {
       margin: [0, 0, 0, entryBottomMargin],
       headlineLevel: 1,
       unbreakable: true,
-    });
-    for (const bullet of job.bullets) {
-      content.push({ ul: [bullet], margin: bulletMargins });
-    }
+    };
+    const bullets = job.bullets.map(bullet => ({ ul: [bullet], margin: bulletMargins }));
+    pagination.keepWith(header, bullets[0]);
+    if (jobIndex === 0) pagination.keepWith(experienceHeading, bullets[0]);
+    content.push(header, ...bullets);
   }
-  content.push(sectionHeading('EDUCATION'));
-  for (const entry of resume.education) {
-    content.push({ text: entry.qualification, style: 'entryHeading', headlineLevel: 1 });
-    content.push({
+  const educationHeading = sectionHeading('EDUCATION');
+  content.push(educationHeading);
+  for (const [entryIndex, entry] of resume.education.entries()) {
+    const qualification = { text: entry.qualification, style: 'entryHeading', headlineLevel: 1 };
+    const institution = {
       ...entryRow(entry.institution, entry.dates, 'body', 'date'),
       margin: [0, 0, 0, entryBottomMargin],
-    });
+    };
+    pagination.keepWith(qualification, institution);
+    if (entryIndex === 0) pagination.keepWith(educationHeading, institution);
+    content.push(qualification, institution);
   }
-  content.push(sectionHeading('CERTIFICATIONS'));
-  for (const entry of resume.certifications) {
-    content.push({
+  const certificationsHeading = sectionHeading('CERTIFICATIONS');
+  content.push(certificationsHeading);
+  for (const [entryIndex, entry] of resume.certifications.entries()) {
+    const title = {
       ...entryRow(entry.title, entry.dates, 'entryHeading', 'date'),
       headlineLevel: 1,
-    });
-    content.push({ text: entry.issuer, margin: [0, 0, 0, entryBottomMargin] });
+    };
+    const issuer = { text: entry.issuer, margin: [0, 0, 0, entryBottomMargin] };
+    pagination.keepWith(title, issuer);
+    if (entryIndex === 0) pagination.keepWith(certificationsHeading, issuer);
+    content.push(title, issuer);
   }
-  content.push(sectionHeading('SKILLS'));
-  for (const row of resume.skills) {
-    content.push({
+  const skillsHeading = sectionHeading('SKILLS');
+  content.push(skillsHeading);
+  for (const [rowIndex, row] of resume.skills.entries()) {
+    const skills = {
       text: [{ text: `${row.category}: `, style: 'skillsCategory' }, row.items],
       margin: [0, 0, 0, 3],
-    });
+    };
+    if (rowIndex === 0) pagination.keepWith(skillsHeading, skills);
+    content.push(skills);
   }
-  const keepNext = new Map();
-  content.forEach((node, index) => {
-    node.id = `block-${index}`;
-    if (node.headlineLevel === 1) keepNext.set(node.id, `block-${index + (node.keepOffset ?? 1)}`);
-  });
   return {
     info: { title: 'Applicable resume', author: 'Applicable' },
     pageSize: 'LETTER',
@@ -148,7 +157,6 @@ export function documentDefinition(resume) {
     defaultStyle: styles.body,
     styles,
     content,
-    // Re-evaluated after pagination so adjacent headings move with their content.
-    pageBreakBefore: (node, followingNodesOnPage) => keepNext.has(node.id) && node.pageNumbers.length === 1 && !followingNodesOnPage.some(next => next.id === keepNext.get(node.id)),
+    pageBreakBefore: pagination.pageBreakBefore,
   };
 }
