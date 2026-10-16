@@ -16,12 +16,12 @@ The roles do not require different models. Keep the configured model unless the 
 
 ## Per-issue flow
 
-1. Chat selects the next issue and gives Codex its acceptance criteria, relevant file paths, branch ownership, expected checks, and stop conditions.
-2. Codex implements and tests it, then returns a concise handoff: changed files, behavior, checks actually run, PR/commit identity, and unresolved concerns.
+1. Chat selects the next issue and gives Codex its acceptance criteria, relevant file paths, branch ownership, expected checks, and stop conditions. Start a labeled [local usage baseline](agent-usage.md) for the selected root chat before work; if unavailable, record that measurement as unknown. On a domain change, begin with fresh concise context: issue contract, relevant paths, decisions, interfaces and risks.
+2. One implementer owns source/tests and returns a concise handoff: changed behavior/files, exact commit and PR identity, checks actually run, interfaces changed or preserved, unresolved risks, and task/review/rework accounting. Include the metric window and local report path; do not paste real session records into the PR.
 3. For substantive code, Chat dispatches one independent testing/review pass against that exact commit. The reviewer receives the issue, specification sections, diff reference, and test results.
 4. Codex fixes actionable findings. Recheck only affected behavior and required checks; request one focused follow-up review if needed.
 5. One designated integration owner performs the authorized merge after all gates pass. Default: Chat. Codex may be explicitly designated instead; never have both attempt the merge.
-6. Verify merge success, close the issue, set its project status to Done, and safely delete the merged branch. Then start the next issue.
+6. Finish the usage window after the bounded work/review, supplying measured task, actionable-finding, rework-pass and accepted-outcome counts where available. Preserve the baseline; identify partial/unknown metrics and do not invent historical attribution. Verify merge success, close the issue, set its project status to Done, and safely delete the merged branch. Then start the next issue.
 
 Minor documentation changes can use coordinator review. Significant requirement or authorization changes still deserve independent review. Do not create a reviewer merely to approve punctuation.
 
@@ -36,7 +36,7 @@ If repeated review still leaves uncertainty, stop and explain the remaining issu
 - Do not allow recursive subagents, competing implementations, continuous monitoring, or repeated full-project scans.
 - Use executable tests and CI for repeatable checking. Use reviewer judgment for gaps and behavior, not as an expensive test runner.
 - Request follow-up review only for material fixes, not every edit.
-- Report the number of delegated tasks and meaningful findings per issue. Record per-task usage only where tooling exposes it; do not represent account-wide usage changes as exact issue cost.
+- Report delegated task, actionable finding and rework-pass counts per issue using the [local measurement definitions](agent-usage.md). Record token observations only where tooling exposes them; observed cumulative tokens, issue deltas, elapsed wall time and model billing are separate concepts. Do not represent account-wide usage changes as exact issue cost.
 - Evaluate the pilot after the first substantive issue. If review adds little value or coordination dominates, simplify to one implementer with coordinator review. No numeric savings or overhead guarantee is assumed.
 
 ## Example: parser issue

@@ -1,0 +1,28 @@
+# Local development agent usage
+
+This optional, dependency-free Node tool benchmarks development agent/model work. It reads the locally observed Codex JSONL format, which is not a guaranteed public API. It does not affect the app or configured models, contact a provider, require an API key, run a watcher, or measure billed credits/dollars.
+
+Run commands from the repository root with the supported Node version:
+
+```sh
+npm run usage:snapshot -- --thread ROOT_THREAD_ID
+npm run usage:start -- --run issue-37-validation --thread ROOT_THREAD_ID
+# Do the bounded issue work, tests and independent review.
+npm run usage:finish -- --run issue-37-validation --tasks 2 --findings 1 --rework 1 --outcomes 1
+```
+
+`ROOT_THREAD_ID` is the selected coordinator chat's session ID. An omitted `--thread` uses `CODEX_THREAD_ID` on snapshot/start; this environment variable can identify a child when run inside a delegated agent, so select the coordinator explicitly when measuring the whole issue. Finish inherits the saved root and scope; an explicit mismatch fails. Use `--sessions-dir /absolute/path/to/sessions` outside the default `~/.codex/sessions` directory or for synthetic reproduction. `--scope descendants` (default) includes recursively linked children via `source.subagent.thread_spawn.parent_thread_id`; `--scope root` measures only the selected chat. Neither scope infers children from similar timestamps, working directories or filenames.
+
+Snapshot writes a dated JSON file. Start creates `output/agent-usage/<run>/baseline.json` exclusively and refuses to overwrite it. Finish requires that baseline, writes `report.json`, and can run again after late records arrive. Keep the baseline and source session records to reproduce a report; a finish refresh replaces the prior report. Use a new run name for a new measurement window. Real logs, baselines and reports remain local under already-ignored `output/`; never commit them. Reports contain only selected session/parent IDs, sanitized agent paths/roles, observed model identifiers, timestamps, hashes of whitelisted events, token counters, diagnostics and explicitly supplied counts. They exclude source paths, working directories, agent instructions, prompts, responses, tool content, resumes and account/user metadata. Synthetic tests are the only committed usage examples.
+
+## Read measurements conservatively
+
+- `cumulative` is the latest reported cumulative counter for an observed agent, not a sum of repeated snapshots. `last_token_usage` is ignored. Identical/prefix copies of session files are deduplicated; divergent copies are flagged. Input/cache/reasoning fields are reported separately; cached input and reasoning output must not be added to `total_tokens` again.
+- `models` lists observed turn-context models. A cumulative total spanning several models is not assigned to the most recent model. Missing or mixed models make the issue delta unknown.
+- `delta` subtracts baseline counters only when history is preserved and observations support it. A newly observed child can contribute its cumulative counters only when its valid session-header creation timestamp and every observed event are after the baseline. An old or unknown creation time leaves its delta unknown even if its first available usage record is recent. Conflicting creation times across copies or changed creation metadata block attribution. Missing counters, malformed/truncated records, resets, missing baseline agents, changed history/parent links, future/undated/late records and model changes make affected deltas `null`. Unchanged valid counters produce an observed zero delta with `usageObservationAdvanced: false`; delayed unflushed work remains possible, so this is not proof that no work occurred. An aggregate is `null` if any observed agent's delta is unknown; inspect per-agent diagnostics and cumulative observations.
+- Every report remains `provisional-local-observation`: delayed, deleted, undiscovered or unlinked sessions cannot be ruled out. The metadata index checks only the first nonblank record of each file and discovers explicit links in available session headers; absent links cannot establish completeness. An unreadable session directory or selected file fails the command. A selected root missing from the index fails without writing a report. A snapshot is an observation, not a guarantee that active work has flushed all counters. Re-run finish after records settle; the preserved baseline lets it detect history changes. Do not turn unknown values into zero or an exact whole-task cost.
+- `wallElapsedSeconds` includes tool execution, waiting and review; it is not model runtime. Counts are optional measured integers, and omitted values stay `null`. `tasks` counts bounded delegated assignments (including review), `findings` counts distinct actionable review findings, `rework` counts implementation correction passes prompted by review, and `outcomes` counts completed accepted issue outcomes. State the measurement window and counting choices in the handoff. These counts do not prove productivity or savings.
+
+Start before future issue work to establish attribution. A baseline created during implementation measures only the subsequent labeled window; it cannot reconstruct earlier per-issue usage. Account-wide rate-limit percentages are not task measurements or billing. Compare several comparable completed issues before changing workflow/models. Record unknown measurements openly, including missing or incomplete local observations.
+
+Use `node --test tests/agent-usage.test.mjs` for focused synthetic aggregation, isolation, privacy and CLI lifecycle checks. The normal `npm run check` includes those tests.
