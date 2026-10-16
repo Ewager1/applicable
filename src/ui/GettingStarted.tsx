@@ -23,8 +23,8 @@ export function GettingStarted() {
         <li>
           <h2>Set up a Job Finder conversation in ChatGPT</h2>
           <p>
-            Create a reusable setup prompt below, then open ChatGPT yourself to explore relevant
-            positions together. Verify each opening on the employer’s website.
+            Copy your setup prompt below, then open ChatGPT yourself to explore relevant positions
+            together. Verify each opening on the employer’s website.
           </p>
           <JobFinderSetup />
         </li>

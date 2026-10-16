@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { buildJobFinderPrompt, type JobFinderAnswers } from '../job-finder/prompt.ts';
 
 const questions: { key: keyof JobFinderAnswers; label: string; example: string }[] = [
@@ -50,20 +50,33 @@ const emptyAnswers: JobFinderAnswers = {
 
 export function JobFinderSetup() {
   const [answers, setAnswers] = useState(emptyAnswers);
-  const [prompt, setPrompt] = useState('');
+  const [fallbackPrompt, setFallbackPrompt] = useState('');
   const [status, setStatus] = useState('');
   const output = useRef<HTMLTextAreaElement>(null);
-  // An edit or regeneration also invalidates feedback from a pending clipboard request.
+  // Edits and newer copy requests invalidate pending clipboard feedback.
   const revision = useRef(0);
 
+  useLayoutEffect(() => {
+    if (fallbackPrompt) {
+      output.current?.focus();
+      output.current?.select();
+    }
+  }, [fallbackPrompt]);
+
   async function copy() {
-    const currentRevision = revision.current;
+    const prompt = buildJobFinderPrompt(answers);
+    const currentRevision = ++revision.current;
+    setFallbackPrompt('');
+    setStatus('');
     try {
       await navigator.clipboard.writeText(prompt);
       if (currentRevision === revision.current)
-        setStatus('Prompt copied. Paste it into a new ChatGPT conversation.');
+        setStatus(
+          'Prompt created and copied. Paste it into a new ChatGPT conversation and upload your existing resumes there. Answer its short clarification questions. For future searches, ask “Look for jobs.” Review results and apply yourself.',
+        );
     } catch {
       if (currentRevision !== revision.current) return;
+      setFallbackPrompt(prompt);
       setStatus(
         'Copy was unavailable. The prompt is selected below; use your device’s Copy command.',
       );
@@ -77,16 +90,15 @@ export function JobFinderSetup() {
       <p id="job-finder-help">
         All seven questions are optional. Must-haves are non-negotiable; nice-to-haves and other
         preferences are flexible. No account, uploads or personal information are needed here.
-        Answers and generated prompts stay on this page and are cleared on reload.
+        Answers stay on this page and are cleared on reload. Copy Prompt creates and copies your
+        setup instructions in one step.
       </p>
       <form
         aria-label="Job Finder setup"
         aria-describedby="job-finder-help"
         onSubmit={(event) => {
           event.preventDefault();
-          revision.current += 1;
-          setPrompt(buildJobFinderPrompt(answers));
-          setStatus('Prompt generated. Review it below, then copy it.');
+          void copy();
         }}
       >
         {questions.map(({ key, label, example }) => (
@@ -103,15 +115,15 @@ export function JobFinderSetup() {
               onChange={(event) => {
                 revision.current += 1;
                 setAnswers({ ...answers, [key]: event.target.value });
-                setPrompt('');
+                setFallbackPrompt('');
                 setStatus('');
               }}
             />
           </div>
         ))}
-        <button type="submit">Generate Prompt</button>
+        <button type="submit">Copy Prompt</button>
       </form>
-      {prompt && (
+      {fallbackPrompt && (
         <div className="job-finder-output">
           <label htmlFor="job-finder-prompt">Your Job Finder prompt</label>
           <p id="job-finder-next-steps">
@@ -123,13 +135,10 @@ export function JobFinderSetup() {
             ref={output}
             id="job-finder-prompt"
             readOnly
-            value={prompt}
+            value={fallbackPrompt}
             rows={16}
             aria-describedby="job-finder-next-steps job-finder-copy-status"
           />
-          <button className="secondary" type="button" onClick={() => void copy()}>
-            Copy Prompt
-          </button>
         </div>
       )}
       <p id="job-finder-copy-status" className="status" role="status" aria-live="polite">
