@@ -676,14 +676,31 @@ test('local header tabs default to PDF Builder and support discovery and keyboar
   assert.equal(await guide.evaluate((element) => element === document.activeElement), true);
   assert.equal(await builder.getAttribute('tabindex'), '-1');
   assert.equal(await page.locator('#builder-panel').isVisible(), false);
-  const stages = page.locator('.workflow-stages > li');
-  assert.equal(await stages.count(), 4);
-  assert.deepEqual(await stages.locator('h2').allTextContents(), [
-    'Understand the process',
-    'Set up a Job Finder conversation in ChatGPT',
-    'Set up a Resume Builder conversation in ChatGPT',
-    'Find positions, tailor resumes, create PDFs and apply',
+  assert.equal(
+    await page.getByRole('heading', { level: 1 }).textContent(),
+    'A simpler way to search for jobs',
+  );
+  const overview = page.getByRole('region', { name: 'Your job search, step by step' });
+  assert.equal(await overview.getByRole('listitem').count(), 4);
+  assert.deepEqual(await overview.getByRole('heading', { level: 3 }).allTextContents(), [
+    'Find the right jobs',
+    'Tailor your resume',
+    'Create your PDF',
+    'Review and apply',
   ]);
+  const setup = page.getByRole('region', { name: 'Let’s get you set up', exact: true });
+  assert.deepEqual(await setup.getByRole('heading', { level: 3 }).allTextContents(), [
+    'Step 1: Create your Job Finder',
+    'Step 2: Create your Resume Builder',
+  ]);
+  assert.equal(await overview.getByRole('form').count(), 0);
+  assert.equal(
+    await setup
+      .getByRole('region', { name: 'Step 1: Create your Job Finder', exact: true })
+      .getByRole('form', { name: 'Job Finder setup' })
+      .isVisible(),
+    true,
+  );
   await guide.press('ArrowRight');
   assert.equal(await builder.getAttribute('aria-selected'), 'true');
   await builder.press('ArrowLeft');
@@ -784,6 +801,36 @@ for (const width of [320, 375, 1280]) {
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         true,
       );
+      if (tab === guide) {
+        const overview = page.getByRole('region', { name: 'Your job search, step by step' });
+        const setup = page.getByRole('region', { name: 'Let’s get you set up', exact: true });
+        const cards = await overview.getByRole('listitem').all();
+        const cardBounds = await Promise.all(cards.map((card) => card.boundingBox()));
+        const overviewBounds = await overview.boundingBox();
+        const setupBounds = await setup.boundingBox();
+        assert.ok(setupBounds.y >= overviewBounds.y + overviewBounds.height);
+        for (const [index, card] of cards.entries()) {
+          assert.equal(await card.getByRole('heading', { level: 3 }).isVisible(), true);
+          assert.ok(cardBounds[index].x >= 0);
+          assert.ok(cardBounds[index].x + cardBounds[index].width <= width);
+          if (index > 0) {
+            if (width === 1280) {
+              assert.ok(Math.abs(cardBounds[index].y - cardBounds[0].y) < 1);
+              assert.ok(
+                cardBounds[index].x >= cardBounds[index - 1].x + cardBounds[index - 1].width,
+              );
+            } else {
+              assert.ok(
+                cardBounds[index].y >= cardBounds[index - 1].y + cardBounds[index - 1].height,
+              );
+            }
+          }
+        }
+        for (const heading of await setup.getByRole('heading').all()) {
+          const headingBounds = await heading.boundingBox();
+          assert.ok(headingBounds.x >= 0 && headingBounds.x + headingBounds.width <= width);
+        }
+      }
       const bounds = await tab.boundingBox();
       assert.ok(bounds.height >= 44 && bounds.width >= 44);
       await mkdir('output/ui', { recursive: true });
