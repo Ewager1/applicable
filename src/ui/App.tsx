@@ -118,10 +118,6 @@ export function App() {
               your time.
             </p>
           </section>
-          <p className="tool-guidance">
-            Answer the optional questions below, then copy your prompt into a new ChatGPT
-            conversation. Upload your existing resumes there to get started.
-          </p>
           <JobFinderSetup />
         </div>
         <div

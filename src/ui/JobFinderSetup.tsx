@@ -43,6 +43,8 @@ const questions: { key: keyof JobFinderAnswers; label: string; example: string }
     example: 'For example, changing industries or using training experience.',
   },
 ];
+const INITIAL_QUESTION_COUNT = 3;
+
 const settingsFields: { key: keyof JobFinderSettings; label: string; description: string }[] = [
   {
     key: 'usJobsOnly',
@@ -111,16 +113,28 @@ export function JobFinderSetup() {
     }
   }
 
+  function renderQuestions(items: typeof questions) {
+    return items.map(({ key, label, example }) => (
+      <div className="job-finder-field" key={key}>
+        <label htmlFor={`job-finder-${key}`}>
+          {label} <span className="optional">(optional)</span>
+        </label>
+        <textarea
+          id={`job-finder-${key}`}
+          rows={3}
+          placeholder={example}
+          value={answers[key]}
+          onChange={(event) => {
+            clearCopyFeedback();
+            setAnswers({ ...answers, [key]: event.target.value });
+          }}
+        />
+      </div>
+    ));
+  }
+
   return (
     <div className="job-finder-setup">
-      <p id="job-finder-help">
-        All questions are optional. Use Must-haves for requirements you can't compromise on.
-        Everything else can be flexible.
-      </p>
-      <p className="tool-guidance">
-        Answers and search preferences stay on this page until reload. Nothing is shared with
-        ChatGPT until you paste the prompt.
-      </p>
       <form
         aria-label="Job Finder setup"
         aria-describedby="job-finder-help"
@@ -129,23 +143,41 @@ export function JobFinderSetup() {
           void copy();
         }}
       >
-        {questions.map(({ key, label, example }) => (
-          <div className="job-finder-field" key={key}>
-            <label htmlFor={`job-finder-${key}`}>
-              {label} <span className="optional">(optional)</span>
-            </label>
+        <p id="job-finder-help" className="tool-guidance">
+          Copy your ChatGPT prompt now, or answer a few optional questions to personalize it.
+        </p>
+        <button type="submit">Copy Prompt</button>
+        <p id="job-finder-copy-status" className="status" role="status" aria-live="polite">
+          {status}
+        </p>
+        <p className="tool-guidance">
+          Your answers stay on this page until you reload. Nothing is sent to ChatGPT until you
+          paste the prompt.
+        </p>
+        {fallbackPrompt && (
+          <div className="job-finder-output">
+            <label htmlFor="job-finder-prompt">Your Job Finder prompt</label>
+            <p id="job-finder-next-steps">
+              Paste this prompt into a new ChatGPT conversation and upload your resumes there.
+            </p>
             <textarea
-              id={`job-finder-${key}`}
-              rows={3}
-              placeholder={example}
-              value={answers[key]}
-              onChange={(event) => {
-                clearCopyFeedback();
-                setAnswers({ ...answers, [key]: event.target.value });
-              }}
+              ref={output}
+              id="job-finder-prompt"
+              readOnly
+              value={fallbackPrompt}
+              rows={16}
+              aria-describedby="job-finder-next-steps job-finder-copy-status"
             />
           </div>
-        ))}
+        )}
+        <p className="tool-guidance">
+          Use Must-haves for requirements you can't compromise on. Everything else can be flexible.
+        </p>
+        {renderQuestions(questions.slice(0, INITIAL_QUESTION_COUNT))}
+        <details className="job-finder-additional">
+          <summary>Additional preferences</summary>
+          {renderQuestions(questions.slice(INITIAL_QUESTION_COUNT))}
+        </details>
         <fieldset className="job-finder-settings">
           <legend>Search preferences</legend>
           {settingsFields.map(({ key, label, description }) => (
@@ -167,29 +199,7 @@ export function JobFinderSetup() {
             </div>
           ))}
         </fieldset>
-        <button type="submit">Copy Prompt</button>
       </form>
-      {fallbackPrompt && (
-        <div className="job-finder-output">
-          <label htmlFor="job-finder-prompt">Your Job Finder prompt</label>
-          <p id="job-finder-next-steps">
-            Paste this prompt into a new ChatGPT conversation and upload your existing resumes
-            there. Answer its short clarification questions. For future searches, ask “Look for
-            jobs.” Review results and apply yourself.
-          </p>
-          <textarea
-            ref={output}
-            id="job-finder-prompt"
-            readOnly
-            value={fallbackPrompt}
-            rows={16}
-            aria-describedby="job-finder-next-steps job-finder-copy-status"
-          />
-        </div>
-      )}
-      <p id="job-finder-copy-status" className="status" role="status" aria-live="polite">
-        {status}
-      </p>
     </div>
   );
 }
