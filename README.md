@@ -95,7 +95,7 @@ Manual clean-source testing covered macOS; the application checks also run in Li
 
 ## License
 
-Applicable's original code is [MIT licensed](LICENSE), copyright 2026 Ewager1. Fonts and dependencies retain their separate licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).
+Applicable's original code is [MIT licensed](LICENSE), copyright 2026 Ewager1. Fonts and dependencies retain their separate licenses; see [third-party notices](THIRD_PARTY_NOTICES.md), including the notice-packaging requirements before redistributing or hosting a standalone production build.
 
 ## Project tracking
 
