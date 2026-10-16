@@ -1,7 +1,9 @@
 import type { createPdf } from 'pdfmake/build/pdfmake.js';
 
 /** Only the browser bundle API used by the core, not a second engine model. */
-export interface PdfMake { createPdf: typeof createPdf }
+export interface PdfMake {
+  createPdf: typeof createPdf;
+}
 export type PdfStream = ReturnType<ReturnType<typeof createPdf>['getStream']>;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -12,9 +14,17 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
  */
 export function measuredPageCount(stream: PdfStream): number | undefined {
   const pages: unknown = Reflect.get(stream, '_pdfMakePages');
-  if (!Array.isArray(pages) || !pages.length || pages.some((page: unknown) =>
-    !isRecord(page) || !Array.isArray(page.items) || !page.items.some((item: unknown) =>
-      isRecord(item) && item.type === 'line'))) return undefined;
+  if (
+    !Array.isArray(pages) ||
+    !pages.length ||
+    pages.some(
+      (page: unknown) =>
+        !isRecord(page) ||
+        !Array.isArray(page.items) ||
+        !page.items.some((item: unknown) => isRecord(item) && item.type === 'line'),
+    )
+  )
+    return undefined;
   return pages.length;
 }
 
@@ -23,5 +33,6 @@ export function firstMeasuredPage(node: object, pageCount: number): number | und
   if (!Array.isArray(positions) || !isRecord(positions[0])) return undefined;
   const page: unknown = positions[0].pageNumber;
   return typeof page === 'number' && Number.isInteger(page) && page >= 1 && page <= pageCount
-    ? page : undefined;
+    ? page
+    : undefined;
 }

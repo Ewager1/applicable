@@ -3,13 +3,8 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
-    "types": [
-      "vite/client"
-    ],
+    "lib": ["ES2022", "DOM"],
+    "types": ["vite/client"],
     "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
@@ -19,8 +14,5 @@
     "noUnusedParameters": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

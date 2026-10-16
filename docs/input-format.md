@@ -29,7 +29,6 @@ Only standalone controls are structural. Unknown or malformed standalone marker-
 
 Existing `# Professional Title`, `# Summary`, `# Relevant Experience`, `# Education`, `# Certifications`, `# Skills` section controls still work. The old entry controls are `## Job`, `## Education`, `## Certification`. They retain case/whitespace tolerance and require whitespace after `#`/`##`. You may safely mix recognized old and new controls on separate lines; repeating one section using another spelling still counts as a duplicate. Prefer the symbol format for new resumes. The section `@@EDUCATION@@` and entry `@@EDUCATION_ENTRY@@` are deliberately distinct.
 
-
 The result always presents contact → professional title → summary → experience → education → certifications → skills. It preserves the input order of jobs, bullets, education entries, certifications, skill categories and skill items. Jobs are never sorted by date or relevance.
 
 Missing or blank sections block export. A marker by itself is empty. All requirements below are structural/nonempty checks, without judging the resume's writing, date formats, phone formats or email correctness. No missing fact is inferred.

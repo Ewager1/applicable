@@ -4,13 +4,13 @@
 
 Tested a fresh `git archive` of [`0190e69`](https://github.com/Ewager1/applicable/commit/0190e691f8fa7f42fedf670a871847f9f401045f), the merged F2 React interface and strict TypeScript core, in a separate temporary source directory. The archive contained no dependencies, build output or environment files. `npm ci` installed the lockfile's 170 packages using an existing npm download cache, without copying workspace dependencies. F3 changes contributor documentation only; application code, dependencies, bundled assets and frozen baselines are unchanged.
 
-| Check | Observed result |
-| --- | --- |
-| Platform/install | macOS 15.6, minimum supported Node **22.13.0**, npm **10.8.2**; `npm ci` passed, audit reported zero vulnerabilities |
-| Static/unit/build | `npm run check` passed typecheck, lint, all **93 unit/PDF/usage tests** and build, emitting all three local Source Sans 3 fonts and the lazy PDF engine |
-| Browser phase | The first Chromium launch stalled and was stopped after about two minutes; its owned processes were cleaned up. One browser-only retry with `npm run test:browser` passed **17/17**, using pinned Playwright Chromium and the same installed source/build; the test servers released ports 4173/4174 |
-| Synthetic application flow | Browser checks covered correction/keyboard submission, actual PDF downloads, selectable text and links, exact preview bytes, narrow/wide layouts, local fonts, no remote HTTP/WebSocket requests, font retry, engine reload recovery and StrictMode cancellation/single delivery/URL cleanup |
-| PDF/layout evidence | Reviewed the existing F1 comparisons (seven synthetic fixtures, 14 pages; identical text/layout/link structures and page images) and F2 comparisons (identical wide/narrow empty/filled and clipboard-fallback captures, plus the actual downloaded PDF page). Reused that unchanged visual evidence; no new PDF layout was introduced |
+| Check                      | Observed result                                                                                                                                                                                                                                                                                                                        |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Platform/install           | macOS 15.6, minimum supported Node **22.13.0**, npm **10.8.2**; `npm ci` passed, audit reported zero vulnerabilities                                                                                                                                                                                                                   |
+| Static/unit/build          | `npm run check` passed typecheck, lint, all **93 unit/PDF/usage tests** and build, emitting all three local Source Sans 3 fonts and the lazy PDF engine                                                                                                                                                                                |
+| Browser phase              | The first Chromium launch stalled and was stopped after about two minutes; its owned processes were cleaned up. One browser-only retry with `npm run test:browser` passed **17/17**, using pinned Playwright Chromium and the same installed source/build; the test servers released ports 4173/4174                                   |
+| Synthetic application flow | Browser checks covered correction/keyboard submission, actual PDF downloads, selectable text and links, exact preview bytes, narrow/wide layouts, local fonts, no remote HTTP/WebSocket requests, font retry, engine reload recovery and StrictMode cancellation/single delivery/URL cleanup                                           |
+| PDF/layout evidence        | Reviewed the existing F1 comparisons (seven synthetic fixtures, 14 pages; identical text/layout/link structures and page images) and F2 comparisons (identical wide/narrow empty/filled and clipboard-fallback captures, plus the actual downloaded PDF page). Reused that unchanged visual evidence; no new PDF layout was introduced |
 
 The entire `npm run check` did **not** finish uninterrupted; the successful browser-only retry completed its remaining gate without repeating the passing static/unit/build stages. The clean-source browser checks include first-export development startup with an isolated empty Vite cache and built-preview startup. Node's experimental type-stripping warning, upstream `crypto-js`/`jpeg-exif` deprecations and Vite's large PDF-engine chunk advisory remain visible. This local evidence does not establish latest-commit CI or GitHub delivery status.
 
@@ -44,18 +44,18 @@ Open http://127.0.0.1:5173/, use `examples/resume.txt`, and select Create PDF. S
 
 ### Results
 
-| Check | Observed result |
-| --- | --- |
-| Clean installation | `npm ci` succeeded using the lockfile and a fresh npm cache; no copied dependencies |
-| Static checks | ESLint passed |
-| Parser/PDF tests | All 51 tests passed |
-| Production build | Succeeded, with all three fonts and the PDF engine emitted as local assets |
-| Browser checks | All 9 passed, including real paste → warnings → correction → download, complete selectable text/links/order, exact preview/download bytes, retry and stale-generation protections |
-| Privacy/network | Every automated application browser case rejected remote HTTP/WebSocket requests; clean development-mode export also made no remote requests |
-| Development startup | `npm run dev` served the application on loopback port 5173 and created an actual 15,870-byte synthetic `resume.pdf` |
-| Built preview startup | `npm run preview` served the built application successfully on loopback port 4174 |
-| Shutdown | Ctrl+C stopped both manually started servers; ports 5173, 4173 and 4174 refused subsequent connections |
-| User interface/PDF | A5 desktop/mobile screenshots and the actual downloaded synthetic PDF were visually reviewed; A4's shared template baseline remains unchanged |
+| Check                 | Observed result                                                                                                                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clean installation    | `npm ci` succeeded using the lockfile and a fresh npm cache; no copied dependencies                                                                                               |
+| Static checks         | ESLint passed                                                                                                                                                                     |
+| Parser/PDF tests      | All 51 tests passed                                                                                                                                                               |
+| Production build      | Succeeded, with all three fonts and the PDF engine emitted as local assets                                                                                                        |
+| Browser checks        | All 9 passed, including real paste → warnings → correction → download, complete selectable text/links/order, exact preview/download bytes, retry and stale-generation protections |
+| Privacy/network       | Every automated application browser case rejected remote HTTP/WebSocket requests; clean development-mode export also made no remote requests                                      |
+| Development startup   | `npm run dev` served the application on loopback port 5173 and created an actual 15,870-byte synthetic `resume.pdf`                                                               |
+| Built preview startup | `npm run preview` served the built application successfully on loopback port 4174                                                                                                 |
+| Shutdown              | Ctrl+C stopped both manually started servers; ports 5173, 4173 and 4174 refused subsequent connections                                                                            |
+| User interface/PDF    | A5 desktop/mobile screenshots and the actual downloaded synthetic PDF were visually reviewed; A4's shared template baseline remains unchanged                                     |
 
 The 9 browser checks use synthetic content only. They include native PDF viewing and a capability-disabled fallback, each producing one intended automatic download, along with unavailable/corrupt font recovery and edits while generation is pending. Existing PDF tests cover short, typical and long resumes, one job split across pages, a single bullet continued over three pages, long tokens/metadata, and unsupported-glyph errors.
 

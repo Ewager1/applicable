@@ -4,23 +4,23 @@ Start with the assigned [GitHub issue](https://github.com/Ewager1/applicable/iss
 
 ## Find the right edit point
 
-| Change | Files and responsibility |
-| --- | --- |
-| Accepted text, validation and source lines | [parse.ts](../src/resume/parse.ts), [input format](input-format.md), [synthetic example](../examples/resume.txt), [chatbot instruction](../examples/chatbot-instruction.md) |
-| Contact fields, safe link assembly and local persistence | [contact.ts](../src/resume/contact.ts), [contact-storage.ts](../src/resume/contact-storage.ts), [useContactFields.ts](../src/ui/useContactFields.ts): literal five-field values, versioned whitelist, nonblocking storage warnings |
-| Shared data/result/error shape | [types.ts](../src/resume/types.ts): canonical TypeScript `ResumeBody`, `Resume`, `ContactFields`, nested entries, discriminated `ParseResult` and `ValidationError`; type-only exports |
-| Input help and copied chatbot instructions | [ChatbotInstructions.tsx](../src/ui/ChatbotInstructions.tsx): visible steps and clipboard/manual fallback; imports [chatbot-instruction.md](../examples/chatbot-instruction.md) as raw text, so edit that single file for the copied instructions and keep it aligned with the [input contract](input-format.md) |
-| Website wording and structure | [App.tsx](../src/ui/App.tsx), [ChatbotInstructions.tsx](../src/ui/ChatbotInstructions.tsx), [ResumeForm.tsx](../src/ui/ResumeForm.tsx), [Feedback.tsx](../src/ui/Feedback.tsx), [PdfResult.tsx](../src/ui/PdfResult.tsx): semantic page structure, chatbot steps, copy fallback, form, accessible feedback and result |
-| Website appearance | [styles.css](../src/styles.css): variables/base, page, form, help/errors, result, responsive rules |
-| Portable PDF filename | [download-filename.ts](../src/download-filename.ts): parsed professional title plus optional company, sanitized/bounded only for filenames; never modify the resume model |
-| Submission, recovery, download and preview | [useResumePdf.ts](../src/ui/useResumePdf.ts): typed generation states, resume/company/contact revision guards, lazy local loads, recovery and Blob URL ownership; `PdfResult.tsx` delivers once after commit |
-| PDF typography, palette, dimensions and entry rows | [document.ts](../src/pdf/document.ts): fixed semantic styles and section order; [current template details](pdf-template.md) |
-| Header/content relationships | [pagination.ts](../src/pdf/pagination.ts) and explicit `keepWith` calls in `document.ts`; layout relationships target actual nodes, including intermediate content |
-| Oversized heading groups | [header-fit.ts](../src/pdf/header-fit.ts): same-engine, fresh-page measurement of those explicit keep-groups |
-| PDF bytes and engine failures | [render.ts](../src/pdf/render.ts): fit check, synchronous local stream, recoverable errors |
-| Local fonts and glyph support | [fonts.ts](../src/pdf/fonts.ts), [font-coverage.ts](../src/pdf/font-coverage.ts), [coverage generator](../scripts/font-coverage.mjs), [font source/license](../assets/fonts/SOURCE.md) |
-| Local development agent/model metrics | [usage CLI](../scripts/agent-usage.mjs), [measurement guide](agent-usage.md); ignored `output/agent-usage/` reports, synthetic [tests](../tests/agent-usage.test.mjs) |
-| Build, browsers and CI | [package.json](../package.json), [Vite config](../vite.config.js), [browser runner](../tests/run-browser.mjs), [browser selection](../tests/browser-options.mjs), [CI workflow](../.github/workflows/checks.yml) |
+| Change                                                   | Files and responsibility                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Accepted text, validation and source lines               | [parse.ts](../src/resume/parse.ts), [input format](input-format.md), [synthetic example](../examples/resume.txt), [chatbot instruction](../examples/chatbot-instruction.md)                                                                                                                                           |
+| Contact fields, safe link assembly and local persistence | [contact.ts](../src/resume/contact.ts), [contact-storage.ts](../src/resume/contact-storage.ts), [useContactFields.ts](../src/ui/useContactFields.ts): literal five-field values, versioned whitelist, nonblocking storage warnings                                                                                    |
+| Shared data/result/error shape                           | [types.ts](../src/resume/types.ts): canonical TypeScript `ResumeBody`, `Resume`, `ContactFields`, nested entries, discriminated `ParseResult` and `ValidationError`; type-only exports                                                                                                                                |
+| Input help and copied chatbot instructions               | [ChatbotInstructions.tsx](../src/ui/ChatbotInstructions.tsx): visible steps and clipboard/manual fallback; imports [chatbot-instruction.md](../examples/chatbot-instruction.md) as raw text, so edit that single file for the copied instructions and keep it aligned with the [input contract](input-format.md)      |
+| Website wording and structure                            | [App.tsx](../src/ui/App.tsx), [ChatbotInstructions.tsx](../src/ui/ChatbotInstructions.tsx), [ResumeForm.tsx](../src/ui/ResumeForm.tsx), [Feedback.tsx](../src/ui/Feedback.tsx), [PdfResult.tsx](../src/ui/PdfResult.tsx): semantic page structure, chatbot steps, copy fallback, form, accessible feedback and result |
+| Website appearance                                       | [styles.css](../src/styles.css): variables/base, page, form, help/errors, result, responsive rules                                                                                                                                                                                                                    |
+| Portable PDF filename                                    | [download-filename.ts](../src/download-filename.ts): parsed professional title plus optional company, sanitized/bounded only for filenames; never modify the resume model                                                                                                                                             |
+| Submission, recovery, download and preview               | [useResumePdf.ts](../src/ui/useResumePdf.ts): typed generation states, resume/company/contact revision guards, lazy local loads, recovery and Blob URL ownership; `PdfResult.tsx` delivers once after commit                                                                                                          |
+| PDF typography, palette, dimensions and entry rows       | [document.ts](../src/pdf/document.ts): fixed semantic styles and section order; [current template details](pdf-template.md)                                                                                                                                                                                           |
+| Header/content relationships                             | [pagination.ts](../src/pdf/pagination.ts) and explicit `keepWith` calls in `document.ts`; layout relationships target actual nodes, including intermediate content                                                                                                                                                    |
+| Oversized heading groups                                 | [header-fit.ts](../src/pdf/header-fit.ts): same-engine, fresh-page measurement of those explicit keep-groups                                                                                                                                                                                                          |
+| PDF bytes and engine failures                            | [render.ts](../src/pdf/render.ts): fit check, synchronous local stream, recoverable errors                                                                                                                                                                                                                            |
+| Local fonts and glyph support                            | [fonts.ts](../src/pdf/fonts.ts), [font-coverage.ts](../src/pdf/font-coverage.ts), [coverage generator](../scripts/font-coverage.mjs), [font source/license](../assets/fonts/SOURCE.md)                                                                                                                                |
+| Local development agent/model metrics                    | [usage CLI](../scripts/agent-usage.mjs), [measurement guide](agent-usage.md); ignored `output/agent-usage/` reports, synthetic [tests](../tests/agent-usage.test.mjs)                                                                                                                                                 |
+| Build, browsers and CI                                   | [package.json](../package.json), [Vite config](../vite.config.js), [browser runner](../tests/run-browser.mjs), [browser selection](../tests/browser-options.mjs), [CI workflow](../.github/workflows/checks.yml)                                                                                                      |
 
 The app has a strict TypeScript parser/PDF core and React/TypeScript interface retaining the HTML/CSS, built with Vite, local pdfmake and bundled Source Sans 3. No backend, account, resume storage or application analytics is involved.
 
@@ -37,22 +37,31 @@ The app has a strict TypeScript parser/PDF core and React/TypeScript interface r
 
 Use Node **22.13 or newer in 22.x, or 24 or newer**, with npm (`^22.13.0 || >=24.0.0` in `package.json`; `.nvmrc` selects 22). Node 20 and 23 are unsupported. Commands below run from the repository root; installation/startup and browser setup are in the [README](../README.md). Chrome is the default developer browser, or select pinned Chromium as documented there.
 
-| Area | Focused check |
-| --- | --- |
-| Agent usage aggregation/privacy and baseline lifecycle | `node --test tests/agent-usage.test.mjs` |
-| Download filename sanitization | `node --experimental-strip-types --test tests/download-filename.test.mjs` |
-| Parser/input contract | `node --experimental-strip-types --test tests/parser.test.mjs` |
-| PDF rendering, fonts, pagination or fit guard | `node --experimental-strip-types --test proof/render.test.mjs tests/production-pdf.test.mjs` |
-| Development dependency loading | `node --test tests/dev.browser.test.mjs` (owns an ephemeral server and isolated cache) |
-| Website, download/preview, errors or async state | `npm run build`, then `npm run test:browser` |
-| Strict core and React interface contracts | `npm run typecheck` |
-| Static JavaScript/TypeScript checks | `npm run lint` |
-| Full code-change gate | `npm run check` |
-| Documentation-only changes | Review content, relative links, commands and `git diff --check`; do not manufacture runtime tests |
+| Area                                                   | Focused check                                                                                     |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Agent usage aggregation/privacy and baseline lifecycle | `node --test tests/agent-usage.test.mjs`                                                          |
+| Download filename sanitization                         | `node --experimental-strip-types --test tests/download-filename.test.mjs`                         |
+| Parser/input contract                                  | `node --experimental-strip-types --test tests/parser.test.mjs`                                    |
+| PDF rendering, fonts, pagination or fit guard          | `node --experimental-strip-types --test proof/render.test.mjs tests/production-pdf.test.mjs`      |
+| Development dependency loading                         | `node --test tests/dev.browser.test.mjs` (owns an ephemeral server and isolated cache)            |
+| Website, download/preview, errors or async state       | `npm run build`, then `npm run test:browser`                                                      |
+| Strict core and React interface contracts              | `npm run typecheck`                                                                               |
+| Static JavaScript/TypeScript checks                    | `npm run lint`                                                                                    |
+| Formatting without changing files                      | `npm run format:check`                                                                            |
+| Full code-change gate                                  | `npm run check`                                                                                   |
+| Documentation-only changes                             | Review content, relative links, commands and `git diff --check`; do not manufacture runtime tests |
 
 `npm run test:browser` owns proof/preview servers on ports 4173/4174 plus isolated cold-cache development and React StrictMode lifecycle checks. Leave those ports free and do not launch duplicate test servers. Local success does not establish remote CI success: review and latest-commit CI remain merge gates under [AGENTS.md](../AGENTS.md).
 
-Run focused commands while developing; `npm run check` already includes typecheck, lint, unit/PDF tests, build and browser tests. The [engineering rules](../AGENTS.md#verification) define ownership and when to repeat checks. Manual PDF inspection applies when output could change; it is not required for developer tooling or documentation.
+Run focused commands while developing; `npm run check` already includes formatting, typecheck, lint, unit/PDF tests, build and browser tests. The [engineering rules](../AGENTS.md#verification) define ownership and when to repeat checks. Manual PDF inspection applies when output could change; it is not required for developer tooling or documentation.
+
+### Formatting and commit hooks
+
+Prettier uses single quotes and a 100-character print width. Run `npm run format` to format maintained source, tests, configuration and documentation, or `npm run format:check` to check without writing. `.prettierignore` preserves generated font coverage, literal examples/fixtures, frozen baselines and third-party font/license data. Run `npm run lint:fix` for ESLint's safe automatic fixes; the React Hooks rules check hook placement and effect dependencies separately from formatting.
+
+In a Git checkout, `npm ci` installs Husky's pre-commit hook. The hook runs lint-staged with Prettier only on supported staged files, using the same exclusions. lint-staged temporarily hides unstaged edits in partially staged files and restores them after formatting; unrelated unstaged files are left alone. If restoration conflicts, resolve the reported conflict and review the index before retrying. The hook does not run the full application suite. GitHub Actions runs `format:check` once through `npm run check`, along with the existing checks.
+
+Source ZIP installation skips hook setup because there is no Git metadata; CI skips local hook setup too. To reinstall hooks in an existing checkout, run `npm run prepare`. Formatting tools are development dependencies and add nothing to the production bundle.
 
 ## Fonts, samples and visual baselines
 

@@ -1,0 +1,21 @@
+# Build output, caches, and local reports
+node_modules/
+dist/
+coverage/
+output/
+tmp/
+private/
+.husky/_/
+
+# Generated coverage stays byte-for-byte reproducible from its generator.
+src/pdf/font-coverage.ts
+package-lock.json
+
+# Literal examples, frozen baselines, and third-party font/license data
+examples/
+tests/fixtures/
+proof/baseline/
+assets/
+licenses/
+THIRD_PARTY_NOTICES.md
+LICENSE

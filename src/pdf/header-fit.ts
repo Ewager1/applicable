@@ -7,14 +7,19 @@ import { fonts } from './fonts.ts';
 
 export class HeaderFitError extends Error {}
 
-const incompatibleLayout = () => new HeaderFitError('The PDF layout could not be checked. Restart Applicable and try again; no PDF was created.');
+const incompatibleLayout = () =>
+  new HeaderFitError(
+    'The PDF layout could not be checked. Restart Applicable and try again; no PDF was created.',
+  );
 
 // Definitions contain plain layout objects and functions, not engine instances.
 // Each group needs its own nodes: the same header can participate in two keeps.
 function cloneLayout<T>(value: T): T {
-  if (Array.isArray(value)) return value.map(item => cloneLayout(item)) as T;
+  if (Array.isArray(value)) return value.map((item) => cloneLayout(item)) as T;
   if (!value || typeof value !== 'object') return value;
-  const copy = Object.fromEntries(Object.entries(value).map(([key, item]) => [key, cloneLayout(item)]));
+  const copy = Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [key, cloneLayout(item)]),
+  );
   delete copy.id;
   if (copy.unbreakable) copy.unbreakable = false;
   // Cloning retains the public layout shape; only application ids/keep flags change.
@@ -25,7 +30,11 @@ function cloneLayout<T>(value: T): T {
  * Measure explicit keep-groups with the same engine and fresh-page area. The
  * target must begin on that page; its later lines may continue naturally.
  */
-export function verifyHeaderFit(resume: Resume, pdfMake: PdfMake, fontData: Record<string, string>) {
+export function verifyHeaderFit(
+  resume: Resume,
+  pdfMake: PdfMake,
+  fontData: Record<string, string>,
+) {
   const definition = documentDefinition(resume);
   const groups = definition.keepGroups.map(({ header, content, label }, index) => {
     const start = definition.content.indexOf(header);
@@ -43,7 +52,7 @@ export function verifyHeaderFit(resume: Resume, pdfMake: PdfMake, fontData: Reco
     pageMargins: cloneLayout(definition.pageMargins),
     defaultStyle: cloneLayout(definition.defaultStyle),
     styles: cloneLayout(definition.styles),
-    content: groups.map(group => group.block),
+    content: groups.map((group) => group.block),
   };
   let stream: PdfStream | undefined;
   try {
@@ -58,7 +67,9 @@ export function verifyHeaderFit(resume: Resume, pdfMake: PdfMake, fontData: Reco
         const guidance = label.startsWith('job ')
           ? 'Shorten the employer, role, dates or location, then create the PDF again.'
           : 'Shorten the heading details for this entry, then create the PDF again.';
-        throw new HeaderFitError(`The details at the top of ${label} are too long to fit with the beginning of its content on one page. ${guidance} Your resume text is still here.`);
+        throw new HeaderFitError(
+          `The details at the top of ${label} are too long to fit with the beginning of its content on one page. ${guidance} Your resume text is still here.`,
+        );
       }
     }
   } finally {

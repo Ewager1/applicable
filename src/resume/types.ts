@@ -1,5 +1,8 @@
 /** Canonical source-preserving contracts; parsing supplies runtime validation. */
-export interface ContactDetail { text: string; link?: string }
+export interface ContactDetail {
+  text: string;
+  link?: string;
+}
 export interface Job {
   employer: string;
   role: string;
@@ -8,10 +11,21 @@ export interface Job {
   location: string;
   bullets: string[];
 }
-export interface EducationEntry { institution: string; qualification: string; dates: string }
-export interface Certification { title: string; issuer: string; dates: string }
+export interface EducationEntry {
+  institution: string;
+  qualification: string;
+  dates: string;
+}
+export interface Certification {
+  title: string;
+  issuer: string;
+  dates: string;
+}
 /** Comma-separated source text, preserving duplicates and order. */
-export interface SkillCategory { category: string; items: string }
+export interface SkillCategory {
+  category: string;
+  items: string;
+}
 export interface ContactFields {
   fullName: string;
   email: string;
@@ -19,7 +33,10 @@ export interface ContactFields {
   website: string;
   phoneNumber: string;
 }
-export interface Resume extends ResumeBody { name: string; contact: ContactDetail[] }
+export interface Resume extends ResumeBody {
+  name: string;
+  contact: ContactDetail[];
+}
 export interface ResumeBody {
   title: string;
   /** Paragraphs separated by two newlines. */
@@ -29,5 +46,9 @@ export interface ResumeBody {
   certifications: Certification[];
   skills: SkillCategory[];
 }
-export interface ValidationError { message: string; line: number | null }
-export type ParseResult = { ok: true; resume: ResumeBody } | { ok: false; errors: ValidationError[] };
+export interface ValidationError {
+  message: string;
+  line: number | null;
+}
+export type ParseResult =
+  { ok: true; resume: ResumeBody } | { ok: false; errors: ValidationError[] };

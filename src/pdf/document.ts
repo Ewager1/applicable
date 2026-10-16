@@ -1,11 +1,21 @@
-import type { ContentColumns, ContentStack, ContentUnorderedList, Margins, StyleDictionary, TDocumentDefinitions } from 'pdfmake/interfaces.js';
+import type {
+  ContentColumns,
+  ContentStack,
+  ContentUnorderedList,
+  Margins,
+  StyleDictionary,
+  TDocumentDefinitions,
+} from 'pdfmake/interfaces.js';
 import type { Resume } from '../resume/types.ts';
 import type { KeepGroup, LayoutNode } from './pagination.ts';
 
 import { supportedRanges } from './font-coverage.ts';
 import { createPagination } from './pagination.ts';
 
-export interface ResumeDocument extends TDocumentDefinitions { content: LayoutNode[]; keepGroups: KeepGroup[] }
+export interface ResumeDocument extends TDocumentDefinitions {
+  content: LayoutNode[];
+  keepGroups: KeepGroup[];
+}
 const palette = { primary: '#20252B', secondary: '#4B5563', accent: '#1F4E5F', divider: '#D8DEE6' };
 const semibold = { font: 'SourceSans3Semibold' };
 const pageMargins: Margins = [43, 43, 43, 43];
@@ -41,7 +51,7 @@ const sectionHeading = (text: string): ContentColumns => ({
       margin: [0, dividerTopMargin, 0, 0],
       table: { widths: ['*'], heights: 1, body: [['']] },
       layout: {
-        hLineWidth: index => index === 0 ? dividerLineWidth : 0,
+        hLineWidth: (index) => (index === 0 ? dividerLineWidth : 0),
         hLineColor: () => palette.divider,
         vLineWidth: () => 0,
         paddingLeft: () => 0,
@@ -56,7 +66,12 @@ const sectionHeading = (text: string): ContentColumns => ({
   headlineLevel: 1,
   unbreakable: true,
 });
-const entryRow = (left: string, right: string, leftStyle: string, rightStyle: string): ContentColumns => ({
+const entryRow = (
+  left: string,
+  right: string,
+  leftStyle: string,
+  rightStyle: string,
+): ContentColumns => ({
   columns: [
     { text: left, style: leftStyle, width: '*' },
     { text: right, style: rightStyle, width: metadataColumnWidth, alignment: 'right' },
@@ -64,19 +79,45 @@ const entryRow = (left: string, right: string, leftStyle: string, rightStyle: st
   columnGap: metadataColumnGap,
 });
 function verifyCharacters(resume: Resume) {
-  const text = [resume.name, ...resume.contact.map(item => item.text), resume.title, resume.summary,
-    ...resume.jobs.flatMap(job => [job.employer, job.role, job.dates, job.location, ...job.bullets]),
-    ...resume.education.flatMap(entry => [entry.qualification, entry.institution, entry.dates]),
-    ...resume.certifications.flatMap(entry => [entry.title, entry.issuer, entry.dates]),
-    ...resume.skills.flatMap(row => [row.category, row.items])].join('\n');
-  const unsupported = [...new Set([...text].filter(character => {
-    const code = character.codePointAt(0)!;
-    if (['\n', '\r', '\t'].includes(character)) return false;
-    return code < 32 || code >= 127 && code <= 159 || !supportedRanges.some(([first, last]) => code >= first && code <= last);
-  }))];
+  const text = [
+    resume.name,
+    ...resume.contact.map((item) => item.text),
+    resume.title,
+    resume.summary,
+    ...resume.jobs.flatMap((job) => [
+      job.employer,
+      job.role,
+      job.dates,
+      job.location,
+      ...job.bullets,
+    ]),
+    ...resume.education.flatMap((entry) => [entry.qualification, entry.institution, entry.dates]),
+    ...resume.certifications.flatMap((entry) => [entry.title, entry.issuer, entry.dates]),
+    ...resume.skills.flatMap((row) => [row.category, row.items]),
+  ].join('\n');
+  const unsupported = [
+    ...new Set(
+      [...text].filter((character) => {
+        const code = character.codePointAt(0)!;
+        if (['\n', '\r', '\t'].includes(character)) return false;
+        return (
+          code < 32 ||
+          (code >= 127 && code <= 159) ||
+          !supportedRanges.some(([first, last]) => code >= first && code <= last)
+        );
+      }),
+    ),
+  ];
   if (unsupported.length) {
-    const characters = unsupported.slice(0, 8).map(character => `“${character}” (U+${character.codePointAt(0)!.toString(16).toUpperCase()})`).join(', ');
-    throw new Error(`The resume font cannot display ${characters}${unsupported.length > 8 ? ', and more characters' : ''}. Replace these characters in the source before exporting; no PDF was created.`);
+    const characters = unsupported
+      .slice(0, 8)
+      .map(
+        (character) => `“${character}” (U+${character.codePointAt(0)!.toString(16).toUpperCase()})`,
+      )
+      .join(', ');
+    throw new Error(
+      `The resume font cannot display ${characters}${unsupported.length > 8 ? ', and more characters' : ''}. Replace these characters in the source before exporting; no PDF was created.`,
+    );
   }
 }
 
@@ -89,18 +130,26 @@ export function documentDefinition(resume: Resume): ResumeDocument {
   let contact;
   try {
     // PDF URI annotations need ASCII serialization (including Unicode URL paths).
-    contact = resume.contact.map(item => item.link ? { ...item, link: new URL(item.link).href } : item);
+    contact = resume.contact.map((item) =>
+      item.link ? { ...item, link: new URL(item.link).href } : item,
+    );
   } catch {
-    throw new Error('A contact link is not a usable web or email address. Check its destination before exporting.');
+    throw new Error(
+      'A contact link is not a usable web or email address. Check its destination before exporting.',
+    );
   }
   const experienceHeading = sectionHeading('RELEVANT EXPERIENCE');
   const content: LayoutNode[] = [
     { text: resume.name, style: 'name', margin: [0, 0, 0, 3] },
-    ...(contact.length ? [{
-      text: contact.flatMap((item, index) => index ? [{ text: ' • ' }, item] : [item]),
-      style: 'contact',
-      margin: [0, 0, 0, 10] as Margins,
-    }] : []),
+    ...(contact.length
+      ? [
+          {
+            text: contact.flatMap((item, index) => (index ? [{ text: ' • ' }, item] : [item])),
+            style: 'contact',
+            margin: [0, 0, 0, 10] as Margins,
+          },
+        ]
+      : []),
     { text: resume.title, style: 'title', margin: [0, 0, 0, 10] },
     { text: resume.summary },
     experienceHeading,
@@ -115,7 +164,10 @@ export function documentDefinition(resume: Resume): ResumeDocument {
       headlineLevel: 1,
       unbreakable: true,
     };
-    const bullets = job.bullets.map((bullet): ContentUnorderedList => ({ ul: [bullet], margin: bulletMargins }));
+    const bullets = job.bullets.map((bullet): ContentUnorderedList => ({
+      ul: [bullet],
+      margin: bulletMargins,
+    }));
     pagination.keepWith(header, bullets[0], `job ${jobIndex + 1}`);
     if (jobIndex === 0) pagination.keepWith(experienceHeading, bullets[0], 'job 1');
     content.push(header, ...bullets);
@@ -141,7 +193,8 @@ export function documentDefinition(resume: Resume): ResumeDocument {
     };
     const issuer: LayoutNode = { text: entry.issuer, margin: [0, 0, 0, entryBottomMargin] };
     pagination.keepWith(title, issuer, `certification entry ${entryIndex + 1}`);
-    if (entryIndex === 0) pagination.keepWith(certificationsHeading, issuer, 'certification entry 1');
+    if (entryIndex === 0)
+      pagination.keepWith(certificationsHeading, issuer, 'certification entry 1');
     content.push(title, issuer);
   }
   const skillsHeading = sectionHeading('SKILLS');

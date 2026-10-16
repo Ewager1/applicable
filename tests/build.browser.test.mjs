@@ -6,25 +6,44 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { parsedExample, exampleContact } from '../proof/production-fixtures.mjs';
 const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
-const chatbotInstructions = await readFile(new URL('../examples/chatbot-instruction.md', import.meta.url), 'utf8');
-const compact = text => text.replace(/\s/g, '');
+const chatbotInstructions = await readFile(
+  new URL('../examples/chatbot-instruction.md', import.meta.url),
+  'utf8',
+);
+const compact = (text) => text.replace(/\s/g, '');
 let browser;
-before(async () => { browser = await chromium.launch(browserOptions()); });
-after(async () => { await browser.close(); });
+before(async () => {
+  browser = await chromium.launch(browserOptions());
+});
+after(async () => {
+  await browser.close();
+});
 
 async function openPage(t, { pdfViewer, ...options } = {}) {
   const page = await browser.newPage({ acceptDownloads: true, ...options });
   t.after(() => page.close());
-  const remote = [], errors = [];
-  page.on('request', request => {
+  const remote = [],
+    errors = [];
+  page.on('request', (request) => {
     const url = new URL(request.url());
-    if (['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol) && url.origin !== 'http://127.0.0.1:4174') remote.push(request.url());
+    if (
+      ['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol) &&
+      url.origin !== 'http://127.0.0.1:4174'
+    )
+      remote.push(request.url());
   });
-  page.on('pageerror', error => errors.push(error.message));
-  t.after(() => { assert.deepEqual(remote, []); assert.deepEqual(errors, []); });
-  if (pdfViewer === false) await page.addInitScript(() => Object.defineProperty(navigator, 'pdfViewerEnabled', { get: () => false }));
+  page.on('pageerror', (error) => errors.push(error.message));
+  t.after(() => {
+    assert.deepEqual(remote, []);
+    assert.deepEqual(errors, []);
+  });
+  if (pdfViewer === false)
+    await page.addInitScript(() =>
+      Object.defineProperty(navigator, 'pdfViewerEnabled', { get: () => false }),
+    );
   await page.goto('http://127.0.0.1:4174/');
-  for (const [id, value] of Object.entries(exampleContact)) await page.locator(`#${id}`).fill(value);
+  for (const [id, value] of Object.entries(exampleContact))
+    await page.locator(`#${id}`).fill(value);
   return page;
 }
 async function submit(page) {
@@ -37,24 +56,31 @@ async function readPdf(download, filename = 'Full-Stack Software Engineer Resume
   const bytes = await readFile(await download.path());
   const pdf = await getDocument({ data: Uint8Array.from(bytes) }).promise;
   try {
-    const texts = [], annotations = [];
+    const texts = [],
+      annotations = [];
     for (let number = 1; number <= pdf.numPages; number++) {
       const page = await pdf.getPage(number);
-      texts.push((await page.getTextContent()).items.map(item => item.str).join(''));
-      annotations.push(...await page.getAnnotations());
+      texts.push((await page.getTextContent()).items.map((item) => item.str).join(''));
+      annotations.push(...(await page.getAnnotations()));
     }
     return { bytes, text: compact(texts.join('')), annotations };
-  } finally { await pdf.destroy(); }
+  } finally {
+    await pdf.destroy();
+  }
 }
 async function artifactUrls(page) {
   return page.evaluate(async () => {
     const download = document.querySelector('#download').href;
     const preview = document.querySelector('#preview').src;
-    return { download, preview, bytes: Array.from(new Uint8Array(await (await fetch(preview)).arrayBuffer())) };
+    return {
+      download,
+      preview,
+      bytes: Array.from(new Uint8Array(await (await fetch(preview)).arrayBuffer())),
+    };
   });
 }
 
-test('optional company names automatic and repeat downloads without entering PDF content', async t => {
+test('optional company names automatic and repeat downloads without entering PDF content', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
   const company = page.getByLabel('Company you’re applying to', { exact: false });
@@ -80,20 +106,28 @@ test('optional company names automatic and repeat downloads without entering PDF
   assert.ok(longDownload.suggestedFilename().endsWith(' Resume.pdf'));
   await input.fill(source.replace('Full-Stack Software Engineer', 'Lead: Platform / Engineer'));
   await company.fill('Corrected');
-  const corrected = await readPdf(await submit(page), 'Lead Platform Engineer at Corrected Resume.pdf');
+  const corrected = await readPdf(
+    await submit(page),
+    'Lead Platform Engineer at Corrected Resume.pdf',
+  );
   assert.ok(corrected.text.includes('Lead:Platform/Engineer'));
   assert.equal(await company.inputValue(), 'Corrected');
 });
 
-test('company edits during generation discard obsolete names and allow corrected submission', async t => {
+test('company edits during generation discard obsolete names and allow corrected submission', async (t) => {
   const page = await openPage(t);
   let release;
-  const held = new Promise(resolve => { release = resolve; });
-  await page.route(/SourceSans3-Regular-.*\.ttf/, async route => { await held; await route.continue(); });
+  const held = new Promise((resolve) => {
+    release = resolve;
+  });
+  await page.route(/SourceSans3-Regular-.*\.ttf/, async (route) => {
+    await held;
+    await route.continue();
+  });
   const company = page.getByLabel('Company you’re applying to', { exact: false });
   const input = page.getByLabel('Your resume', { exact: true });
   const downloads = [];
-  page.on('download', download => downloads.push(download));
+  page.on('download', (download) => downloads.push(download));
   try {
     await input.fill(source);
     await company.fill('Old Company');
@@ -108,31 +142,59 @@ test('company edits during generation discard obsolete names and allow corrected
     assert.equal(await input.inputValue(), source);
     await readPdf(await submit(page), 'Full-Stack Software Engineer at Current Company Resume.pdf');
     assert.equal(downloads.length, 1);
-  } finally { release(); }
+  } finally {
+    release();
+  }
 });
 
-test('visible chatbot workflow copies the complete literal instructions with keyboard activation', async t => {
+test('visible chatbot workflow copies the complete literal instructions with keyboard activation', async (t) => {
   const page = await openPage(t);
-  await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', {
-    value: { writeText: async text => { window.copiedInstructions = text; } },
-  }));
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: async (text) => {
+          window.copiedInstructions = text;
+        },
+      },
+    }),
+  );
   await page.reload();
-  await page.getByRole('heading', { name: 'Turn chatbot text into a polished resume.', exact: true }).waitFor();
+  await page
+    .getByRole('heading', { name: 'Turn chatbot text into a polished resume.', exact: true })
+    .waitFor();
   const copy = page.getByRole('button', { name: 'Copy chatbot instructions', exact: true });
-  assert.equal(await copy.isVisible(), true, 'Beginner workflow is visible without opening hidden help');
+  assert.equal(
+    await copy.isVisible(),
+    true,
+    'Beginner workflow is visible without opening hidden help',
+  );
   await copy.focus();
   await copy.press('Enter');
-  await page.getByText('Instructions copied. Paste them into ChatGPT or another chatbot with your current resume.', { exact: true }).waitFor();
+  await page
+    .getByText(
+      'Instructions copied. Paste them into ChatGPT or another chatbot with your current resume.',
+      { exact: true },
+    )
+    .waitFor();
   assert.equal(await page.evaluate(() => window.copiedInstructions), chatbotInstructions);
-  assert.ok(chatbotInstructions.includes('@@PROFESSIONAL_TITLE@@') && chatbotInstructions.includes('@@JOB@@'));
+  assert.ok(
+    chatbotInstructions.includes('@@PROFESSIONAL_TITLE@@') &&
+      chatbotInstructions.includes('@@JOB@@'),
+  );
   assert.equal(await page.locator('#instructions-fallback').isVisible(), false);
 });
 
-test('clipboard denial exposes focused complete instructions without changing the pasted resume', async t => {
+test('clipboard denial exposes focused complete instructions without changing the pasted resume', async (t) => {
   const page = await openPage(t);
-  await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', {
-    value: { writeText: async () => { throw new Error('Synthetic clipboard denial'); } },
-  }));
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: async () => {
+          throw new Error('Synthetic clipboard denial');
+        },
+      },
+    }),
+  );
   await page.reload();
   const input = page.getByLabel('Your resume', { exact: true });
   await input.fill(source);
@@ -148,12 +210,12 @@ test('clipboard denial exposes focused complete instructions without changing th
 });
 
 // This replaces the shell smoke test: exercise the built application end to end.
-test('symbol markers and an outer text code block export complete ordered PDF content after correction', async t => {
+test('symbol markers and an outer text code block export complete ordered PDF content after correction', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
   const invalid = source.replace(/@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/, '');
   const downloads = [];
-  page.on('download', event => downloads.push(event));
+  page.on('download', (event) => downloads.push(event));
   await input.fill(invalid);
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
   await page.getByText('Education is missing. Add @@EDUCATION@@.', { exact: true }).waitFor();
@@ -170,17 +232,47 @@ test('symbol markers and an outer text code block export complete ordered PDF co
   assert.equal(pdf.text.includes('@@CONTACT@@'), false, 'Structural markers do not print');
   assert.equal(pdf.text.includes('```'), false, 'Outer code fences do not print');
   assert.equal(await input.inputValue(), corrected);
-  const fields = [parsedExample.name, ...parsedExample.contact.map(item => item.text), parsedExample.title, parsedExample.summary,
-    ...parsedExample.jobs.flatMap(job => [job.employer, job.role, job.dates, job.location, ...job.bullets]),
-    ...parsedExample.education.flatMap(entry => Object.values(entry)), ...parsedExample.certifications.flatMap(entry => Object.values(entry)),
-    ...parsedExample.skills.flatMap(row => [row.category, row.items])];
-  for (const field of fields) assert.ok(pdf.text.includes(compact(field)), `Missing PDF field: ${field}`);
+  const fields = [
+    parsedExample.name,
+    ...parsedExample.contact.map((item) => item.text),
+    parsedExample.title,
+    parsedExample.summary,
+    ...parsedExample.jobs.flatMap((job) => [
+      job.employer,
+      job.role,
+      job.dates,
+      job.location,
+      ...job.bullets,
+    ]),
+    ...parsedExample.education.flatMap((entry) => Object.values(entry)),
+    ...parsedExample.certifications.flatMap((entry) => Object.values(entry)),
+    ...parsedExample.skills.flatMap((row) => [row.category, row.items]),
+  ];
+  for (const field of fields)
+    assert.ok(pdf.text.includes(compact(field)), `Missing PDF field: ${field}`);
   assert.ok(pdf.text.indexOf('ExampleStudio') < pdf.text.indexOf('ExampleSystems'));
   assert.ok(pdf.text.indexOf('EDUCATION') < pdf.text.indexOf('CERTIFICATIONS'));
   assert.ok(pdf.text.indexOf('CERTIFICATIONS') < pdf.text.indexOf('SKILLS'));
-  assert.deepEqual([...new Set(pdf.annotations.filter(annotation => annotation.subtype === 'Link').map(annotation => annotation.url))].sort(), ['https://example.com/alex', 'https://linkedin.com/in/example-alex', 'mailto:alex@example.com'].sort());
+  assert.deepEqual(
+    [
+      ...new Set(
+        pdf.annotations
+          .filter((annotation) => annotation.subtype === 'Link')
+          .map((annotation) => annotation.url),
+      ),
+    ].sort(),
+    [
+      'https://example.com/alex',
+      'https://linkedin.com/in/example-alex',
+      'mailto:alex@example.com',
+    ].sort(),
+  );
   assert.equal(downloads.length, 1, 'One automatic download for one submission');
-  assert.equal(await page.evaluate(() => navigator.pdfViewerEnabled), true, 'Native viewer is available in this browser mode');
+  assert.equal(
+    await page.evaluate(() => navigator.pdfViewerEnabled),
+    true,
+    'Native viewer is available in this browser mode',
+  );
   const artifact = await artifactUrls(page);
   assert.equal(artifact.download, artifact.preview);
   assert.deepEqual(Buffer.from(artifact.bytes), pdf.bytes);
@@ -195,13 +287,17 @@ test('symbol markers and an outer text code block export complete ordered PDF co
   await page.screenshot({ path: 'output/ui/desktop-preview.png', fullPage: true });
 });
 
-test('without native PDF viewing, one download is delivered with a usable fallback link', async t => {
+test('without native PDF viewing, one download is delivered with a usable fallback link', async (t) => {
   const page = await openPage(t, { pdfViewer: false });
   const downloads = [];
-  page.on('download', download => downloads.push(download));
+  page.on('download', (download) => downloads.push(download));
   await page.getByLabel('Your resume', { exact: true }).fill(source);
   const first = await readPdf(await submit(page));
-  await page.getByText('Your browser does not display PDFs here. Use Download PDF to open your resume.', { exact: true }).waitFor();
+  await page
+    .getByText('Your browser does not display PDFs here. Use Download PDF to open your resume.', {
+      exact: true,
+    })
+    .waitFor();
   assert.equal(await page.locator('#preview').getAttribute('src'), null);
   assert.equal(await page.locator('#preview').isVisible(), false);
   assert.equal(downloads.length, 1);
@@ -210,12 +306,12 @@ test('without native PDF viewing, one download is delivered with a usable fallba
   assert.deepEqual((await readPdf(await repeat)).bytes, first.bytes);
 });
 
-test('unsupported displayed glyphs block download and allow correction without losing text', async t => {
+test('unsupported displayed glyphs block download and allow correction without losing text', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
   const invalid = source.replace('Product-focused engineer', '😀 Product-focused engineer');
   const downloads = [];
-  page.on('download', download => downloads.push(download));
+  page.on('download', (download) => downloads.push(download));
   await input.fill(invalid);
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
   await page.locator('#error-list').filter({ hasText: 'resume font cannot display' }).waitFor();
@@ -226,22 +322,31 @@ test('unsupported displayed glyphs block download and allow correction without l
   assert.ok((await readPdf(await submit(page))).text.includes('AlexMorgan'));
 });
 
-test('oversized job details block delivery, retain source and allow corrected resubmission', async t => {
+test('oversized job details block delivery, retain source and allow corrected resubmission', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
-  const oversized = source.replace('Employer: Example Studio', `Employer: BEGIN ${'Longword '.repeat(300)} ENDMARKER`);
+  const oversized = source.replace(
+    'Employer: Example Studio',
+    `Employer: BEGIN ${'Longword '.repeat(300)} ENDMARKER`,
+  );
   assert.notEqual(oversized, source);
   const downloads = [];
-  page.on('download', download => downloads.push(download));
+  page.on('download', (download) => downloads.push(download));
   await input.fill(oversized);
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
-  await page.locator('#error-list').filter({ hasText: 'top of job 1 are too long to fit with the beginning' }).waitFor();
+  await page
+    .locator('#error-list')
+    .filter({ hasText: 'top of job 1 are too long to fit with the beginning' })
+    .waitFor();
   assert.equal(await input.inputValue(), oversized);
   assert.equal(downloads.length, 0);
   assert.equal(await page.locator('#result').isVisible(), false);
   assert.equal(await page.locator('#download').getAttribute('href'), null);
   assert.equal(await page.locator('#preview').getAttribute('src'), null);
-  assert.equal(await page.getByRole('button', { name: 'Create PDF', exact: true }).isEnabled(), true);
+  assert.equal(
+    await page.getByRole('button', { name: 'Create PDF', exact: true }).isEnabled(),
+    true,
+  );
   await input.fill(source);
   const pdf = await readPdf(await submit(page));
   assert.ok(pdf.text.includes('ExampleStudio'));
@@ -250,16 +355,29 @@ test('oversized job details block delivery, retain source and allow corrected re
 });
 
 for (const kind of ['unavailable', 'corrupt']) {
-  test(`${kind} local font failure is recoverable by retrying the same text`, async t => {
+  test(`${kind} local font failure is recoverable by retrying the same text`, async (t) => {
     const page = await openPage(t);
     let fail = true;
-    await page.route(/SourceSans3-.*\.ttf/, route => fail ? route.fulfill({ status: kind === 'unavailable' ? 503 : 200, contentType: 'font/ttf', body: 'not a font' }) : route.continue());
+    await page.route(/SourceSans3-.*\.ttf/, (route) =>
+      fail
+        ? route.fulfill({
+            status: kind === 'unavailable' ? 503 : 200,
+            contentType: 'font/ttf',
+            body: 'not a font',
+          })
+        : route.continue(),
+    );
     const input = page.getByLabel('Your resume', { exact: true });
     const downloads = [];
-    page.on('download', download => downloads.push(download));
+    page.on('download', (download) => downloads.push(download));
     await input.fill(source);
     await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
-    await page.locator('#error-list').filter({ hasText: kind === 'unavailable' ? 'fonts could not be loaded' : 'PDF could not be created' }).waitFor();
+    await page
+      .locator('#error-list')
+      .filter({
+        hasText: kind === 'unavailable' ? 'fonts could not be loaded' : 'PDF could not be created',
+      })
+      .waitFor();
     assert.equal(await input.inputValue(), source);
     assert.equal(downloads.length, 0);
     assert.equal(await page.locator('#result').isVisible(), false);
@@ -268,21 +386,29 @@ for (const kind of ['unavailable', 'corrupt']) {
   });
 }
 
-test('edits during pending fonts discard stale output and repeated submissions do not queue downloads', async t => {
+test('edits during pending fonts discard stale output and repeated submissions do not queue downloads', async (t) => {
   const page = await openPage(t);
   let release;
-  const held = new Promise(resolve => { release = resolve; });
-  await page.route(/SourceSans3-Regular-.*\.ttf/, async route => { await held; await route.continue(); });
+  const held = new Promise((resolve) => {
+    release = resolve;
+  });
+  await page.route(/SourceSans3-Regular-.*\.ttf/, async (route) => {
+    await held;
+    await route.continue();
+  });
   const input = page.getByLabel('Your resume', { exact: true });
   const downloads = [];
-  page.on('download', download => downloads.push(download));
+  page.on('download', (download) => downloads.push(download));
   try {
     await input.fill(source);
     const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
     await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
     await request;
     assert.equal(await page.locator('#create-pdf').isDisabled(), true);
-    await page.evaluate(() => { document.querySelector('#resume-form').requestSubmit(); document.querySelector('#resume-form').requestSubmit(); });
+    await page.evaluate(() => {
+      document.querySelector('#resume-form').requestSubmit();
+      document.querySelector('#resume-form').requestSubmit();
+    });
     const edited = source.replace('Product-focused engineer', 'Jamie Example engineer');
     await input.fill(edited);
     release();
@@ -294,10 +420,12 @@ test('edits during pending fonts discard stale output and repeated submissions d
     assert.ok(pdf.text.includes('JamieExample'));
     assert.equal(pdf.text.includes('Product-focusedengineer'), false);
     assert.equal(downloads.length, 1);
-  } finally { release(); }
+  } finally {
+    release();
+  }
 });
 
-test('editing an exported resume removes and revokes the old artifact before regeneration', async t => {
+test('editing an exported resume removes and revokes the old artifact before regeneration', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
   await input.fill(source);
@@ -307,16 +435,29 @@ test('editing an exported resume removes and revokes the old artifact before reg
   assert.equal(await page.locator('#result').isVisible(), false);
   assert.equal(await page.locator('#download').getAttribute('href'), null);
   assert.equal(await page.locator('#preview').getAttribute('src'), null);
-  assert.equal(await page.evaluate(async url => { try { await fetch(url); return false; } catch { return true; } }, url), true);
+  assert.equal(
+    await page.evaluate(async (url) => {
+      try {
+        await fetch(url);
+        return false;
+      } catch {
+        return true;
+      }
+    }, url),
+    true,
+  );
   const pdf = await readPdf(await submit(page));
   assert.ok(pdf.text.includes('JamieExample'));
   assert.notEqual((await artifactUrls(page)).download, url);
 });
 
-test('interface stays within narrow and wide viewports, grows with input and keeps submit above it', async t => {
+test('interface stays within narrow and wide viewports, grows with input and keeps submit above it', async (t) => {
   const page = await openPage(t, { viewport: { width: 1280, height: 1000 } });
   await mkdir('output/ui', { recursive: true });
-  for (const [name, width, height] of [['desktop', 1280, 1000], ['mobile', 390, 844]]) {
+  for (const [name, width, height] of [
+    ['desktop', 1280, 1000],
+    ['mobile', 390, 844],
+  ]) {
     await page.setViewportSize({ width, height });
     const input = page.getByLabel('Your resume', { exact: true });
     await input.fill('');
@@ -327,18 +468,24 @@ test('interface stays within narrow and wide viewports, grows with input and kee
     const button = await page.locator('#create-pdf').boundingBox();
     assert.ok(expanded.height > initial.height, 'Textarea expands with content');
     assert.ok(button.y + button.height <= expanded.y, 'Submit stays above the text input');
-    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'No horizontal overflow');
+    assert.ok(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      'No horizontal overflow',
+    );
     await page.screenshot({ path: `output/ui/${name}-filled.png`, fullPage: true });
   }
 });
 
-
-test('PDF assets stay lazy and engine load failure preserves source for reload recovery', async t => {
+test('PDF assets stay lazy and engine load failure preserves source for reload recovery', async (t) => {
   const page = await openPage(t);
   let fail = true;
   const assets = [];
-  page.on('request', request => { if (/\/pdfmake-.*\.js|SourceSans3-.*\.ttf/.test(request.url())) assets.push(request.url()); });
-  await page.route(/\/pdfmake-.*\.js/, route => fail ? route.abort('failed') : route.continue());
+  page.on('request', (request) => {
+    if (/\/pdfmake-.*\.js|SourceSans3-.*\.ttf/.test(request.url())) assets.push(request.url());
+  });
+  await page.route(/\/pdfmake-.*\.js/, (route) =>
+    fail ? route.abort('failed') : route.continue(),
+  );
   await page.reload();
   const input = page.getByLabel('Your resume', { exact: true });
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
@@ -346,7 +493,10 @@ test('PDF assets stay lazy and engine load failure preserves source for reload r
   assert.deepEqual(assets, [], 'Initial load and invalid submission load no PDF engine or fonts');
   await input.fill(source);
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
-  await page.locator('#error-list').filter({ hasText: 'PDF creation could not be loaded' }).waitFor();
+  await page
+    .locator('#error-list')
+    .filter({ hasText: 'PDF creation could not be loaded' })
+    .waitFor();
   assert.equal(await input.inputValue(), source);
   assert.equal(await input.getAttribute('aria-invalid'), null);
   assert.equal(await page.evaluate(() => document.activeElement.id), 'error-summary');
@@ -360,7 +510,7 @@ test('PDF assets stay lazy and engine load failure preserves source for reload r
   assert.ok((await readPdf(await submit(page))).text.includes('AlexMorgan'));
 });
 
-test('Full Name is the only required contact field; old pasted contacts require migration', async t => {
+test('Full Name is the only required contact field; old pasted contacts require migration', async (t) => {
   const page = await openPage(t);
   for (const id of Object.keys(exampleContact)) await page.locator(`#${id}`).fill('');
   await page.locator('#fullName').fill('   ');
@@ -377,22 +527,32 @@ test('Full Name is the only required contact field; old pasted contacts require 
   const oldSource = '@@CONTACT@@\nName: Another Person\nContact: old@example.com\n' + source;
   await page.locator('#resume').fill(oldSource);
   await page.locator('#create-pdf').click();
-  await page.locator('#error-list').filter({ hasText: 'Move contact details into the fields above' }).waitFor();
+  await page
+    .locator('#error-list')
+    .filter({ hasText: 'Move contact details into the fields above' })
+    .waitFor();
   assert.equal(await page.locator('#resume').inputValue(), oldSource);
 });
 
-test('only contact fields persist across reload; clearing every field persists', async t => {
+test('only contact fields persist across reload; clearing every field persists', async (t) => {
   const page = await openPage(t);
   await page.locator('#resume').fill(source);
   await page.locator('#company').fill('Synthetic Company');
   await page.reload();
-  for (const [id, value] of Object.entries(exampleContact)) assert.equal(await page.locator(`#${id}`).inputValue(), value);
+  for (const [id, value] of Object.entries(exampleContact))
+    assert.equal(await page.locator(`#${id}`).inputValue(), value);
   assert.equal(await page.locator('#resume').inputValue(), '');
   assert.equal(await page.locator('#company').inputValue(), '');
-  assert.deepEqual(await page.evaluate(() => Object.keys(JSON.parse(window.localStorage.getItem('applicable.contact.v1')).fields)), Object.keys(exampleContact));
+  assert.deepEqual(
+    await page.evaluate(() =>
+      Object.keys(JSON.parse(window.localStorage.getItem('applicable.contact.v1')).fields),
+    ),
+    Object.keys(exampleContact),
+  );
   for (const id of Object.keys(exampleContact)) await page.locator(`#${id}`).fill('');
   await page.reload();
-  for (const id of Object.keys(exampleContact)) assert.equal(await page.locator(`#${id}`).inputValue(), '');
+  for (const id of Object.keys(exampleContact))
+    assert.equal(await page.locator(`#${id}`).inputValue(), '');
   await page.locator('#fullName').focus();
   for (const id of ['email', 'linkedIn', 'website', 'phoneNumber', 'company']) {
     await page.keyboard.press('Tab');
@@ -401,10 +561,16 @@ test('only contact fields persist across reload; clearing every field persists',
 });
 
 for (const kind of ['blocked', 'corrupt']) {
-  test(`${kind} contact storage warns and permits correction/export`, async t => {
+  test(`${kind} contact storage warns and permits correction/export`, async (t) => {
     const page = await openPage(t);
     if (kind === 'blocked') {
-      await page.addInitScript(() => Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } }));
+      await page.addInitScript(() =>
+        Object.defineProperty(window, 'localStorage', {
+          get() {
+            throw new Error('blocked');
+          },
+        }),
+      );
     } else {
       await page.evaluate(() => window.localStorage.setItem('applicable.contact.v1', '{broken'));
     }
@@ -412,20 +578,31 @@ for (const kind of ['blocked', 'corrupt']) {
     await page.locator('.storage-warning').waitFor();
     assert.equal(await page.locator('#fullName').inputValue(), '');
     await page.locator('#fullName').fill('Synthetic Candidate');
-    if (kind === 'blocked') assert.match(await page.locator('.storage-warning').textContent(), /could not be saved/);
-    else assert.equal(await page.locator('.storage-warning').count(), 0, 'Successful save clears the warning');
+    if (kind === 'blocked')
+      assert.match(await page.locator('.storage-warning').textContent(), /could not be saved/);
+    else
+      assert.equal(
+        await page.locator('.storage-warning').count(),
+        0,
+        'Successful save clears the warning',
+      );
     await page.locator('#resume').fill(source);
     assert.ok((await readPdf(await submit(page))).text.includes('SyntheticCandidate'));
   });
 }
 
-test('contact edits invalidate pending work and revoke completed artifacts', async t => {
+test('contact edits invalidate pending work and revoke completed artifacts', async (t) => {
   const page = await openPage(t);
   let release;
-  const held = new Promise(resolve => { release = resolve; });
-  await page.route(/SourceSans3-Regular-.*\.ttf/, async route => { await held; await route.continue(); });
+  const held = new Promise((resolve) => {
+    release = resolve;
+  });
+  await page.route(/SourceSans3-Regular-.*\.ttf/, async (route) => {
+    await held;
+    await route.continue();
+  });
   const downloads = [];
-  page.on('download', download => downloads.push(download));
+  page.on('download', (download) => downloads.push(download));
   try {
     await page.locator('#resume').fill(source);
     const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
@@ -440,9 +617,24 @@ test('contact edits invalidate pending work and revoke completed artifacts', asy
     const url = (await artifactUrls(page)).download;
     await page.locator('#email').fill('available on request');
     assert.equal(await page.locator('#result').isVisible(), false);
-    assert.equal(await page.evaluate(async url => { try { await fetch(url); return false; } catch { return true; } }, url), true);
+    assert.equal(
+      await page.evaluate(async (url) => {
+        try {
+          await fetch(url);
+          return false;
+        } catch {
+          return true;
+        }
+      }, url),
+      true,
+    );
     const corrected = await readPdf(await submit(page));
     assert.ok(corrected.text.includes('availableonrequest'));
-    assert.equal(corrected.annotations.some(row => row.url?.startsWith('mailto:')), false);
-  } finally { release(); }
+    assert.equal(
+      corrected.annotations.some((row) => row.url?.startsWith('mailto:')),
+      false,
+    );
+  } finally {
+    release();
+  }
 });

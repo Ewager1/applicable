@@ -12,7 +12,6 @@ Create issues in this order: A1, A2, A3, A4, A5, A6. Record their assigned GitHu
 
 Execution follows the canonical [engineering/merge gates](../AGENTS.md#git-and-github), [delegation workflow](agent-workflow.md) and [verification commands](maintenance.md#choose-verification-by-the-change). This plan records scope and sequence rather than duplicating those procedures.
 
-
 ## Phase 1: Verify the PDF approach
 
 ### A1: PDF rendering investigation
@@ -104,14 +103,14 @@ Dependencies: A5.
 - Dedicated project: https://github.com/users/Ewager1/projects/6
 - The initial bootstrap contained planning and workflow files only. Implementation uses issue branches and PRs.
 
-| Order | Plan | GitHub issue |
-| --- | --- | --- |
-| 1 | A1 | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1) |
-| 2 | A2 | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) |
-| 3 | A3 | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3) |
-| 4 | A4 | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4) |
-| 5 | A5 | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5) |
-| 6 | A6 | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6) |
+| Order | Plan | GitHub issue                                                                                     |
+| ----- | ---- | ------------------------------------------------------------------------------------------------ |
+| 1     | A1   | [#1: PDF rendering investigation](https://github.com/Ewager1/applicable/issues/1)                |
+| 2     | A2   | [#2: Minimal application and verification setup](https://github.com/Ewager1/applicable/issues/2) |
+| 3     | A3   | [#3: Document and parse the resume format](https://github.com/Ewager1/applicable/issues/3)       |
+| 4     | A4   | [#4: Production PDF template](https://github.com/Ewager1/applicable/issues/4)                    |
+| 5     | A5   | [#5: Minimal interface and PDF delivery](https://github.com/Ewager1/applicable/issues/5)         |
+| 6     | A6   | [#6: Local setup and release readiness](https://github.com/Ewager1/applicable/issues/6)          |
 
 ## Post-plan fixes
 

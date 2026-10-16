@@ -21,12 +21,12 @@ Parser, rendering and interface modules should remain small and separate. Do not
 
 All direct dependencies are exact versions, with transitive integrity hashes in `package-lock.json`.
 
-| Tool | Role | License |
-| --- | --- | --- |
-| Vite 8.3.4 | Local development, static production build and local build preview | MIT, `node_modules/vite/LICENSE.md` |
-| ESLint 10.12.0 / @eslint/js 10.0.1 | Recommended JavaScript static checks | MIT, each installed package's `LICENSE` |
-| React / React DOM 19.3.1 | Function components and DOM mounting; local state, no router/store/UI framework | MIT, retained under `licenses/` |
-| Node's built-in test runner | PDF and browser test execution | Included with Node; no separate test-runner dependency |
+| Tool                               | Role                                                                            | License                                                |
+| ---------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Vite 8.3.4                         | Local development, static production build and local build preview              | MIT, `node_modules/vite/LICENSE.md`                    |
+| ESLint 10.12.0 / @eslint/js 10.0.1 | Recommended JavaScript static checks                                            | MIT, each installed package's `LICENSE`                |
+| React / React DOM 19.3.1           | Function components and DOM mounting; local state, no router/store/UI framework | MIT, retained under `licenses/`                        |
+| Node's built-in test runner        | PDF and browser test execution                                                  | Included with Node; no separate test-runner dependency |
 
 TypeScript is a development dependency used for strict no-emit checking; `@types/react` and `@types/react-dom` describe the interface runtime; `@types/pdfmake` 0.2 and `@types/node` 22 describe the pinned engine and supported Node baseline. `@typescript-eslint/parser` lets existing ESLint rules parse TypeScript; compiler checks own names and unused declarations. Exact installed versions remain in `package.json` and the lockfile. These additions use the Apache-2.0 (TypeScript), MIT (DefinitelyTyped) and BSD-2-Clause (parser) licenses.
 
