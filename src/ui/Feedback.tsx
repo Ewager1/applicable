@@ -16,7 +16,7 @@ export function ErrorSummary({ errors }: { errors: ValidationError[] | undefined
       aria-labelledby="error-title"
       hidden={!errors}
     >
-      <h2 id="error-title">A few details need your attention</h2>
+      <h2 id="error-title">Fix the following issues</h2>
       <ul id="error-list">
         {errors?.map((error, index) => (
           <li key={index}>{error.line ? `Line ${error.line}: ${error.message}` : error.message}</li>

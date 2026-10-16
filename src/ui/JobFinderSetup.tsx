@@ -53,8 +53,7 @@ const settingsFields: { key: keyof JobFinderSettings; label: string; description
   {
     key: 'preferRecent',
     label: 'Prefer recently posted positions',
-    description:
-      'Prioritize newer openings. Some older, legitimate positions may appear less often, but strong matches should still be considered.',
+    description: 'Prioritize newer jobs without excluding strong older matches.',
   },
 ];
 
@@ -99,7 +98,7 @@ export function JobFinderSetup() {
       await navigator.clipboard.writeText(prompt);
       if (currentRevision === revision.current)
         setStatus(
-          'Prompt created and copied. Paste it into a new ChatGPT conversation and upload your existing resumes there. Answer its short clarification questions. For future searches, ask “Look for jobs.” Review results and apply yourself.',
+          'Prompt copied. Paste it into a new ChatGPT conversation and upload your resumes.',
         );
     } catch {
       if (currentRevision !== revision.current) return;
@@ -115,10 +114,12 @@ export function JobFinderSetup() {
   return (
     <div className="job-finder-setup">
       <p id="job-finder-help">
-        All seven questions are optional. Must-haves are non-negotiable; nice-to-haves and other
-        preferences are flexible. No account, uploads or personal information are needed here.
-        Answers and search preferences stay on this page and reset on reload. Copy Prompt creates
-        and copies your setup instructions in one step.
+        All questions are optional. Use Must-haves for requirements you can't compromise on.
+        Everything else can be flexible.
+      </p>
+      <p className="tool-guidance">
+        Answers and search preferences stay on this page until reload. Nothing is shared with
+        ChatGPT until you paste the prompt.
       </p>
       <form
         aria-label="Job Finder setup"

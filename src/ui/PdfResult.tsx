@@ -18,7 +18,6 @@ export function PdfResult({ artifact }: { artifact: PdfArtifact | undefined }) {
     <section id="result" className="result" aria-labelledby="result-title" hidden={!artifact}>
       <div className="result-top">
         <div>
-          <p className="eyebrow">READY TO SEND</p>
           <h2 ref={title} id="result-title" tabIndex={-1}>
             Your resume PDF
           </h2>

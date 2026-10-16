@@ -100,12 +100,8 @@ export function App() {
         tabIndex={0}
       >
         <section className="intro" aria-labelledby="page-title">
-          <p className="eyebrow">READY FOR YOUR NEXT OPPORTUNITY</p>
           <h2 id="page-title">Turn your resume into a polished PDF.</h2>
-          <p>
-            Paste your prepared resume to create a clean, professionally formatted PDF, ready for
-            review and submission. Use the chatbot instructions below to prepare the text first.
-          </p>
+          <p>Paste your resume in Applicable Format to create a PDF.</p>
         </section>
         <ChatbotInstructions />
         <ResumeForm
@@ -129,23 +125,13 @@ export function App() {
         tabIndex={0}
       >
         <section className="intro" aria-labelledby="job-finder-title">
-          <p className="eyebrow">JOB FINDER</p>
           <h2 id="job-finder-title">Find jobs that fit you.</h2>
-          <p>
-            Tell us what kinds of jobs you’re looking for. Create a personalized ChatGPT
-            conversation to search for opportunities matching your experience and preferences.
-          </p>
+          <p>Create a personalized ChatGPT job search based on your experience and preferences.</p>
         </section>
-        <ol className="tool-steps">
-          <li>Answer a few questions about your preferred jobs.</li>
-          <li>Copy your personalized ChatGPT prompt.</li>
-          <li>Paste it into a new ChatGPT conversation.</li>
-          <li>Upload one or more existing resumes to that conversation.</li>
-          <li>
-            Answer clarification questions and start searching. Verify openings on the employer’s
-            website.
-          </li>
-        </ol>
+        <p className="tool-guidance">
+          Answer the optional questions below, then copy your prompt into a new ChatGPT
+          conversation. Upload your existing resumes there to get started.
+        </p>
         <JobFinderSetup />
       </div>
       <div
