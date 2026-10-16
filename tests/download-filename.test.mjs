@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resumeFilename } from '../app/download-filename.js';
+import { resumeFilename } from '../app/download-filename.ts';
 
 test('title and optional company retain readable capitalization, Unicode and punctuation', () => {
   assert.equal(resumeFilename('Full-Stack Software Engineer'), 'Full-Stack Software Engineer Resume.pdf');

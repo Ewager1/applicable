@@ -1,9 +1,9 @@
 import './styles.css';
 import chatbotInstructions from '../examples/chatbot-instruction.md?raw';
-import { resumeFilename } from './download-filename.js';
-import { parseResume } from './resume/parse.js';
-import { loadBrowserFonts } from './pdf/fonts.js';
-import { createPdfBytes } from './pdf/render.js';
+import { resumeFilename } from './download-filename.ts';
+import { parseResume } from './resume/parse.ts';
+import { loadBrowserFonts } from './pdf/fonts.ts';
+import { createPdfBytes } from './pdf/render.ts';
 
 const resumeForm = document.querySelector('#resume-form');
 const companyInput = document.querySelector('#company');
@@ -38,7 +38,7 @@ function clearErrors() {
   resumeInput.removeAttribute('aria-invalid');
   resumeInput.setAttribute('aria-describedby', 'resume-help');
 }
-/** @param {import('./resume/types.js').ValidationError[]} items */
+/** @param {import('./resume/types.ts').ValidationError[]} items */
 function showErrors(items, invalidInput = true) {
   clearErrors();
   for (const item of items) {

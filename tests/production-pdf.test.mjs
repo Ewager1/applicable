@@ -1,18 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import pdfMake from 'pdfmake/build/pdfmake.js';
-import { createPdfBytes } from '../app/pdf/render.js';
-import { fontFiles } from '../app/pdf/fonts.js';
+import { createPdfBytes } from '../app/pdf/render.ts';
+import { measuredPageCount, firstMeasuredPage } from '../app/pdf/pdfmake-adapter.ts';
+import { fontFiles } from '../app/pdf/fonts.ts';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { renderPdf } from '../proof/pdf.mjs';
 import { parsedExample, stressFixture } from '../proof/production-fixtures.mjs';
-import { fontHashes, supportedRanges } from '../app/pdf/font-coverage.js';
+import { fontHashes, supportedRanges } from '../app/pdf/font-coverage.ts';
 import { createRequire } from 'node:module';
-import { fonts } from '../app/pdf/fonts.js';
-import { documentDefinition } from '../app/pdf/document.js';
-import { createPagination } from '../app/pdf/pagination.js';
+import { fonts } from '../app/pdf/fonts.ts';
+import { documentDefinition } from '../app/pdf/document.ts';
+import { createPagination } from '../app/pdf/pagination.ts';
 const require = createRequire(import.meta.url);
 const fontkit = createRequire(require.resolve('pdfmake/package.json'))('@foliojs-fork/fontkit');
 
@@ -347,4 +348,16 @@ test('unavailable pinned layout metadata blocks export and cleans up the measure
   const engine = { createPdf: () => ({ getStream: () => ({ destroy: () => { destroyed = true; } }) }) };
   await assert.rejects(createPdfBytes(parsedExample, engine, fontData), /PDF layout could not be checked.*no PDF was created/);
   assert.equal(destroyed, true);
+});
+
+
+test('pinned layout boundary rejects malformed pages and impossible positions', () => {
+  for (const pages of [null, {}, [], [null], [{ items: null }], [{ items: [] }], [{ items: [{ type: 'image' }] }]]) {
+    assert.equal(measuredPageCount({ _pdfMakePages: pages }), undefined);
+  }
+  assert.equal(measuredPageCount({ _pdfMakePages: [{ items: [{ type: 'line' }] }] }), 1);
+  for (const positions of [null, {}, [], [null], [{}], [{ pageNumber: '1' }], [{ pageNumber: 0 }], [{ pageNumber: 1.5 }], [{ pageNumber: 3 }]]) {
+    assert.equal(firstMeasuredPage({ positions }, 2), undefined);
+  }
+  assert.equal(firstMeasuredPage({ positions: [{ pageNumber: 2 }] }, 2), 2);
 });

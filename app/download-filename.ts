@@ -1,6 +1,6 @@
 const MAX_FILENAME_BYTES = 180;
 
-function cleanPart(value) {
+function cleanPart(value: string) {
   // Remove hidden directional controls and lone surrogates; keep safe Unicode,
   // including joiners used in emoji. These edits affect filenames only.
   return value.replace(/[<>:"/\\|?*]/g, ' ')
@@ -10,9 +10,9 @@ function cleanPart(value) {
 }
 
 // encodeURIComponent counts UTF-8 bytes without a browser/Node-specific API.
-const byteLength = value => encodeURIComponent(value).replace(/%[0-9A-F]{2}|./g, 'x').length;
+const byteLength = (value: string) => encodeURIComponent(value).replace(/%[0-9A-F]{2}|./g, 'x').length;
 
-function fitPart(value, budget) {
+function fitPart(value: string, budget: number) {
   let bounded = '';
   for (const character of value) {
     if (byteLength(bounded + character) > budget) break;
@@ -28,7 +28,7 @@ function fitPart(value, budget) {
  * @param {string} [company] Optional interface-only company value.
  * @returns {string}
  */
-export function resumeFilename(title, company = '') {
+export function resumeFilename(title: string, company = '') {
   const jobTitle = cleanPart(title);
   const companyName = cleanPart(company);
   if (!jobTitle && !companyName) return 'Resume.pdf';

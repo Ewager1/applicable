@@ -4,12 +4,12 @@ A4 promotes the verified single-column template into `app/pdf/`. The synthetic p
 
 ## Modules and use
 
-- `document.js`: fixed section order, semantic typography/styles, explicit header/content relationships, metadata columns, and supported-character preflight.
-- `pagination.js`: local stable node IDs and the keep-with-content callback; no content-array offsets or fixed page cap.
-- `fonts.js`: local font mapping and browser-only font loading, with static asset URLs bundled by Vite.
-- `header-fit.js`: disposable same-engine layout check for blocks that must fit on one page; overflow stops delivery with recoverable guidance.
-- `render.js`: `createPdfBytes(resume, pdfMake, fontData)` returns a promise for one PDF byte buffer. Supply a successful parser result's `resume`, the locally imported pdfmake browser bundle, and the font map from `loadBrowserFonts()`.
-- `font-coverage.js`: generated supported code-point ranges and hashes for the exact bundled fonts.
+- `document.ts`: fixed section order, semantic typography/styles, explicit header/content relationships, metadata columns, and supported-character preflight.
+- `pagination.ts`: local stable node IDs and the keep-with-content callback; no content-array offsets or fixed page cap.
+- `fonts.ts`: local font mapping and browser-only font loading, with static asset URLs bundled by Vite.
+- `header-fit.ts`: disposable same-engine layout check for blocks that must fit on one page; overflow stops delivery with recoverable guidance.
+- `render.ts`: `createPdfBytes(resume, pdfMake, fontData)` returns a promise for one PDF byte buffer. Supply a successful parser result's `resume`, the locally imported pdfmake browser bundle, and the font map from `loadBrowserFonts()`.
+- `font-coverage.ts`: generated supported code-point ranges and hashes for the exact bundled fonts.
 - `proof/document.mjs`: compatibility re-exports of the production template.
 - `proof/pdf.mjs`: Node-only development adapter reading the same fonts from disk.
 
@@ -87,7 +87,7 @@ C4 pagination cleanup registers each intended following content block while buil
 
 ## C5 oversized-header safeguard
 
-The pinned pdfmake engine can discard an oversized unbreakable fragment while reporting successful PDF creation. Near-full-page headers can also leave a section heading or their first bullet stranded on another page. Original callback/page-number metadata is insufficient to detect this reliably after the loss. `header-fit.js` therefore measures **the explicit C4 keep-groups** in a separate disposable pass: header through its actual intended following content, including intermediate layout nodes. Each group starts on a fresh page with unbreakable flags disabled. Its target's **first placed line** must share the group's starting page. Later lines of a multi-page bullet are allowed to continue.
+The pinned pdfmake engine can discard an oversized unbreakable fragment while reporting successful PDF creation. Near-full-page headers can also leave a section heading or their first bullet stranded on another page. Original callback/page-number metadata is insufficient to detect this reliably after the loss. `header-fit.ts` therefore measures **the explicit C4 keep-groups** in a separate disposable pass: header through its actual intended following content, including intermediate layout nodes. Each group starts on a fresh page with unbreakable flags disabled. Its target's **first placed line** must share the group's starting page. Later lines of a multi-page bullet are allowed to continue.
 
 Fonts, semantic styles, column widths, margins and page area match the real document. There is no character-count limit, text-matching heuristic, shrinking, truncation or parser restriction. This applies coherently to job/first-bullet groups, first-section/entry groups, qualification/institution groups and certificate/issuer groups. Long body text and multi-page bullets remain supported; heading metadata that makes its required group impossible to keep receives a correction message instead of an incomplete or orphaned result.
 

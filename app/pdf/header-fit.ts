@@ -1,5 +1,9 @@
-import { documentDefinition } from './document.js';
-import { fonts } from './fonts.js';
+import type { TDocumentDefinitions, ContentStack } from 'pdfmake/interfaces.js';
+import type { Resume } from '../resume/types.ts';
+import type { PdfMake, PdfStream } from './pdfmake-adapter.ts';
+import { measuredPageCount, firstMeasuredPage } from './pdfmake-adapter.ts';
+import { documentDefinition } from './document.ts';
+import { fonts } from './fonts.ts';
 
 export class HeaderFitError extends Error {}
 
@@ -7,23 +11,21 @@ const incompatibleLayout = () => new HeaderFitError('The PDF layout could not be
 
 // Definitions contain plain layout objects and functions, not engine instances.
 // Each group needs its own nodes: the same header can participate in two keeps.
-function cloneLayout(value) {
-  if (Array.isArray(value)) return value.map(cloneLayout);
+function cloneLayout<T>(value: T): T {
+  if (Array.isArray(value)) return value.map(item => cloneLayout(item)) as T;
   if (!value || typeof value !== 'object') return value;
   const copy = Object.fromEntries(Object.entries(value).map(([key, item]) => [key, cloneLayout(item)]));
   delete copy.id;
   if (copy.unbreakable) copy.unbreakable = false;
-  return copy;
+  // Cloning retains the public layout shape; only application ids/keep flags change.
+  return copy as T;
 }
 
 /**
  * Measure explicit keep-groups with the same engine and fresh-page area. The
  * target must begin on that page; its later lines may continue naturally.
- * @param {import('../resume/types.js').Resume} resume
- * @param {typeof import('pdfmake/build/pdfmake.js')} pdfMake
- * @param {Record<string, string>} fontData
  */
-export function verifyHeaderFit(resume, pdfMake, fontData) {
+export function verifyHeaderFit(resume: Resume, pdfMake: PdfMake, fontData: Record<string, string>) {
   const definition = documentDefinition(resume);
   const groups = definition.keepGroups.map(({ header, content, label }, index) => {
     const start = definition.content.indexOf(header);
@@ -32,32 +34,26 @@ export function verifyHeaderFit(resume, pdfMake, fontData) {
     const nodes = definition.content.slice(start, end + 1).map(cloneLayout);
     return {
       label,
-      target: nodes.at(-1),
-      block: { stack: nodes, ...(index > 0 ? { pageBreak: 'before' } : {}) },
+      target: nodes.at(-1)!,
+      block: { stack: nodes, ...(index > 0 ? { pageBreak: 'before' } : {}) } satisfies ContentStack,
     };
   });
-  const measurement = {
+  const measurement: TDocumentDefinitions = {
     pageSize: definition.pageSize,
     pageMargins: cloneLayout(definition.pageMargins),
     defaultStyle: cloneLayout(definition.defaultStyle),
     styles: cloneLayout(definition.styles),
     content: groups.map(group => group.block),
   };
-  let stream;
+  let stream: PdfStream | undefined;
   try {
     stream = pdfMake.createPdf(measurement, undefined, fonts, fontData).getStream();
-    // Isolated dependency on the pinned pdfmake 0.2.20 placed-layout metadata.
-    // Refuse export if a future engine cannot supply the measurements we check.
-    const pages = stream._pdfMakePages;
-    if (!Array.isArray(pages) || !pages.length || pages.some(page => !Array.isArray(page.items) || !page.items.some(item => item.type === 'line'))) {
-      throw incompatibleLayout();
-    }
+    const pageCount = measuredPageCount(stream);
+    if (pageCount === undefined) throw incompatibleLayout();
     for (const { label, block, target } of groups) {
-      const startPage = block.positions?.[0]?.pageNumber;
-      const targetPage = target.positions?.[0]?.pageNumber;
-      if (![startPage, targetPage].every(page => Number.isInteger(page) && page >= 1 && page <= pages.length)) {
-        throw incompatibleLayout();
-      }
+      const startPage = firstMeasuredPage(block, pageCount);
+      const targetPage = firstMeasuredPage(target, pageCount);
+      if (startPage === undefined || targetPage === undefined) throw incompatibleLayout();
       if (startPage !== targetPage) {
         const guidance = label.startsWith('job ')
           ? 'Shorten the employer, role, dates or location, then create the PDF again.'

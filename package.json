@@ -7,28 +7,33 @@
     "node": "^22.13.0 || >=24.0.0"
   },
   "scripts": {
-    "proof:generate": "node proof/generate.mjs",
-    "proof:serve": "node proof/serve.mjs",
-    "test": "node --test proof/render.test.mjs tests/parser.test.mjs tests/production-pdf.test.mjs tests/download-filename.test.mjs tests/agent-usage.test.mjs",
+    "proof:generate": "node --experimental-strip-types proof/generate.mjs",
+    "proof:serve": "node --experimental-strip-types proof/serve.mjs",
+    "test": "node --experimental-strip-types --test proof/render.test.mjs tests/parser.test.mjs tests/production-pdf.test.mjs tests/download-filename.test.mjs tests/agent-usage.test.mjs",
     "test:browser": "node tests/run-browser.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "check": "npm run lint && npm test && npm run build && npm run test:browser",
-    "fonts:coverage": "node scripts/font-coverage.mjs",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build && npm run test:browser",
+    "fonts:coverage": "node --experimental-strip-types scripts/font-coverage.mjs",
     "usage:snapshot": "node scripts/agent-usage.mjs snapshot",
     "usage:start": "node scripts/agent-usage.mjs start",
-    "usage:finish": "node scripts/agent-usage.mjs finish"
+    "usage:finish": "node scripts/agent-usage.mjs finish",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "pdfmake": "0.2.20"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "@types/pdfmake": "0.2.13",
+    "@typescript-eslint/parser": "8.71.2",
     "eslint": "10.12.0",
     "pdfjs-dist": "4.10.38",
     "playwright": "1.62.1",
+    "typescript": "6.0.3",
     "vite": "8.3.4"
   }
 }

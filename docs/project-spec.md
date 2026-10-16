@@ -93,7 +93,7 @@ Prefer displaying the same generated PDF bytes that are offered for download, af
 
 Keep parsing, validation, PDF rendering and interface handling separate enough to test without introducing a general template engine. The user approved strict TypeScript for the core followed by a small React/TypeScript interface; follow the sequential migration issues linked in the [development plan](project-plan.md).
 
-The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. The current implementation is plain JavaScript with shared editor-visible JSDoc contracts, not TypeScript or React. The approved migration is not delivered until its issues are implemented and merged.
+The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. F1 introduces strict TypeScript contracts, parser and PDF core independent of React. The existing JavaScript interface remains until F2; developer scripts and proof fixtures remain JavaScript.
 
 ## Privacy and examples
 

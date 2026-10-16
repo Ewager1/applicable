@@ -1,9 +1,14 @@
+import type { ContactDetail, ParseResult, ValidationError } from './types.ts';
+
+interface SourceLine { text: string; line: number }
+interface EntryBlock { lines: SourceLine[]; line: number }
+interface SectionBlock extends EntryBlock { title?: string }
 const sectionTitles = new Map([
   ['contact', 'Contact'], ['professional title', 'Professional Title'],
   ['summary', 'Summary'], ['relevant experience', 'Relevant Experience'],
   ['education', 'Education'], ['certifications', 'Certifications'], ['skills', 'Skills'],
 ]);
-const normalizeLabel = text => text.trim().replace(/\s+/g, ' ').toLowerCase();
+const normalizeLabel = (text: string) => text.trim().replace(/\s+/g, ' ').toLowerCase();
 const bulletPattern = /^(?:-|\*|•)(?:[ \t]+(.*)|$)/;
 const reservedControlPattern = /^(?:#{1,6}(?:\s|$)|```|~~~)/;
 const symbolMarkers = new Map([
@@ -12,21 +17,18 @@ const symbolMarkers = new Map([
   ['@@EDUCATION@@', '# Education'], ['@@CERTIFICATIONS@@', '# Certifications'], ['@@SKILLS@@', '# Skills'],
   ['@@JOB@@', '## Job'], ['@@EDUCATION_ENTRY@@', '## Education'], ['@@CERTIFICATION@@', '## Certification'],
 ]);
-const sectionMarker = key => `@@${key.toUpperCase().replaceAll(' ', '_')}@@`;
+const sectionMarker = (key: string) => `@@${key.toUpperCase().replaceAll(' ', '_')}@@`;
 
 /**
  * Parse the documented Applicable text format without rewriting supplied content.
  * Errors never include a partially usable resume. The caller retains its source text.
- * @param {unknown} source
- * @returns {import('./types.js').ParseResult}
  */
-export function parseResume(source) {
+export function parseResume(source: unknown): ParseResult {
   if (typeof source !== 'string' || !source.trim()) {
     return { ok: false, errors: [{ message: 'Paste a complete resume before creating a PDF.', line: null }] };
   }
-  /** @type {import('./types.js').ValidationError[]} */
-  const errors = [];
-  const report = (message, line = null) => errors.push({ message, line });
+  const errors: ValidationError[] = [];
+  const report = (message: string, line: number | null = null) => errors.push({ message, line });
   let lines = source
     .replace(/^\uFEFF/, '')
     .replace(/\r\n?/g, '\n')
@@ -36,7 +38,7 @@ export function parseResume(source) {
   const fence = /^(?:`{3,}|~{3,})/;
   if (nonblank.some(item => fence.test(item.text.trim()))) {
     const first = nonblank[0];
-    const last = nonblank.at(-1);
+    const last = nonblank.at(-1)!;
     if (first === last || !/^```(?:text|plaintext)?$/i.test(first.text.trim()) || last.text.trim() !== '```') {
       return { ok: false, errors: [{ message: 'Use one enclosing text code block with no commentary outside it, or copy only the resume text. Other code-block formats are not supported.', line: first.line }] };
     }
@@ -61,9 +63,9 @@ export function parseResume(source) {
     return marker ? { ...item, text: marker } : item;
   });
   if (errors.length) return { ok: false, errors };
-  const sectionBlocks = new Map();
-  let currentBlock;
-  let preambleLine;
+  const sectionBlocks = new Map<string, SectionBlock>();
+  let currentBlock: SectionBlock | undefined;
+  let preambleLine: number | undefined;
   for (const item of lines) {
     const { text, line } = item;
     const heading = text.trim().match(/^#(?:\s+(.*)|$)/);
@@ -91,7 +93,7 @@ export function parseResume(source) {
     };
   }
 
-  const readSectionLines = key => {
+  const readSectionLines = (key: string): SourceLine[] => {
     const block = sectionBlocks.get(key);
     if (!block) {
       report(`${sectionTitles.get(key)} is missing. Add ${sectionMarker(key)}.`);
@@ -109,17 +111,17 @@ export function parseResume(source) {
   const certificationLines = readSectionLines('certifications');
   const skillLines = readSectionLines('skills');
 
-  const parseField = item => {
+  const parseField = (item: SourceLine) => {
     const match = item.text.trim().match(/^([^:]+):[ \t]*(.*)$/);
     return match ? { key: normalizeLabel(match[1]), value: match[2].trim() } : null;
   };
-  const reportMissingFields = (values, fields, context, line) => {
+  const reportMissingFields = (values: Record<string, string>, fields: readonly string[], context: string, line: number) => {
     for (const key of fields) {
       if (!values[key]?.trim()) report(`Add ${key} for ${context}.`, line);
     }
   };
-  const readFields = (lines, allowed, context, startLine) => {
-    const values = {};
+  const readFields = (lines: SourceLine[], allowed: readonly string[], context: string, startLine: number) => {
+    const values: Record<string, string> = {};
     for (const item of lines) {
       const value = parseField(item);
       if (!value || !allowed.includes(value.key)) {
@@ -135,9 +137,9 @@ export function parseResume(source) {
     reportMissingFields(values, allowed, context, startLine);
     return values;
   };
-  const readEntries = (lines, marker, context) => {
-    const parsedEntries = [];
-    let entry;
+  const readEntries = (lines: SourceLine[], marker: string, context: string) => {
+    const parsedEntries: EntryBlock[] = [];
+    let entry: EntryBlock | undefined;
     let reportedPreamble = false;
     for (const item of lines) {
       if (normalizeLabel(item.text) === `## ${marker}`) {
@@ -155,8 +157,7 @@ export function parseResume(source) {
 
   let name = '';
   let sawName = false;
-  /** @type {import('./types.js').ContactDetail[]} */
-  const contact = [];
+  const contact: ContactDetail[] = [];
   for (const item of contactLines) {
     const value = parseField(item);
     if (value?.key === 'name') {
@@ -185,8 +186,8 @@ export function parseResume(source) {
       report('Use Name: or Contact: for contact information.', item.line);
     }
   }
-  if (contactLines.length && !name.trim()) report('Add your name after Name: in Contact.', sectionBlocks.get('contact').line);
-  if (contactLines.length && !contact.length) report('Add at least one contact detail after Contact:.', sectionBlocks.get('contact').line);
+  if (contactLines.length && !name.trim()) report('Add your name after Name: in Contact.', sectionBlocks.get('contact')?.line ?? null);
+  if (contactLines.length && !contact.length) report('Add at least one contact detail after Contact:.', sectionBlocks.get('contact')?.line ?? null);
 
   let title = '';
   if (titleLines.length) {
@@ -211,8 +212,8 @@ export function parseResume(source) {
     .join('\n\n');
 
   const jobs = readEntries(jobLines, 'job', 'job').map(entry => {
-    const metadata = [];
-    const bullets = [];
+    const metadata: SourceLine[] = [];
+    const bullets: string[] = [];
     for (const item of entry.lines) {
       const text = item.text.trim();
       const match = text.match(bulletPattern);

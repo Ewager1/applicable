@@ -130,7 +130,7 @@ Errors use human-language messages, such as “Education is missing. Add @@EDUCA
 
 ## Parser interface and data shape
 
-`parseResume(source)` in `app/resume/parse.js` is pure and uses no browser API, storage, dependencies or network requests. It returns either:
+`parseResume(source)` in `app/resume/parse.ts` is pure and uses no browser API, storage, dependencies or network requests. It returns either:
 
 ```js
 { ok: true, resume: { name, contact, title, summary, jobs, education, certifications, skills } }
