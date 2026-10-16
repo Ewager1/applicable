@@ -4,6 +4,7 @@ import type { GenerationState } from './useResumePdf.ts';
 import { ErrorSummary } from './Feedback.tsx';
 
 interface Props {
+  visible: boolean;
   contact: ContactFields;
   contactWarning: string;
   onContactChange: (contact: ContactFields) => void;
@@ -15,6 +16,7 @@ interface Props {
   onSubmit: () => void;
 }
 export function ResumeForm({
+  visible,
   contact,
   contactWarning,
   onContactChange,
@@ -31,14 +33,14 @@ export function ResumeForm({
   const errors = state.phase === 'error' ? state.errors : undefined;
   useLayoutEffect(() => {
     function resize() {
-      if (!input.current) return;
+      if (!visible || !input.current) return;
       input.current.style.height = 'auto';
       input.current.style.height = `${input.current.scrollHeight}px`;
     }
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
-  }, [source]);
+  }, [source, visible]);
   return (
     <form
       ref={form}

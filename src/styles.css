@@ -456,3 +456,81 @@ iframe {
     grid-template-columns: 1fr;
   }
 }
+
+/* Local view navigation and job-search guidance */
+.masthead {
+  flex-wrap: wrap;
+}
+
+.view-tabs {
+  display: flex;
+  flex-basis: 100%;
+  gap: 8px;
+}
+
+.view-tabs button {
+  flex: 1;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.view-tabs button[aria-selected='true'] {
+  color: var(--accent-hover);
+  background: #edf5f0;
+  border-color: var(--accent);
+}
+
+.workflow-intro {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.workflow-intro p,
+.workflow-stages p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.workflow-stages {
+  padding-left: 28px;
+  margin: 0 0 24px;
+}
+
+.workflow-stages li {
+  padding: 0 0 24px 10px;
+}
+
+.workflow-stages li::marker {
+  color: var(--accent);
+  font-weight: 650;
+}
+
+.workflow-stages h2 {
+  font-size: 20px;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+
+@media (max-width: 600px) {
+  .view-tabs {
+    gap: 6px;
+  }
+
+  .view-tabs button {
+    padding: 12px 8px;
+  }
+
+  .workflow-intro {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}

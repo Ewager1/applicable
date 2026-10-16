@@ -663,3 +663,134 @@ test('contact edits invalidate pending work and revoke completed artifacts', asy
     release();
   }
 });
+
+test('local header tabs default to PDF Builder and support discovery and keyboard navigation', async (t) => {
+  const page = await openPage(t);
+  const builder = page.getByRole('tab', { name: 'PDF Builder', exact: true });
+  const guide = page.getByRole('tab', { name: 'Getting Started', exact: true });
+  assert.equal(await builder.getAttribute('aria-selected'), 'true');
+  assert.equal(await guide.getAttribute('tabindex'), '-1');
+  assert.equal(await page.locator('#getting-started-panel').isVisible(), false);
+  await page.getByRole('button', { name: 'Explore Getting Started', exact: true }).click();
+  assert.equal(await guide.getAttribute('aria-selected'), 'true');
+  assert.equal(await guide.evaluate((element) => element === document.activeElement), true);
+  assert.equal(await builder.getAttribute('tabindex'), '-1');
+  assert.equal(await page.locator('#builder-panel').isVisible(), false);
+  const stages = page.locator('.workflow-stages > li');
+  assert.equal(await stages.count(), 4);
+  assert.deepEqual(await stages.locator('h2').allTextContents(), [
+    'Understand the process',
+    'Set up a Job Finder conversation in ChatGPT',
+    'Set up a Resume Builder conversation in ChatGPT',
+    'Find positions, tailor resumes, create PDFs and apply',
+  ]);
+  await guide.press('ArrowRight');
+  assert.equal(await builder.getAttribute('aria-selected'), 'true');
+  await builder.press('ArrowLeft');
+  assert.equal(await guide.getAttribute('aria-selected'), 'true');
+  await guide.press('Home');
+  assert.equal(await builder.evaluate((element) => element === document.activeElement), true);
+  await builder.press('End');
+  assert.equal(await guide.evaluate((element) => element === document.activeElement), true);
+  await guide.press('Tab');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'getting-started-panel');
+  await page.reload();
+  assert.equal(await builder.getAttribute('aria-selected'), 'true');
+  assert.equal(
+    await page.getByRole('button', { name: 'Copy chatbot instructions', exact: true }).isVisible(),
+    true,
+  );
+});
+
+test('switching views preserves drafts, validation and expanded input across hidden resizes', async (t) => {
+  const page = await openPage(t);
+  const input = page.getByLabel('Your resume', { exact: true });
+  const company = page.locator('#company');
+  const invalid = source.replace(/@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/, '');
+  await input.fill(invalid);
+  await company.fill('Example Company');
+  await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
+  const error = page.locator('#error-summary');
+  await error.waitFor();
+  const errorText = await error.textContent();
+  const height = await input.evaluate((element) => element.clientHeight);
+  assert.ok(height > 300);
+  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
+  assert.equal(await input.inputValue(), invalid);
+  assert.equal(await company.inputValue(), 'Example Company');
+  for (const [id, value] of Object.entries(exampleContact))
+    assert.equal(await page.locator(`#${id}`).inputValue(), value);
+  assert.equal(await error.textContent(), errorText);
+  assert.equal(await error.isVisible(), true);
+  assert.equal(await input.getAttribute('aria-invalid'), 'true');
+  assert.ok(await input.evaluate((element) => element.clientHeight > 300));
+});
+
+test('PDF generation continues while guidance is open and the same artifact survives view switches', async (t) => {
+  const page = await openPage(t);
+  let release;
+  const held = new Promise((resolve) => {
+    release = resolve;
+  });
+  await page.route(/SourceSans3-Regular-.*\.ttf/, async (route) => {
+    await held;
+    await route.continue();
+  });
+  const downloads = [];
+  page.on('download', (download) => downloads.push(download));
+  try {
+    await page.locator('#resume').fill(source);
+    const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
+    await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
+    await request;
+    await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+    const download = page.waitForEvent('download');
+    release();
+    await readPdf(await download);
+    const readyUrl = await page.locator('#download').getAttribute('href');
+    assert.ok(readyUrl.startsWith('blob:'));
+    assert.equal(
+      await page
+        .getByRole('tab', { name: 'Getting Started', exact: true })
+        .getAttribute('aria-selected'),
+      'true',
+    );
+    await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
+    assert.equal(await page.locator('#result').isVisible(), true);
+    await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+    await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
+    assert.equal(await page.locator('#download').getAttribute('href'), readyUrl);
+    assert.equal(downloads.length, 1);
+    const repeat = page.waitForEvent('download');
+    await page.getByRole('link', { name: 'Download PDF' }).click();
+    await readPdf(await repeat);
+  } finally {
+    release();
+  }
+});
+
+for (const width of [320, 375, 1280]) {
+  test(`navigation and guidance fit ${width}px with touch or pointer activation`, async (t) => {
+    const page = await openPage(t, { viewport: { width, height: 900 }, hasTouch: width < 600 });
+    const guide = page.getByRole('tab', { name: 'Getting Started', exact: true });
+    const builder = page.getByRole('tab', { name: 'PDF Builder', exact: true });
+    for (const tab of [guide, builder]) {
+      if (width < 600) await tab.tap();
+      else await tab.click();
+      assert.equal(await tab.getAttribute('aria-selected'), 'true');
+      assert.equal(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+        true,
+      );
+      const bounds = await tab.boundingBox();
+      assert.ok(bounds.height >= 44 && bounds.width >= 44);
+      await mkdir('output/ui', { recursive: true });
+      await page.screenshot({
+        path: `output/ui/getting-started-${width}-${await tab.getAttribute('id')}.png`,
+        fullPage: true,
+      });
+    }
+  });
+}

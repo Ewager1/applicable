@@ -10,6 +10,11 @@ Turn an entire resume copied from a chat into a consistently formatted PDF with 
 
 ### Input and interaction
 
+- Open in PDF Builder on every page load. Header tabs switch between PDF Builder and Getting Started without reloading; support pointer, touch and keyboard navigation at mobile widths.
+- Getting Started explains four stages: understand the process; set up a Job Finder conversation in ChatGPT; set up a Resume Builder conversation in ChatGPT; find positions, tailor resumes, generate PDFs and manually apply. These are instructions for work the user performs, with no ChatGPT integration or generated setup prompts.
+- Include a small visible introduction in PDF Builder linking to Getting Started, and retain the chatbot formatting instructions in the builder.
+- Switching views preserves resume text, company, contact fields, validation and existing PDF output. The selected view is local state only, with no router or persistence.
+
 - Provide one labeled, expanding plain-text input.
 - Place the submit button above the input.
 - Accept the complete resume through copy and paste. File import is outside the initial scope.
@@ -93,7 +98,7 @@ Prefer displaying the same generated PDF bytes that are offered for download, af
 
 Keep parsing, validation, PDF rendering and interface handling separate enough to test without introducing a general template engine. The [maintenance edit map](maintenance.md#find-the-right-edit-point) identifies contributor entry points; the [development plan](project-plan.md) records the approved migration sequence/history.
 
-The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. The parser, contracts and PDF core use strict TypeScript independent of React. The interface uses small React/TypeScript function components and local state under StrictMode; developer scripts and proof fixtures remain JavaScript.
+The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. The parser, contracts and PDF core use strict TypeScript independent of React. The interface uses small React/TypeScript function components and local state under StrictMode; header tabs keep both panels mounted and hide the inactive view to preserve builder and generation lifetimes; developer scripts and proof fixtures remain JavaScript.
 
 `src/resume/types.ts` owns the canonical model and parse/error contracts; `parse.ts` supplies runtime validation. The optional company belongs only to interface/filename state. `src/pdf/pdfmake-adapter.ts` validates pinned engine internals; `src/ui/useResumePdf.ts` owns generation revisions and Blob URL lifetime. Preserve the [data-flow invariants and recovery limits](maintenance.md#data-flow-and-invariants) when changing these boundaries. Agent-usage scripts measure development activity only and are outside the application bundle.
 
