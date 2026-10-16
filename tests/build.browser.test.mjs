@@ -5,6 +5,7 @@ import { browserOptions } from './browser-options.mjs';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { parsedExample } from '../proof/production-fixtures.mjs';
+import { buildJobFinderPrompt, defaultJobFinderSettings } from '../src/job-finder/prompt.ts';
 const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
 const chatbotInstructions = await readFile(
   new URL('../examples/chatbot-instruction.md', import.meta.url),
@@ -844,7 +845,7 @@ for (const width of [320, 375, 1280]) {
   });
 }
 
-test('Job Finder copies latest optional answers in one action without preview and clears on reload', async (t) => {
+test('Job Finder copies immediately and preserves disclosed answers in exact generated output', async (t) => {
   const page = await openPage(t);
   await page.evaluate(() => {
     window.copiedJobFinderPrompt = '';
@@ -862,6 +863,23 @@ test('Job Finder copies latest optional answers in one action without preview an
   const fields = form.locator('textarea');
   const output = page.getByLabel('Your Job Finder prompt', { exact: true });
   assert.equal(await fields.count(), 7);
+  assert.equal(await form.getByRole('textbox').count(), 3);
+  const answerKeys = [
+    'roles',
+    'location',
+    'mustHaves',
+    'preferences',
+    'salary',
+    'experience',
+    'other',
+  ];
+  assert.deepEqual(
+    await fields.evaluateAll((rows) => rows.map((row) => row.id)),
+    answerKeys.map((key) => `job-finder-${key}`),
+  );
+  const details = form.locator('details');
+  const summary = details.getByText('Additional preferences', { exact: true });
+  assert.equal(await details.getAttribute('open'), null);
   const usOnly = form.getByRole('checkbox', { name: 'Search U.S. jobs only', exact: true });
   const recent = form.getByRole('checkbox', {
     name: 'Prefer recently posted positions',
@@ -869,6 +887,8 @@ test('Job Finder copies latest optional answers in one action without preview an
   });
   assert.equal(await usOnly.isChecked(), true);
   assert.equal(await recent.isChecked(), true);
+  assert.equal(await usOnly.isVisible(), true);
+  assert.equal(await recent.isVisible(), true);
   for (const [checkbox, description] of [
     [
       usOnly,
@@ -886,13 +906,17 @@ test('Job Finder copies latest optional answers in one action without preview an
   }
   const copy = form.getByRole('button', { name: 'Copy Prompt', exact: true });
   assert.equal(await form.getByRole('button').count(), 1);
+  const copyBounds = await copy.boundingBox();
+  assert.ok(copyBounds.y + copyBounds.height <= (await fields.first().boundingBox()).y);
+  assert.ok(copyBounds.y + copyBounds.height <= (await page.viewportSize()).height);
   assert.equal(await output.count(), 0);
   await copy.click();
   await page.waitForFunction(() =>
     document.querySelector('#job-finder-copy-status').textContent.startsWith('Prompt copied.'),
   );
   const standard = await page.evaluate(() => window.copiedJobFinderPrompt);
-  assert.ok(standard.includes('Ask me to upload one or more previous resumes here in ChatGPT'));
+  const empty = Object.fromEntries(answerKeys.map((key) => [key, '']));
+  assert.equal(standard, buildJobFinderPrompt(empty, defaultJobFinderSettings));
   assert.ok(!standard.includes('My questionnaire answers:'));
   assert.equal(await output.count(), 0);
   // Native keyboard toggles exercise every combination through the actual copy action.
@@ -914,8 +938,7 @@ test('Job Finder copies latest optional answers in one action without preview an
     }
     await copy.click();
     const copied = await page.evaluate(() => window.copiedJobFinderPrompt);
-    assert.ok(copied.includes(`Search U.S. jobs only: ${us ? 'On' : 'Off'}`));
-    assert.ok(copied.includes(`Prefer recently posted positions: ${fresh ? 'On' : 'Off'}`));
+    assert.equal(copied, buildJobFinderPrompt(empty, { usJobsOnly: us, preferRecent: fresh }));
     assert.equal(await output.count(), 0);
   }
   await usOnly.uncheck();
@@ -929,14 +952,33 @@ test('Job Finder copies latest optional answers in one action without preview an
     'Mid-level',
     'Changing industries',
   ];
+  await summary.focus();
+  await summary.press('Enter');
+  assert.equal(await form.getByRole('textbox').count(), 7);
+  await summary.press('Tab');
+  assert.equal(
+    await details
+      .locator('textarea')
+      .first()
+      .evaluate((el) => el === document.activeElement),
+    true,
+  );
   for (const [index, value] of values.entries()) await fields.nth(index).fill(value);
+  await summary.focus();
+  await summary.press('Space');
+  assert.equal(await details.getAttribute('open'), null);
+  assert.equal(await form.getByRole('textbox').count(), 3);
   assert.equal(await output.count(), 0);
   await copy.click();
   await page.waitForFunction(() =>
     document.querySelector('#job-finder-copy-status').textContent.startsWith('Prompt copied.'),
   );
   const populated = await page.evaluate(() => window.copiedJobFinderPrompt);
-  for (const value of values) assert.ok(populated.includes(value.trim()));
+  const answers = Object.fromEntries(answerKeys.map((key, index) => [key, values[index]]));
+  assert.equal(
+    populated,
+    buildJobFinderPrompt(answers, { usJobsOnly: false, preferRecent: false }),
+  );
   const status = await page.locator('#job-finder-copy-status').textContent();
   assert.match(status, /new ChatGPT conversation and upload your resumes/);
   assert.equal(await output.count(), 0);
@@ -945,7 +987,11 @@ test('Job Finder copies latest optional answers in one action without preview an
   await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
   assert.equal(await page.locator('#job-finder-copy-status').textContent(), status);
   assert.equal(await output.count(), 0);
-  assert.equal(await fields.first().inputValue(), values[0]);
+  assert.equal(await details.getAttribute('open'), null);
+  await summary.press('Enter');
+  for (const [index, value] of values.entries())
+    assert.equal(await fields.nth(index).inputValue(), value);
+  assert.equal(await page.locator('#job-finder-copy-status').textContent(), status);
   assert.equal(await usOnly.isChecked(), false);
   assert.equal(await recent.isChecked(), false);
   await mkdir('output/ui', { recursive: true });
@@ -960,6 +1006,7 @@ test('Job Finder copies latest optional answers in one action without preview an
   assert.equal(await output.count(), 0);
   await page.reload();
   await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
+  assert.equal(await details.getAttribute('open'), null);
   for (const field of await fields.all()) assert.equal(await field.inputValue(), '');
   assert.equal(await usOnly.isChecked(), true);
   assert.equal(await recent.isChecked(), true);

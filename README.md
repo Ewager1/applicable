@@ -64,7 +64,7 @@ Resume PDF Maker opens by default. Switch between the three tabs with a click or
 
 ### Job Finder
 
-Optionally answer the seven questions, adjust **Search U.S. jobs only** and **Prefer recently posted positions** (both on by default), and choose **Copy Prompt**. Paste the prompt into a new ChatGPT conversation and upload your existing resumes there. Answer its clarification questions; for future searches, ask “Look for jobs.” Verify openings and apply yourself. Applicable does not search or apply for jobs.
+Choose **Copy Prompt** immediately, or personalize it with three initial questions and four more under **Additional preferences**. **Search U.S. jobs only** and **Prefer recently posted positions** remain visible outside that disclosure (both on by default). Paste the prompt into a new ChatGPT conversation and upload your existing resumes there. Answer its clarification questions; for future searches, ask “Look for jobs.” Verify openings and apply yourself. Applicable does not search or apply for jobs.
 
 ### Resume Writer
 

@@ -397,9 +397,21 @@ iframe {
   margin-top: 18px;
 }
 
-.job-finder-setup form,
 .job-finder-output {
   margin-top: 18px;
+}
+
+.job-finder-additional {
+  margin-bottom: 24px;
+}
+
+.job-finder-additional > summary {
+  min-height: 44px;
+  padding: 10px 0;
+}
+
+.job-finder-additional[open] > summary {
+  margin-bottom: 12px;
 }
 
 .job-finder-field {
