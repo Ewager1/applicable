@@ -40,8 +40,8 @@ export function App() {
         <a className="brand" href="./" aria-label="Applicable home">
           Applicable<span aria-hidden="true">.</span>
         </a>
+        <p className="tagline">Find better jobs. Apply faster.</p>
       </header>
-      <h1 className="tagline">Find better jobs. Apply faster.</h1>
       <div className="workspace">
         <div className="view-tabs" role="tablist" aria-label="Applicable views">
           {views.map(({ id, label }, index) => (
@@ -83,8 +83,11 @@ export function App() {
           tabIndex={0}
         >
           <section className="intro" aria-labelledby="page-title">
-            <h2 id="page-title">Turn your resume into a polished PDF.</h2>
-            <p>Paste your resume in Applicable Format to create a PDF.</p>
+            <h1 id="page-title">Turn your resume into a polished PDF.</h1>
+            <p>
+              Resume PDF Maker turns your formatted resume text into a professional PDF. Paste your
+              resume, preview the result, and download it.
+            </p>
           </section>
           <ChatbotInstructions />
           <ResumeForm
@@ -108,9 +111,11 @@ export function App() {
           tabIndex={0}
         >
           <section className="intro" aria-labelledby="job-finder-title">
-            <h2 id="job-finder-title">Find jobs that fit you.</h2>
+            <h1 id="job-finder-title">Find jobs that fit you.</h1>
             <p>
-              Create a personalized ChatGPT job search based on your experience and preferences.
+              Job Finder sets up ChatGPT to find jobs based on your resume and preferences. It helps
+              screen suspicious listings, filter poor matches, and prioritize opportunities worth
+              your time.
             </p>
           </section>
           <p className="tool-guidance">

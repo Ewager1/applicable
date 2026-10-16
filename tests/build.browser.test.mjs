@@ -691,14 +691,22 @@ test('three local tools default to PDF Maker in one workspace with keyboard navi
   assert.equal(await page.locator('#job-finder-panel').isVisible(), false);
   assert.equal(
     await page.getByRole('heading', { level: 1 }).textContent(),
-    'Find better jobs. Apply faster.',
+    'Turn your resume into a polished PDF.',
   );
   assert.equal(await page.locator('.workspace > [role="tabpanel"]').count(), 3);
   await builder.press('ArrowRight');
   assert.equal(await finder.getAttribute('aria-selected'), 'true');
+  assert.equal(
+    await page.getByRole('heading', { level: 1 }).textContent(),
+    'Find jobs that fit you.',
+  );
   assert.equal(await page.getByRole('form', { name: 'Job Finder setup' }).isVisible(), true);
   await finder.press('ArrowRight');
   assert.equal(await writer.getAttribute('aria-selected'), 'true');
+  assert.equal(
+    await page.getByRole('heading', { level: 1 }).textContent(),
+    'Turn job descriptions into tailored resumes.',
+  );
   assert.equal(await page.getByRole('button', { name: 'Copy Prompt', exact: true }).count(), 0);
   await page
     .getByRole('button', { name: 'Open chatbot formatting instructions', exact: true })
@@ -802,10 +810,10 @@ for (const width of [320, 375, 1280]) {
     const page = await openPage(t, { viewport: { width, height: 900 }, hasTouch: width < 600 });
     const guide = page.getByRole('tab', { name: 'Job Finder', exact: true });
     const builder = page.getByRole('tab', { name: 'Resume PDF Maker', exact: true });
-    const intro = await page.getByRole('heading', { level: 1 }).boundingBox();
+    const intro = await page.locator('.masthead').boundingBox();
     const navigation = await page.getByRole('tablist').boundingBox();
     assert.ok(intro.y + intro.height <= navigation.y);
-    assert.ok(navigation.y < 350, 'Compact tagline keeps tools near the top on mobile');
+    assert.ok(navigation.y < 350, 'Compact branding keeps tools near the top on mobile');
     for (const tab of [
       guide,
       page.getByRole('tab', { name: 'Resume Writer', exact: true }),

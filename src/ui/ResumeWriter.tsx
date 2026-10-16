@@ -109,14 +109,18 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
   return (
     <section aria-labelledby="resume-writer-title">
       <div className="intro">
-        <h2 id="resume-writer-title">A resume for every opportunity.</h2>
+        <h1 id="resume-writer-title">Turn job descriptions into tailored resumes.</h1>
         <p>
-          Set up ChatGPT to tailor resumes using your professional experience and individual job
-          descriptions.
+          Resume Writer sets up a ChatGPT conversation that gets to know your professional
+          background. Once it's ready, simply paste a job description to create a tailored resume.
+        </p>
+        <p>
+          You can request a standard, readable resume or one formatted specifically for Applicable's
+          Resume PDF Maker. Just ask ChatGPT to switch between them.
         </p>
       </div>
       <section className="resume-writer-questionnaire" aria-labelledby="background-title">
-        <h3 id="background-title">Help your Resume Writer get to know you</h3>
+        <h2 id="background-title">Help your Resume Writer get to know you</h2>
         <p>
           Your existing resumes provide most of what ChatGPT needs. These optional questions help
           fill in important details about your experience and accomplishments.
@@ -161,9 +165,6 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
       <p className="tool-guidance">
         Copy your setup prompt, paste it into a new ChatGPT conversation, and upload your existing
         resumes. Once you're ready, share a job description to create a tailored resume.
-      </p>
-      <p className="tool-guidance">
-        You can request a standard resume or one formatted for Applicable's Resume PDF Maker.
       </p>
       <button className="secondary" type="button" onClick={onFormatHelp}>
         Open chatbot formatting instructions
