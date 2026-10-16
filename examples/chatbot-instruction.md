@@ -8,7 +8,11 @@ Format my complete resume for Applicable using only the facts and wording I supp
 
 Return the finished resume inside **one fenced `text` code block**, so I can use the chat interface's **Copy** button. Do not add commentary before or after that block. Keep the literal `@@...@@` markers below, each on its own line. Do not turn them into Markdown headings, bold labels or ordinary unmarked titles. The markers do not appear in the PDF.
 
-Leave out my name and personal contact details; I enter those in Applicable’s contact fields. Include only the body sections that apply, at most once each. Include at least one valid nonempty body section. Omit any inapplicable section entirely, including its marker; never invent facts or add placeholders such as "No certifications." Each included section must satisfy its required content below. Sections may arrive in any order; Applicable always displays them in the listed order:
+Include `@@CONTACT@@` once with `Name: my full name` on the next line. Name is required; ask me if it is missing. Optional single-line labels are `Email:`, `Phone:`, `LinkedIn:` and `Website:` (personal site or portfolio). Use each label at most once. Omit optional details I do not supply; blank optional labels are accepted. Never invent contact information. Applicable displays Email, LinkedIn, Website and Phone in that order.
+
+If I supply a target company, include `@@TARGET_COMPANY@@` once followed by exactly one nonempty plain-text line with its name, without a field label. Omit that section otherwise. Target company affects only the filename and never appears in the PDF or as an employer. Metadata sections may appear in any order among the body sections. Contact and target company do not count as body content.
+
+ Include only the body sections that apply, at most once each. Include at least one valid nonempty body section. Omit any inapplicable section entirely, including its marker; never invent facts or add placeholders such as "No certifications." Each included section must satisfy its required content below. Sections may arrive in any order; Applicable always displays them in the listed order:
 
 1. `@@PROFESSIONAL_TITLE@@`
    - Exactly one plain-text line containing my professional title.
@@ -28,4 +32,4 @@ Leave out my name and personal contact details; I enter those in Applicable’s 
    - One `Category: skill, skill` row per category, with exactly one colon per row.
    - Category names cannot contain colons. Individual skill names cannot contain colons or commas. Keep repeated items and category/item order. Do not leave empty items between commas.
 
-Use metadata values on single lines; they may contain ordinary prose colons. Use the explicit entry markers even for a single job, education entry or certification. Do not add other sections, fields, Markdown formatting or nested code blocks. Keep wording, capitalization, punctuation and duplicates unchanged unless I explicitly request language revisions. If a supplied skill name conflicts with a delimiter or a fact is missing, ask me rather than silently dropping or rewriting it.
+Use metadata values on single lines; they may contain ordinary prose colons. Use the explicit entry markers even for a single job, education entry or certification. Do not add other sections, fields, Markdown formatting or nested code blocks. Keep wording, capitalization, punctuation and duplicates unchanged unless I explicitly request language revisions. If a supplied skill name conflicts with a delimiter or a fact required for an included entry is missing, ask me rather than silently dropping or rewriting it.

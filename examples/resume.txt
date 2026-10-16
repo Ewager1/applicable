@@ -1,3 +1,10 @@
+@@CONTACT@@
+Name: Alex Morgan
+Email: alex@example.com
+LinkedIn: https://linkedin.com/in/example-alex
+Website: example.com/alex
+Phone: 555-010-0142
+
 @@PROFESSIONAL_TITLE@@
 Full-Stack Software Engineer
 

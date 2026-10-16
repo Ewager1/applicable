@@ -1,7 +1,5 @@
 # Applicable resume text format
 
-The optional **Company you’re applying to** field is entered separately in the app. It affects only the download filename, is never required, and must not be added as a resume marker or field.
-
 Applicable accepts a complete resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; use the chat code block’s Copy button and paste the entire result into the application. The parser, paste interface and shared production PDF integration are implemented. The application can copy the reusable chatbot instruction from its collapsible format help.
 
 See the complete [synthetic example](../examples/resume.txt), the [sparse example](../examples/resume-sparse.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
@@ -33,13 +31,31 @@ The result presents included content in contact → professional title → summa
 
 Omitted sections are accepted. Included blank or malformed sections block export, even when another section is valid. A marker by itself is empty. At least one valid nonempty body section is required. All requirements below are structural/nonempty checks, without judging the resume's writing, date formats, phone formats or email correctness. No missing fact is inferred.
 
-## Contact fields and migration
+## Contact and target-company metadata
 
-Enter Full Name, Email, LinkedIn, Website and Phone Number in the app, separately from this body text. Only Full Name is mandatory; all other fields may be blank. Display text remains literal. Usable email/web destinations become safe clickable links; phone remains text. Blank details and an empty contact row are omitted. There is no location field.
+Include one `@@CONTACT@@` section with a nonempty `Name:`. Optional labels are `Email:`, `Phone:`, `LinkedIn:` and `Website:` (a personal site or portfolio). Each label may appear at most once; optional labels may be omitted or blank. Blank optional values produce no contact text, links or spacing. Unknown labels and unlabeled lines block export. All values occupy one line; outer whitespace is structural and internal wording remains literal.
 
-The five contact fields are saved in localStorage for this browser and origin. Clearing a field saves its empty value; clearing site data removes the saved fields. Resume text and company are never saved. Blocked storage or invalid saved data produces a nonblocking warning; editing and PDF creation remain available.
+```text
+@@CONTACT@@
+Name: Alex Morgan
+Email: alex@example.com
+Phone: 555-010-0142
+LinkedIn: linkedin.com/in/example-alex
+Website: example.com/alex
 
-An old `@@CONTACT@@` or `# Contact` section blocks export with migration guidance: move its details into the fields and remove the section. The entire pasted source remains available. There is no automatic import, fallback or silent discard.
+@@TARGET_COMPANY@@
+Example Corporation
+```
+
+Name is required; no email, phone or website is forced. The PDF header displays optional contact details in Email → LinkedIn → Website → Phone order regardless of input field order. Usable email/web destinations become safe clickable links; unsupported destinations remain literal display text. Phone remains text. There is no location field.
+
+`@@TARGET_COMPANY@@` is optional. When included, supply exactly one nonempty plain-text line without a field label. It affects only the download filename; it never appears in the PDF, becomes an employer, or counts as a body section. Omit its marker when no target company applies. With no professional title, filenames fall back to `Resume.pdf` or `Untitled at Example Corporation Resume.pdf` when a company is supplied.
+
+Contact, target company and body sections may appear in any order. Marker names and field labels are case-insensitive; legacy `# Contact` and `# Target Company` section controls also work. Duplicate metadata sections, duplicate fields, included empty target company, extra lines and malformed markers block export with original source line numbers.
+
+Older body-only input must add `@@CONTACT@@` and `Name:`. The app never invents or retrieves a name. All information comes from the current paste; there are no separate contact/company inputs or saved profiles. Contact metadata alone, even with target company, cannot replace the required valid nonempty body section.
+
+Resume text, contact details and target company are never persisted. At startup, Applicable makes one best-effort removal of its old `applicable.contact.v1` storage key without reading or reusing its values. Other browser storage is untouched; unavailable cleanup does not block editing or export.
 
 ## Professional title and summary
 
@@ -124,14 +140,16 @@ Errors use human-language messages, such as “Add content under Education.” E
 `parseResume(source)` in `src/resume/parse.ts` is pure and uses no browser API, storage, dependencies or network requests. It returns either:
 
 ```js
-{ ok: true, resume: { title, summary, jobs, education, certifications, skills } }
+{ ok: true, resume: { name, contact, title, summary, jobs, education, certifications, skills }, targetCompany }
 { ok: false, errors: [{ message, line }] }
 ```
 
-The successful `resume` is a `ResumeBody` with this shape. Omitted title/summary use empty strings; omitted entry sections use empty arrays. `assembleResume(body, fields)` combines it with current contact fields into the canonical `Resume` for PDF rendering:
+The successful `resume` is the complete canonical `Resume`, including name and safe contact details. Omitted title/summary use empty strings; omitted entry sections use empty arrays. `targetCompany` is separate filename metadata and never enters the PDF model:
 
 ```js
 {
+  name: 'Alex Morgan',
+  contact: [{ text: 'alex@example.com', link: 'mailto:alex@example.com' }],
   title: 'Full-Stack Software Engineer',
   summary: 'Summary paragraphs.',
   jobs: [{ employer: 'Example Studio', role: 'Software Engineer', dates: '2023 - Present', location: 'Remote', bullets: ['Built accessible interfaces.'] }],

@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import pdfMake from 'pdfmake/build/pdfmake.js';
+import { parseResume } from '../src/resume/parse.ts';
+import { resumeFilename } from '../src/download-filename.ts';
 import { createPdfBytes } from '../src/pdf/render.ts';
 import { measuredPageCount, firstMeasuredPage } from '../src/pdf/pdfmake-adapter.ts';
 import { fontFiles } from '../src/pdf/fonts.ts';
@@ -714,4 +716,22 @@ test('experience alone retains multi-page first-bullet continuation and its head
   checkIncludedHeadings(pages, resume);
   assert.ok(pages[0].text.includes('Beginningofonelongbullet.'));
   assert.ok(pages.slice(1).some((page) => page.text.includes('Endofthesamelongbullet.')));
+});
+
+test('parsed target metadata names the file but never appears in PDF or font preflight', async () => {
+  const parsed = parseResume(
+    '@@TARGET_COMPANY@@\n漢字🚀 Company\n@@CONTACT@@\nName: Taylor Example\nEmail:\nPhone:\nLinkedIn:\nWebsite:\n@@SUMMARY@@\nResolved customer questions.',
+  );
+  assert.equal(parsed.ok, true, JSON.stringify(parsed.errors));
+  assert.equal(
+    resumeFilename(parsed.resume.title, parsed.targetCompany),
+    'Untitled at 漢字🚀 Company Resume.pdf',
+  );
+  const pages = await inspect(parsed.resume);
+  assert.equal(pages.length, 1);
+  const text = pages[0].text;
+  assert.ok(text.includes('TaylorExample'));
+  assert.ok(text.includes('Resolvedcustomerquestions.'));
+  assert.equal(text.includes('Company'), false);
+  assert.deepEqual(pages[0].annotations, []);
 });

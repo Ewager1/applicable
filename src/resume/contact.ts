@@ -1,13 +1,4 @@
-import type { ContactDetail, ContactFields, Resume, ResumeBody } from './types.ts';
-
-export const emptyContact: ContactFields = {
-  fullName: '',
-  email: '',
-  linkedIn: '',
-  website: '',
-  phoneNumber: '',
-};
-export const contactKeys = ['fullName', 'email', 'linkedIn', 'website', 'phoneNumber'] as const;
+import type { ContactDetail } from './types.ts';
 
 const firstPrintableAsciiCode = 32;
 const deleteControlCode = 127;
@@ -52,14 +43,19 @@ function safeLink(value: string, email = false): string | undefined {
   }
 }
 
-/** The validated body and current contact fields meet only at the PDF boundary. */
-export function assembleResume(body: ResumeBody, fields: ContactFields): Resume {
+/** Preserve the established header order independently of metadata field order. */
+export function contactDetails(fields: {
+  email?: string;
+  linkedin?: string;
+  website?: string;
+  phone?: string;
+}): ContactDetail[] {
   const contact: ContactDetail[] = [];
-  for (const key of ['email', 'linkedIn', 'website', 'phoneNumber'] as const) {
+  for (const key of ['email', 'linkedin', 'website', 'phone'] as const) {
     const text = fields[key];
-    if (!text.trim()) continue;
-    const link = key === 'phoneNumber' ? undefined : safeLink(text, key === 'email');
+    if (!text?.trim()) continue;
+    const link = key === 'phone' ? undefined : safeLink(text, key === 'email');
     contact.push(link ? { text, link } : { text });
   }
-  return { ...body, name: fields.fullName, contact };
+  return contact;
 }

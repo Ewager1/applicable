@@ -6,7 +6,6 @@ import { ChatbotInstructions } from './ChatbotInstructions.tsx';
 import { ResumeForm } from './ResumeForm.tsx';
 import { Status } from './Feedback.tsx';
 import { PdfResult } from './PdfResult.tsx';
-import { useContactFields } from './useContactFields.ts';
 import { useResumePdf } from './useResumePdf.ts';
 
 type View = 'job-finder' | 'resume-writer' | 'builder';
@@ -34,9 +33,7 @@ export function App() {
     setView(next);
     tabs.current[next]?.focus();
   }
-  const contact = useContactFields();
   const [source, setSource] = useState('');
-  const [company, setCompany] = useState('');
   const { state, status, invalidate, generate } = useResumePdf();
   return (
     <main>
@@ -118,24 +115,13 @@ export function App() {
         <ChatbotInstructions />
         <ResumeForm
           visible={view === 'builder'}
-          contact={contact.fields}
-          contactWarning={contact.warning}
-          onContactChange={(fields) => {
-            invalidate('Contact details updated. Create a PDF when you’re ready.');
-            contact.update(fields);
-          }}
           source={source}
-          company={company}
           state={state}
           onSourceChange={(value) => {
             invalidate('Resume updated. Create a PDF when you’re ready.');
             setSource(value);
           }}
-          onCompanyChange={(value) => {
-            invalidate('Company updated. Create a PDF when you’re ready.');
-            setCompany(value);
-          }}
-          onSubmit={() => void generate(source, company, contact.fields)}
+          onSubmit={() => void generate(source)}
         />
         <Status message={status} />
         <PdfResult artifact={state.phase === 'ready' ? state.artifact : undefined} />
@@ -183,8 +169,8 @@ export function App() {
       </div>
       <HowItWorks />
       <footer>
-        Contact details are saved only in this browser for future visits. Resume text and company
-        stay on this page and are not saved or uploaded.
+        Resume text, contact details and target company stay on this page and are not saved or
+        uploaded.
       </footer>
     </main>
   );
