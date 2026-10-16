@@ -2,9 +2,9 @@
 
 Applicable accepts a complete resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; use the chat code block’s Copy button and paste the entire result into the application. The parser, paste interface and shared production PDF integration are implemented. The application can copy the reusable chatbot instruction from its collapsible format help.
 
-See the complete [synthetic example](../examples/resume.txt), the [sparse example](../examples/resume-sparse.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
+See the complete [synthetic example](../examples/resume.txt), the [sparse example](../examples/resume-sparse.txt), the [volunteer/project example](../examples/resume-volunteer-projects.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
 
-## Six optional body sections
+## Eight optional body sections
 
 Include at least one body section with valid nonempty content. Omit any section that does not apply, including its marker; never add placeholder content such as "No certifications." Include each chosen literal section marker exactly once, on its own line, in any order. These symbols survive copying rendered Markdown instead of relying on Markdown heading syntax:
 
@@ -12,6 +12,8 @@ Include at least one body section with valid nonempty content. Omit any section 
 @@PROFESSIONAL_TITLE@@
 @@SUMMARY@@
 @@RELEVANT_EXPERIENCE@@
+@@VOLUNTEER_EXPERIENCE@@
+@@PROJECTS@@
 @@EDUCATION@@
 @@CERTIFICATIONS@@
 @@SKILLS@@
@@ -25,9 +27,9 @@ Only standalone controls are structural. Unknown or malformed standalone marker-
 
 ### Legacy compatibility
 
-Existing `# Professional Title`, `# Summary`, `# Relevant Experience`, `# Education`, `# Certifications`, `# Skills` section controls still work. The old entry controls are `## Job`, `## Education`, `## Certification`. They retain case/whitespace tolerance and require whitespace after `#`/`##`. You may safely mix recognized old and new controls on separate lines; repeating one section using another spelling still counts as a duplicate. Prefer the symbol format for new resumes. The section `@@EDUCATION@@` and entry `@@EDUCATION_ENTRY@@` are deliberately distinct.
+Supported `#` controls are `# Professional Title`, `# Summary`, `# Relevant Experience`, `# Volunteer Experience`, `# Projects`, `# Education`, `# Certifications`, `# Skills`. The corresponding entry controls are `## Job`, `## Volunteer`, `## Project`, `## Education`, `## Certification`. They retain case/whitespace tolerance and require whitespace after `#`/`##`. You may safely mix recognized old and new controls on separate lines; repeating one section using another spelling still counts as a duplicate. Prefer the symbol format for new resumes. The section `@@EDUCATION@@` and entry `@@EDUCATION_ENTRY@@` are deliberately distinct.
 
-The result presents included content in contact → professional title → summary → experience → education → certifications → skills order. Omitted sections produce no heading, divider or space. It preserves the input order of jobs, bullets, education entries, certifications, skill categories and skill items. Jobs are never sorted by date or relevance.
+The result presents included content in contact → professional title → summary → experience → volunteer experience → projects → education → certifications → skills order. Omitted sections produce no heading, divider or space. It preserves the input order of jobs, bullets, education entries, certifications, skill categories and skill items. Jobs are never sorted by date or relevance.
 
 Omitted sections are accepted. Included blank or malformed sections block export, even when another section is valid. A marker by itself is empty. At least one valid nonempty body section is required. All requirements below are structural/nonempty checks, without judging the resume's writing, date formats, phone formats or email correctness. No missing fact is inferred.
 
@@ -97,6 +99,42 @@ Location: Portland, OR
 
 Each job requires nonempty Employer, Role, Dates and Location, plus at least one nonempty bullet. A bullet starts with `-`, `*` or `•`, followed by a space/tab and text. All three markers normalize to ordinary PDF bullets. A continued bullet line must be indented by at least two spaces or one tab; its outer indentation is removed and its text joins the prior bullet with a space. Blank lines between bullets do not create entries or extra bullets. Unindented continuation text is an error, not a new inferred field or a silently omitted line. An empty bullet is an error even if followed by continuation text. Continued bullet text can contain colons, commas or other prose punctuation.
 
+## Volunteer experience
+
+Use `@@VOLUNTEER_EXPERIENCE@@` and start every entry with `@@VOLUNTEER@@`. `Organization:` and at least one nonempty bullet are required. `Role:`, `Dates:` and `Location:` are optional single-line values; omit them or leave them blank when they do not apply. Do not invent an employer, role, dates or location. Included field labels may appear only once and all metadata belongs above the bullets.
+
+```text
+@@VOLUNTEER_EXPERIENCE@@
+@@VOLUNTEER@@
+Organization: Example Food Pantry
+Role: Volunteer Coordinator
+Dates: 2022 - Present
+Location: Portland, OR
+- Organized weekly food distribution.
+  Documented procedures for new volunteers.
+```
+
+Bullets use the same markers, indentation and preservation rules as jobs. Repeat `@@VOLUNTEER@@` for more entries; supplied entry order is retained. Optional metadata produces no empty row in the PDF.
+
+## Projects
+
+Use `@@PROJECTS@@` and start every entry with `@@PROJECT@@`. `Name:` is required, together with a nonempty `Description:` and/or at least one nonempty bullet. `Dates:` and `Link:` are optional. Optional blank values are omitted. A name or link alone is not meaningful project content. Do not force a project into employment fields or invent an employer/job title.
+
+```text
+@@PROJECTS@@
+@@PROJECT@@
+Name: Community Resource Guide
+Dates: 2024
+Link: https://example.com/resource-guide
+Description: Created a practical guide to local support services.
+  Updated details with community partners.
+- Improved navigation based on reader feedback.
+```
+
+Description begins on its labeled line and may continue on lines indented by two spaces or a tab, before any bullets. Continuations join with one space; blank separator lines do not create paragraphs. Bullets follow the existing experience rules. Each labeled field may appear only once; metadata belongs above the bullets. Repeated entries preserve source order. Unknown labels, empty bullets, unlabeled/unindented description continuations and malformed markers block the entire resume with source lines.
+
+A nonempty Link must be a usable HTTP(S) URL or dotted bare web address. Unsafe schemes, credentials and whitespace inside a URL block export. Literal link text stays visible; its PDF destination uses safe URL serialization, including encoded Unicode paths. Links are not fetched. The project name, optional date/link rows and beginning of the description or first bullet stay together; long descriptions/bullets can continue across pages. Oversized heading groups receive the existing recoverable fit error rather than losing content.
+
 ## Education and certifications
 
 Use an explicit marker for every entry. For an included section, every displayed field below is required and nonempty, once per entry. Fields may appear in any order and values are single-line text. Their date values are preserved as supplied; the parser does not interpret them.
@@ -140,7 +178,7 @@ Errors use human-language messages, such as “Add content under Education.” E
 `parseResume(source)` in `src/resume/parse.ts` is pure and uses no browser API, storage, dependencies or network requests. It returns either:
 
 ```js
-{ ok: true, resume: { name, contact, title, summary, jobs, education, certifications, skills }, targetCompany }
+{ ok: true, resume: { name, contact, title, summary, jobs, volunteerExperience, projects, education, certifications, skills }, targetCompany }
 { ok: false, errors: [{ message, line }] }
 ```
 
@@ -153,6 +191,8 @@ The successful `resume` is the complete canonical `Resume`, including name and s
   title: 'Full-Stack Software Engineer',
   summary: 'Summary paragraphs.',
   jobs: [{ employer: 'Example Studio', role: 'Software Engineer', dates: '2023 - Present', location: 'Remote', bullets: ['Built accessible interfaces.'] }],
+  volunteerExperience: [],
+  projects: [],
   education: [{ qualification: 'Example qualification', institution: 'Example State University', dates: '2020' }],
   certifications: [{ title: 'Example Certificate', issuer: 'Example Institute', dates: '2024' }],
   skills: [{ category: 'Languages', items: 'JavaScript, TypeScript' }]
@@ -160,3 +200,7 @@ The successful `resume` is the complete canonical `Resume`, including name and s
 ```
 
 Skill items remain a validated string to preserve original separators/spacing and to fit the flowing reference layout. The shared production template now consumes this complete model, including structured certification fields. See [PDF template behavior and verification](pdf-template.md). No UI or PDF generation is performed by the parser, and failures deliberately expose no partial `resume`.
+
+## Possible future additions
+
+Awards and Honors, Professional Affiliations, Publications, Languages, additional licensing/training categories, configurable section order and multiple PDF templates are possible future enhancements. They are not accepted sections or controls in this format.

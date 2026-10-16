@@ -18,6 +18,7 @@ const routes = new Map([
     'header-fit.ts',
     'pdfmake-adapter.ts',
   ].map((file) => [`/src/pdf/${file}`, [`src/pdf/${file}`, 'text/javascript']]),
+  ['/src/resume/contact.ts', ['src/resume/contact.ts', 'text/javascript']],
   [
     '/node_modules/pdfmake/build/pdfmake.min.js',
     ['node_modules/pdfmake/build/pdfmake.min.js', 'text/javascript'],

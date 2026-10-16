@@ -4,7 +4,7 @@ const firstPrintableAsciiCode = 32;
 const deleteControlCode = 127;
 
 /** Link only recognized email/web destinations; all supplied display text stays literal. */
-function safeLink(value: string, email = false): string | undefined {
+export function safeLink(value: string, email = false): string | undefined {
   const destination = value.trim();
   if (
     !destination ||

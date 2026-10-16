@@ -1135,3 +1135,47 @@ test('optional sections export sparse content and use the existing title-free fi
   const named = await readPdf(await submit(page), 'Untitled at Example Team Resume.pdf');
   assert.equal(named.text, pdf.text);
 });
+
+test('volunteer/project paste exports new sections, links and company filename without invented jobs', async (t) => {
+  const page = await openPage(t);
+  const source = await readFile(
+    new URL('../examples/resume-volunteer-projects.txt', import.meta.url),
+    'utf8',
+  );
+  await page.locator('#resume').fill(source);
+  const pdf = await readPdf(await submit(page), 'Untitled at Example Community Center Resume.pdf');
+  for (const text of [
+    'Taylor Example',
+    'VOLUNTEER EXPERIENCE',
+    'Example Food Pantry',
+    'PROJECTS',
+    'Community Resource Guide',
+    'Neighborhood Survey',
+  ])
+    assert.ok(pdf.text.includes(compact(text)));
+  for (const text of [
+    'RELEVANT EXPERIENCE',
+    'EDUCATION',
+    'CERTIFICATIONS',
+    'SKILLS',
+    'Example Community Center',
+  ])
+    assert.equal(pdf.text.includes(compact(text)), false);
+  assert.ok(pdf.annotations.some((row) => row.url === 'https://example.com/resource-guide'));
+  assert.equal(await page.locator('#resume').inputValue(), source);
+  assert.deepEqual(Buffer.from((await artifactUrls(page)).bytes), pdf.bytes);
+  const invalid = source.replace(
+    'Link: https://example.com/resource-guide',
+    'Link: javascript:alert(1)',
+  );
+  await page.locator('#resume').fill(invalid);
+  await page.locator('#create-pdf').click();
+  await page
+    .locator('#error-list')
+    .filter({ hasText: 'usable HTTP(S) or bare web address' })
+    .waitFor();
+  assert.equal(await page.locator('#resume').inputValue(), invalid);
+  assert.equal(await page.locator('#result').isVisible(), false);
+  await page.locator('#resume').fill(source);
+  await readPdf(await submit(page), 'Untitled at Example Community Center Resume.pdf');
+});

@@ -33,9 +33,11 @@ Render groups in this fixed order, even when input sections arrive in another or
 2. Professional title
 3. Summary
 4. Relevant Experience
-5. Education
-6. Certifications
-7. Skills
+5. Volunteer Experience
+6. Projects
+7. Education
+8. Certifications
+9. Skills
 
 Contact information, professional title, and summary are content blocks, not additional visible uppercase headings. The remaining groups use the visible headings shown above.
 
@@ -50,7 +52,7 @@ Contact information, professional title, and summary are content blocks, not add
 
 Use the canonical [resume text format](input-format.md), with a complete [synthetic example](../examples/resume.txt) and [reusable chatbot instruction](../examples/chatbot-instruction.md). The pure parser implements this format without guessing at arbitrary free-form resumes.
 
-The preferred contract uses six individually optional body standalone `@@...@@` section markers, repeated `@@JOB@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` boundaries, labeled metadata, and `Category: comma-separated skills` rows. Legacy `#`/`##` controls remain compatible, including safe mixed formats. A single optional outer plain-text code fence is accepted without changing source line numbers; unknown/nested fences and exterior content block export. Unmarked headings are not inferred. Section blocks may arrive in a different order. Jobs retain source order. Certification title, issuer and dates remain separate fields for the production template.
+The preferred contract uses eight individually optional body standalone `@@...@@` section markers, repeated `@@JOB@@`, `@@VOLUNTEER@@`, `@@PROJECT@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` boundaries, labeled metadata, and `Category: comma-separated skills` rows. Legacy `#`/`##` controls remain compatible, including safe mixed formats. A single optional outer plain-text code fence is accepted without changing source line numbers; unknown/nested fences and exterior content block export. Unmarked headings are not inferred. Section blocks may arrive in a different order. Jobs retain source order. Certification title, issuer and dates remain separate fields for the production template.
 
 Required labels, minimum entry values, whitespace normalization, indented bullet continuations, duplicate handling and human-language errors are documented in the input contract. Skills use exactly one colon per row; unsupported delimiters and malformed content cause blocking errors rather than silent guessing. No partial resume is exposed on failure.
 
@@ -58,7 +60,7 @@ Required labels, minimum entry values, whitespace normalization, indented bullet
 
 - Use programmatic checks without AI or external requests.
 - Reject empty input and missing or whitespace-only required values, including Name in Contact metadata and values in included body sections.
-- The six body groups are individually optional: professional title, summary, Relevant Experience, Education, Certifications, and Skills. Contact metadata with Name is required in pasted text; Email, LinkedIn, Website and Phone may be omitted or blank. Older body-only input receives guidance to add Contact and Name. Require at least one valid nonempty body section. Included blank or malformed sections block export; omitted sections have no PDF heading, divider or spacing.
+- The eight body groups are individually optional: professional title, summary, Relevant Experience, Volunteer Experience, Projects, Education, Certifications, and Skills. Contact metadata with Name is required in pasted text; Email, LinkedIn, Website and Phone may be omitted or blank. Older body-only input receives guidance to add Contact and Name. Require at least one valid nonempty body section. Included blank or malformed sections block export; omitted sections have no PDF heading, divider or spacing.
 - A heading by itself does not count as content.
 - Show clear human-language warnings naming what is missing, such as "Add content under Education." Keep the source text available for correction; do not expose parser jargon or raw exceptions as validation feedback.
 - Report missing fields and malformed or unrecognized blocks with useful locations where practical.
@@ -121,3 +123,9 @@ Follow [AGENTS.md](../AGENTS.md#git-and-github) for engineering/merge gates, [ag
 - Any preview shows the exported artifact accurately.
 - Local installation and usage are tested and documented.
 - Relevant checks pass and the final changes are reviewed through the authorized workflow.
+
+### Additional background sections
+
+Volunteer Experience uses Organization plus responsibility/accomplishment bullets, with optional Role, Dates and Location. Projects use Name, optional Dates/Link and a description and/or bullets; they do not require employment metadata. Both are optional, retain supplied entry order, and use existing styles and header/content pagination safeguards. See the input format for exact markers, validation and continuation rules.
+
+Possible future enhancements include Awards and Honors, Professional Affiliations, Publications, Languages, additional licensing or professional training categories, user-configurable section order and multiple PDF templates. None is implemented by these two additions.

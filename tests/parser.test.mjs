@@ -63,6 +63,8 @@ test('legacy example preserves normalized resume data, links, and entry metadata
         bullets: ['Maintained API integrations and investigated production issues.'],
       },
     ],
+    volunteerExperience: [],
+    projects: [],
     education: [
       {
         institution: 'Example State University',
@@ -102,6 +104,8 @@ test('shuffled sections normalize presentation groups while reversed jobs stay r
     'title',
     'summary',
     'jobs',
+    'volunteerExperience',
+    'projects',
     'education',
     'certifications',
     'skills',
@@ -543,6 +547,8 @@ test('a few meaningful sections work without title, summary, jobs, education or 
       title: '',
       summary: '',
       jobs: [],
+      volunteerExperience: [],
+      projects: [],
       education: [],
       certifications: [],
       skills: [{ category: 'Engineering', items: 'Automated testing, Git' }],
@@ -647,4 +653,164 @@ test('included target company must contain one plain line and cannot repeat', ()
     'Target Company appears more than once',
   );
   rejected(`${source}\n@@TARGET_COMPANY@\nOne`, 'recognized @@MARKER@@');
+});
+
+const broaderSource = await readFile(
+  new URL('../examples/resume-volunteer-projects.txt', import.meta.url),
+  'utf8',
+);
+const minimalContact = '@@CONTACT@@\nName: Taylor Example\n';
+const volunteerText =
+  '@@VOLUNTEER_EXPERIENCE@@\n@@VOLUNTEER@@\nOrganization: Example Pantry\n- Welcomed community members.\n  Documented procedures.';
+const projectText =
+  '@@PROJECTS@@\n@@PROJECT@@\nName: Resource Guide\nDescription: Collected useful resources.\n  Shared them with community members.';
+
+test('volunteer/project example preserves distinct models, optional defaults and multiline wording', () => {
+  const result = parseResume(broaderSource);
+  assert.equal(result.ok, true, JSON.stringify(result.errors));
+  assert.deepEqual(result.resume.volunteerExperience, [
+    {
+      organization: 'Example Food Pantry',
+      role: 'Volunteer Coordinator',
+      dates: '2022 - Present',
+      location: 'Portland, OR',
+      bullets: [
+        'Organized weekly food distribution and welcomed community members. Documented procedures for new volunteers.',
+      ],
+    },
+    {
+      organization: 'Example Neighborhood Group',
+      role: '',
+      dates: '',
+      location: '',
+      bullets: ['Helped prepare accessible community events.'],
+    },
+  ]);
+  assert.deepEqual(result.resume.projects, [
+    {
+      name: 'Community Resource Guide',
+      dates: '2024',
+      link: 'https://example.com/resource-guide',
+      description:
+        'Created a practical guide to local support services. Updated contact information with community partners.',
+      bullets: ['Improved navigation based on reader feedback.'],
+    },
+    {
+      name: 'Neighborhood Survey',
+      dates: '',
+      link: '',
+      description: '',
+      bullets: ['Gathered resident feedback and summarized priorities for a community meeting.'],
+    },
+  ]);
+  assert.deepEqual(result.resume.jobs, []);
+  assert.deepEqual(result.resume.education, []);
+});
+
+for (const [label, text, field] of [
+  ['volunteer', volunteerText, 'volunteerExperience'],
+  ['project', projectText, 'projects'],
+]) {
+  test(`${label} alone supplies meaningful body content and accepts legacy/case controls`, () => {
+    const result = parseResume(minimalContact + text);
+    assert.equal(result.ok, true, JSON.stringify(result.errors));
+    assert.equal(result.resume[field].length, 1);
+    const legacy = text
+      .replace('@@VOLUNTEER_EXPERIENCE@@', ' # VOLUNTEER  EXPERIENCE ')
+      .replace('@@VOLUNTEER@@', '## volunteer')
+      .replace('@@PROJECTS@@', '# projects')
+      .replace('@@PROJECT@@', '## PROJECT');
+    assert.deepEqual(parseResume(minimalContact + legacy), result);
+    rejected(text, 'Add @@CONTACT@@ with Name:');
+  });
+}
+
+test('new sections and entries preserve input order while normalizing only section order', () => {
+  const sections = broaderSource
+    .trim()
+    .split(/\n(?=@@(?:CONTACT|TARGET_COMPANY|VOLUNTEER_EXPERIENCE|PROJECTS)@@)/);
+  const reordered = parseResume(sections.reverse().join('\n'));
+  const original = parseResume(broaderSource);
+  assert.deepEqual(reordered, original);
+  const reversedProjects = broaderSource.replace(
+    /@@PROJECTS@@[\s\S]*/,
+    '@@PROJECTS@@\n@@PROJECT@@\nName: Second Project\n- Second work.\n@@PROJECT@@\nName: First Project\n- First work.',
+  );
+  assert.deepEqual(
+    parseResume(reversedProjects).resume.projects.map((entry) => entry.name),
+    ['Second Project', 'First Project'],
+  );
+});
+
+test('projects accept descriptions, bullets or both and validate usable web links', () => {
+  for (const content of [
+    'Description: Useful work.',
+    '- Useful work.',
+    'Description: Useful work.\n- Documented the result.',
+  ]) {
+    const result = parseResume(
+      `${minimalContact}@@PROJECTS@@\n@@PROJECT@@\nName: Resource Guide\nDates:\nLink: example.com/é?q=yes#guide\n${content}`,
+    );
+    assert.equal(result.ok, true, JSON.stringify(result.errors));
+    assert.equal(result.resume.projects[0].link, 'example.com/é?q=yes#guide');
+  }
+  for (const link of [
+    'javascript:alert(1)',
+    'mailto:person@example.com',
+    'ftp://example.com',
+    'https://user:password@example.com',
+    'https://',
+    'https://example.com/has space',
+  ]) {
+    const input = `${minimalContact}@@PROJECTS@@\n@@PROJECT@@\nName: Guide\nLink: ${link}\n- Useful work.`;
+    const result = rejected(input, 'usable HTTP(S) or bare web address');
+    assert.equal(result.errors[0].line, 6);
+  }
+});
+
+for (const [title, entry, text] of [
+  ['VOLUNTEER_EXPERIENCE', 'VOLUNTEER', volunteerText],
+  ['PROJECTS', 'PROJECT', projectText],
+]) {
+  test(`${title} included empty, duplicate or malformed entries block the whole result`, () => {
+    rejected(`${minimalContact}@@SUMMARY@@\nUseful summary.\n@@${title}@@`, 'Add content under');
+    rejected(
+      `${minimalContact}@@${title}@@\n@@${entry}@@`,
+      entry === 'VOLUNTEER' ? 'Add organization' : 'Add name',
+    );
+    rejected(`${minimalContact}${text}\n@@${title}@@`, 'appears more than once');
+    rejected(`${minimalContact}${text.replace(`@@${entry}@@`, '@@JOB@@')}`, 'Start each');
+    rejected(
+      `${minimalContact}${text.replace(`@@${entry}@@`, `@@${entry}@@\nUnknown: Value`)}`,
+      'Unrecognized content',
+    );
+    rejected(
+      `${minimalContact}${text.replace(`@@${entry}@@`, `@@${entry}@@\n${entry === 'VOLUNTEER' ? 'Organization: Duplicate' : 'Name: Duplicate'}`)}`,
+      'appears more than once',
+    );
+    rejected(`${minimalContact}${text}\n- `, 'Add text after');
+    rejected(
+      `${minimalContact}${text}\nUnindented continuation.`,
+      entry === 'VOLUNTEER' ? 'Indent continued bullet' : 'Unrecognized content',
+    );
+    rejected(
+      `${minimalContact}${text.replace(`@@${entry}@@`, `@@${entry}@`)}`,
+      'recognized @@MARKER@@',
+    );
+  });
+}
+
+test('project name/link alone and volunteer organization alone do not invent meaningful content', () => {
+  rejected(
+    `${minimalContact}@@PROJECTS@@\n@@PROJECT@@\nName: Guide\nLink: https://example.com\nDescription:`,
+    'Add a description or at least one bullet',
+  );
+  rejected(
+    `${minimalContact}@@VOLUNTEER_EXPERIENCE@@\n@@VOLUNTEER@@\nOrganization: Pantry`,
+    'Add at least one bullet',
+  );
+  rejected(
+    `${minimalContact}@@PROJECTS@@\n@@PROJECT@@\nName: Guide\n  Unsupported continuation.\n- Work.`,
+    'Put continued bullet text',
+  );
 });
