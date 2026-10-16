@@ -1,30 +1,26 @@
-# PDF rendering investigation (A1)
+# PDF proof and regression resources
 
-This is a synthetic, developer-only proof, not the finished paste-to-PDF application. A4 promotes its template into shared production modules under `src/pdf/`; see [the production template and verification record](../docs/pdf-template.md). The fixture objects do not define the future text input contract. No reference resumes or personal information are included.
+This directory retains the synthetic PDF investigation, testing fixtures, reviewed PDF baselines and regression checks. It shares the production TypeScript renderer in `src/pdf/` with the React/TypeScript application; the separate proof page remains a small JavaScript development tool. The [input contract](../docs/input-format.md) defines pasted text, while proof fixture objects supply rendering inputs. No personal resumes or contact details are included.
+
+- `fixtures.mjs` supplies short, typical and long rendering inputs; `production-fixtures.mjs` parses the canonical example and supplies pagination/long-value stress cases.
+- `document.mjs` and `pdf.mjs` reuse the production template and renderer; `generate.mjs` writes disposable samples.
+- `index.html`, `browser.mjs` and `serve.mjs` provide the loopback-only interactive proof. `render.test.mjs` and `browser.test.mjs` retain PDF and actual preview/download regression checks.
+- `baseline/typical.pdf` is the current reviewed visual baseline. `baseline/pre-refresh/` preserves the frozen old-font PDF, identical synthetic data and its license. Keep these source-controlled resources; only scratch output belongs in ignored `output/`.
 
 ## Reproduce
 
-Prerequisites: Node.js 22.13+ in the 22.x series, or Node.js 24+, and npm. Use a current desktop Chrome installation for the browser check. Installation downloads dependencies; generation itself uses only local assets.
+Use the [supported Node version and local installation instructions](../README.md#download-and-run-locally). After installing dependencies, run from the repository root:
 
 ```sh
-npm ci
-npm test
 npm run proof:generate
 npm run proof:serve
 ```
 
 Open http://127.0.0.1:4173/, select an example, generate, inspect the actual embedded PDF, and download it. The tiny development server binds only to the loopback address and serves an explicit asset list. Stop it with Ctrl+C. It does not receive or generate resume content; all PDF generation happens in the browser. Opening the HTML directly with `file://` is unsupported because JavaScript modules and font loading need a local origin.
 
-For automated browser verification, stop the manual proof server first; the test command now owns its temporary servers. Build the application, then run:
+For automated checks, stop the manual proof server first and follow the [maintenance check commands](../docs/maintenance.md#choose-verification-by-the-change). The browser command owns its temporary servers; [browser selection/setup](../README.md#verification-and-build) is documented in the main README. PDF.js and Playwright are test-only dependencies. The browser test saves an ignored screenshot to `output/pdf/browser-preview.png`.
 
-```sh
-npm run build
-npm run test:browser
-```
-
-Playwright uses installed Chrome by default. To use another Chromium executable, set `CHROME_PATH` to its absolute path. To use the version-matched browser used in CI, run `npx --no-install playwright install chromium` and set `PLAYWRIGHT_BROWSER=chromium`. No browser download occurs automatically when running the checks. PDF.js and Playwright are test-only dependencies, not product assets. The browser test saves an ignored screenshot to `output/pdf/browser-preview.png`.
-
-The seven generated PDFs are written to `output/pdf/` (ignored), including the parsed canonical example and targeted split-job, multi-page-bullet and long-value fixtures. To render every page for visual review, install Poppler and run:
+The seven generated PDFs are written to `output/pdf/` (ignored), including the parsed canonical example and targeted split-job, multi-page-bullet and long-value fixtures. To render sample pages for visual review, install Poppler; for example:
 
 ```sh
 pdftoppm -scale-to 1200 -png output/pdf/short.pdf output/pdf/short
@@ -32,11 +28,11 @@ pdftoppm -scale-to 1200 -png output/pdf/typical.pdf output/pdf/typical
 pdftoppm -scale-to 1200 -png output/pdf/long.pdf output/pdf/long
 ```
 
-A2 adds application development/build scripts, lint and CI; see the [main README](../README.md). This proof does not implement the parser, user resume form or final packaging. F1 migrates the shared PDF core to strict TypeScript; fixtures and developer tools remain JavaScript. The allowlisted proof server erases core types in memory and serves JavaScript, without a second emitted build. Direct Node imports need `--experimental-strip-types`; the package commands include it.
+The proof server transforms only allowlisted TypeScript core routes in memory and serves JavaScript, without a second emitted build. Direct Node imports need `--experimental-strip-types`; package commands include it. See [the TypeScript/JavaScript boundary](../docs/development.md#typescriptjavascript-boundary).
 
-## Decision
+## Rendering approach
 
-Use native browser HTML/CSS/JavaScript plus **pdfmake 0.2.20**, pinned with `package-lock.json`. Its declarative document layout handles automatic pagination, selectable text, local font embedding, and link annotations. This avoids building a pagination engine or requiring a generation backend. The browser bundle is approximately 1.3 MB uncompressed; the three bundled fonts total approximately 472 KiB. These are acceptable for a local tool; no UI framework is justified.
+The application uses React/TypeScript for its interface and a framework-independent TypeScript PDF core with pinned **pdfmake 0.2.20**. Its declarative layout handles automatic pagination, selectable text, local font embedding and link annotations. PDF generation runs in the browser without a generation backend. The proof exercises that same core without mounting the application interface.
 
 The same document definition and bundled fonts generate the Node verification samples and browser PDFs. Node generation is a development check, not a production architecture requirement. The browser creates one PDF buffer and one Blob URL shared by the preview iframe and download link; it does not generate a second HTML approximation or require a print dialog. The automated browser check compares the actual downloaded file bytes with bytes fetched from that preview URL for all three examples.
 
@@ -48,23 +44,16 @@ Every top-level heading/job header is linked to its next content block when pagi
 
 ### Dependencies and licenses
 
-| Dependency                            | Purpose                                                | License / source                                                                                                                                                                                            |
-| ------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| pdfmake 0.2.20                        | Only product dependency; browser PDF generation        | MIT, installed `node_modules/pdfmake/LICENSE`; [official source](https://github.com/bpampuch/pdfmake/tree/0.2.20), [browser documentation](https://pdfmake.github.io/docs/0.1/getting-started/client-side/) |
-| Source Sans 3 Regular, Semibold, Bold | Local static TTFs, embedded/subset into generated PDFs | SIL OFL 1.1; full license in `assets/fonts/OFL.txt`; [Adobe release/source record](../assets/fonts/SOURCE.md)                                                                                               |
-| pdfjs-dist 4.10.38                    | Test-only text, annotation and geometry inspection     | Apache 2.0, installed `node_modules/pdfjs-dist/LICENSE`; [official source](https://github.com/mozilla/pdf.js)                                                                                               |
-| Playwright 1.62.1                     | Test-only real browser downloads and preview checks    | Apache 2.0, installed `node_modules/playwright/LICENSE`; [official source](https://github.com/microsoft/playwright)                                                                                         |
-
-Current static TTFs come from Adobe’s pinned 3.052R release, with exact source revision and original OFL recorded in `assets/fonts/SOURCE.md`. Poppins is retained only as embedded historical PDF subsets with its separate license. The bundled copies are the runtime sources; generation makes no font request to an external host. Any later distribution must preserve dependency notices, and font redistribution must retain `OFL.txt`. The npm lockfile records all transitive packages and integrity hashes. pdfmake's package installation currently emits upstream deprecation notices for `crypto-js` and `jpeg-exif`; the 2026-10-15 production dependency audit reported no known vulnerabilities. This snapshot is not a guarantee about future advisories.
+[Tool choices](../docs/development.md#tool-choices) describe application and development dependencies. [Third-party notices](../THIRD_PARTY_NOTICES.md) own the runtime inventory, licenses and production notice packaging; [the font source record](../assets/fonts/SOURCE.md) pins the bundled Adobe release. Poppins remains only in the frozen historical PDF subsets with its original license. PDF.js and Playwright inspect generated output during development and are excluded from the application build.
 
 ### Limits and deferred work
 
 - Native PDF preview was verified in desktop Chrome. Other browsers, mobile devices, and browsers configured to download every PDF may not render inline. Download remains available. No separate viewer is needed or included in the product proof.
 - Browser PDF controls, zoom and antialiasing vary. The preview is the exact exported artifact, but viewport appearance need not match other PDF viewers pixel for pixel.
-- Font coverage is bounded by the bundled Source Sans 3 files. Accented Latin text, curly quotes and an em dash are verified. A4 adds glyph coverage checks that block unsupported displayed characters with a recoverable message; no glyph is silently dropped. See the production template document.
+- Font coverage is bounded by the bundled Source Sans 3 files. Accented Latin text, curly quotes and an em dash are verified. Production glyph coverage checks block unsupported displayed characters with a recoverable message; no glyph is silently dropped. See the [production template](../docs/pdf-template.md).
 - A4 verifies long unbroken tokens, long wrapping metadata, a job continued across pages and one bullet continued across three pages. C5 measures explicit keep-groups with the same engine and blocks headers that cannot fit with the beginning of their following content on a fresh page, preserving input for correction; no arbitrary-document fidelity claim is made.
 - PDFs are searchable/selectable but are not tagged accessibility PDFs. The proof's automated bounds checks complement visual review; they do not prove the absence of every possible overlap.
-- Styling uses the fixed Applicable visual identity, with no claim of exact reproduction for every possible input. No parsing, rewriting, storage, external AI or resume validation is implemented.
+- Styling uses the fixed Applicable visual identity, with no claim of exact reproduction for every possible input. The interactive proof uses synthetic fixture objects; use the application to exercise pasted-text parsing, validation and contact fields.
 
 ## Retained baseline and layout checklist
 
