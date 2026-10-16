@@ -3,14 +3,17 @@ const MAX_FILENAME_BYTES = 180;
 function cleanPart(value: string) {
   // Remove hidden directional controls and lone surrogates; keep safe Unicode,
   // including joiners used in emoji. These edits affect filenames only.
-  return value.replace(/[<>:"/\\|?*]/g, ' ')
+  return value
+    .replace(/[<>:"/\\|?*]/g, ' ')
     .replace(/[\p{Cc}\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/gu, ' ')
     .replace(/[\uD800-\uDFFF]/gu, ' ')
-    .replace(/\s+/gu, ' ').trim();
+    .replace(/\s+/gu, ' ')
+    .trim();
 }
 
 // encodeURIComponent counts UTF-8 bytes without a browser/Node-specific API.
-const byteLength = (value: string) => encodeURIComponent(value).replace(/%[0-9A-F]{2}|./g, 'x').length;
+const byteLength = (value: string) =>
+  encodeURIComponent(value).replace(/%[0-9A-F]{2}|./g, 'x').length;
 
 function fitPart(value: string, budget: number) {
   let bounded = '';

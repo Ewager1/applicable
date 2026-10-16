@@ -48,12 +48,12 @@ Every top-level heading/job header is linked to its next content block when pagi
 
 ### Dependencies and licenses
 
-| Dependency | Purpose | License / source |
-| --- | --- | --- |
-| pdfmake 0.2.20 | Only product dependency; browser PDF generation | MIT, installed `node_modules/pdfmake/LICENSE`; [official source](https://github.com/bpampuch/pdfmake/tree/0.2.20), [browser documentation](https://pdfmake.github.io/docs/0.1/getting-started/client-side/) |
-| Source Sans 3 Regular, Semibold, Bold | Local static TTFs, embedded/subset into generated PDFs | SIL OFL 1.1; full license in `assets/fonts/OFL.txt`; [Adobe release/source record](../assets/fonts/SOURCE.md) |
-| pdfjs-dist 4.10.38 | Test-only text, annotation and geometry inspection | Apache 2.0, installed `node_modules/pdfjs-dist/LICENSE`; [official source](https://github.com/mozilla/pdf.js) |
-| Playwright 1.62.1 | Test-only real browser downloads and preview checks | Apache 2.0, installed `node_modules/playwright/LICENSE`; [official source](https://github.com/microsoft/playwright) |
+| Dependency                            | Purpose                                                | License / source                                                                                                                                                                                            |
+| ------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| pdfmake 0.2.20                        | Only product dependency; browser PDF generation        | MIT, installed `node_modules/pdfmake/LICENSE`; [official source](https://github.com/bpampuch/pdfmake/tree/0.2.20), [browser documentation](https://pdfmake.github.io/docs/0.1/getting-started/client-side/) |
+| Source Sans 3 Regular, Semibold, Bold | Local static TTFs, embedded/subset into generated PDFs | SIL OFL 1.1; full license in `assets/fonts/OFL.txt`; [Adobe release/source record](../assets/fonts/SOURCE.md)                                                                                               |
+| pdfjs-dist 4.10.38                    | Test-only text, annotation and geometry inspection     | Apache 2.0, installed `node_modules/pdfjs-dist/LICENSE`; [official source](https://github.com/mozilla/pdf.js)                                                                                               |
+| Playwright 1.62.1                     | Test-only real browser downloads and preview checks    | Apache 2.0, installed `node_modules/playwright/LICENSE`; [official source](https://github.com/microsoft/playwright)                                                                                         |
 
 Current static TTFs come from Adobe’s pinned 3.052R release, with exact source revision and original OFL recorded in `assets/fonts/SOURCE.md`. Poppins is retained only as embedded historical PDF subsets with its separate license. The bundled copies are the runtime sources; generation makes no font request to an external host. Any later distribution must preserve dependency notices, and font redistribution must retain `OFL.txt`. The npm lockfile records all transitive packages and integrity hashes. pdfmake's package installation currently emits upstream deprecation notices for `crypto-js` and `jpeg-exif`; the 2026-10-15 production dependency audit reported no known vulnerabilities. This snapshot is not a guarantee about future advisories.
 

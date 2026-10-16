@@ -6,10 +6,10 @@ This document owns delegation and handoffs. [AGENTS.md](../AGENTS.md) owns manda
 
 Use three roles, with one delegated task running at a time by default. Keep issues sequential. Use the existing agent tools rather than building an orchestration service, adding API credentials, or running agents continuously.
 
-| Role | Responsibility | Boundaries |
-| --- | --- | --- |
-| Chat: coordinator | Own the plan, issue order, handoffs, decisions, and verification of the merge/closure/cleanup lifecycle. | Do not duplicate the implementation agent's work. Escalate material ambiguity to the user early. |
-| Codex: implementer | Complete the current issue, write meaningful tests, run checks, and prepare the PR. | One issue and one branch. Own source and test edits. No recursive delegation. |
+| Role                         | Responsibility                                                                                                                                                                 | Boundaries                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Chat: coordinator            | Own the plan, issue order, handoffs, decisions, and verification of the merge/closure/cleanup lifecycle.                                                                       | Do not duplicate the implementation agent's work. Escalate material ambiguity to the user early.                        |
+| Codex: implementer           | Complete the current issue, write meaningful tests, run checks, and prepare the PR.                                                                                            | One issue and one branch. Own source and test edits. No recursive delegation.                                           |
 | Reviewer: testing and review | Independently inspect substantive changes against acceptance criteria, look for missing edge cases, run targeted checks when useful, and inspect generated PDFs when relevant. | Read-only by default. Report concrete findings with evidence; do not rewrite the feature or repeat every passing check. |
 
 The roles do not require different models. Keep the configured model unless the user requests a change. A named testing agent is not a substitute for the implementer writing and running tests.

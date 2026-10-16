@@ -9,14 +9,23 @@ import { HeaderFitError, verifyHeaderFit } from './header-fit.ts';
  * browser bundle and font data returned by loadBrowserFonts (or local Node reads).
  * Failures reject with an Error; the UI must retain source and offer no new PDF.
  */
-export async function createPdfBytes(resume: Resume, pdfMake: PdfMake, fontData: Record<string, string>): Promise<Uint8Array> {
+export async function createPdfBytes(
+  resume: Resume,
+  pdfMake: PdfMake,
+  fontData: Record<string, string>,
+): Promise<Uint8Array> {
   const definition = documentDefinition(resume);
-  if (!fontFiles.every(file => typeof fontData?.[file] === 'string' && fontData[file].length)) {
+  if (!fontFiles.every((file) => typeof fontData?.[file] === 'string' && fontData[file].length)) {
     throw new Error('The local resume fonts are missing. Restart Applicable and try again.');
   }
   return new Promise((resolve, reject) => {
     let stream: PdfStream | undefined;
-    const fail = (cause: unknown) => reject(new Error('The PDF could not be created. Check the local font files and try again.', { cause }));
+    const fail = (cause: unknown) =>
+      reject(
+        new Error('The PDF could not be created. Check the local font files and try again.', {
+          cause,
+        }),
+      );
     try {
       verifyHeaderFit(resume, pdfMake, fontData);
       // With all fonts in VFS, the synchronous stream API exposes creation errors.
@@ -24,12 +33,18 @@ export async function createPdfBytes(resume: Resume, pdfMake: PdfMake, fontData:
       stream = pdfMake.createPdf(definition, undefined, fonts, fontData).getStream();
       const chunks: Uint8Array[] = [];
       let length = 0;
-      stream.on('data', (chunk: Uint8Array) => { chunks.push(chunk); length += chunk.length; });
+      stream.on('data', (chunk: Uint8Array) => {
+        chunks.push(chunk);
+        length += chunk.length;
+      });
       stream.once('error', fail);
       stream.once('end', () => {
         const bytes = new Uint8Array(length);
         let offset = 0;
-        for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+        for (const chunk of chunks) {
+          bytes.set(chunk, offset);
+          offset += chunk.length;
+        }
         resolve(bytes);
       });
       stream.end();

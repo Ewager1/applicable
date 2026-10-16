@@ -15,7 +15,7 @@ const fontDescriptors = [
   },
 ];
 const [regular, semibold, bold] = fontDescriptors;
-export const fontFiles = fontDescriptors.map(font => font.file);
+export const fontFiles = fontDescriptors.map((font) => font.file);
 export const fonts: TFontDictionary = {
   SourceSans3: {
     normal: regular.file,
@@ -37,15 +37,21 @@ export const fonts: TFontDictionary = {
  */
 export async function loadBrowserFonts(): Promise<Record<string, string>> {
   try {
-    return Object.fromEntries(await Promise.all(fontDescriptors.map(async ({ file, url }) => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Font request failed');
-      const bytes = new Uint8Array(await response.arrayBuffer());
-      let binary = '';
-      for (const byte of bytes) binary += String.fromCharCode(byte);
-      return [file, btoa(binary)];
-    })));
+    return Object.fromEntries(
+      await Promise.all(
+        fontDescriptors.map(async ({ file, url }) => {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error('Font request failed');
+          const bytes = new Uint8Array(await response.arrayBuffer());
+          let binary = '';
+          for (const byte of bytes) binary += String.fromCharCode(byte);
+          return [file, btoa(binary)];
+        }),
+      ),
+    );
   } catch {
-    throw new Error('The local resume fonts could not be loaded. Restart Applicable and try again.');
+    throw new Error(
+      'The local resume fonts could not be loaded. Restart Applicable and try again.',
+    );
   }
 }

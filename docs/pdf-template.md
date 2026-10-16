@@ -19,18 +19,18 @@ The UI parses the entire source, loads/caches local fonts and awaits generation.
 
 US Letter, white background, 43 pt margins and one column. The B2 visual identity supersedes the earlier reference-matching typography. Contact information, title and summary do not acquire visible uppercase headings.
 
-| Semantic role | Source Sans 3 weight | Size | Color |
-| --- | --- | --- | --- |
-| Name | Bold | 20 pt | Accent `#1F4E5F` |
-| Contact | Regular | 9.5 pt | Secondary `#4B5563` |
-| Professional title | Semibold | 11.5 pt | Primary `#20252B` |
-| Summary/body and skills values | Regular | 9.75 pt | Primary |
-| Section headings | Semibold | 9.75 pt | Accent, 0.68 pt character spacing (about 0.07 em) |
-| Employer, qualification, certificate title | Semibold | 10.75 pt | Primary |
-| Role | Semibold | 10.25 pt | Primary |
-| Every date | Semibold | 9.5 pt | Primary |
-| Location | Semibold | 9.5 pt | Secondary |
-| Skills category | Semibold | 9.75 pt | Primary |
+| Semantic role                              | Source Sans 3 weight | Size     | Color                                             |
+| ------------------------------------------ | -------------------- | -------- | ------------------------------------------------- |
+| Name                                       | Bold                 | 20 pt    | Accent `#1F4E5F`                                  |
+| Contact                                    | Regular              | 9.5 pt   | Secondary `#4B5563`                               |
+| Professional title                         | Semibold             | 11.5 pt  | Primary `#20252B`                                 |
+| Summary/body and skills values             | Regular              | 9.75 pt  | Primary                                           |
+| Section headings                           | Semibold             | 9.75 pt  | Accent, 0.68 pt character spacing (about 0.07 em) |
+| Employer, qualification, certificate title | Semibold             | 10.75 pt | Primary                                           |
+| Role                                       | Semibold             | 10.25 pt | Primary                                           |
+| Every date                                 | Semibold             | 9.5 pt   | Primary                                           |
+| Location                                   | Semibold             | 9.5 pt   | Secondary                                         |
+| Skills category                            | Semibold             | 9.75 pt  | Primary                                           |
 
 All date-bearing rows reference the same `date` style; institutions/issuers retain independent Regular styling. Semantic font/color definitions live in the document's central `styles` map. The shared `entryHeading` style covers employers, qualifications and certificate titles; `entryRow` callers state both text styles explicitly. Fixed page/column/divider/section dimensions are named local constants, rather than a configurable theme system. No Light/ExtraLight font or old accent appears in newly generated PDFs.
 

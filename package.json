@@ -15,12 +15,16 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "check": "npm run typecheck && npm run lint && npm test && npm run build && npm run test:browser",
+    "check": "npm run format:check && npm run typecheck && npm run lint && npm test && npm run build && npm run test:browser",
     "fonts:coverage": "node --experimental-strip-types scripts/font-coverage.mjs",
     "usage:snapshot": "node scripts/agent-usage.mjs snapshot",
     "usage:start": "node scripts/agent-usage.mjs start",
     "usage:finish": "node scripts/agent-usage.mjs finish",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "node scripts/prepare-hooks.mjs"
   },
   "dependencies": {
     "pdfmake": "0.2.20",
@@ -35,9 +39,16 @@
     "@types/react-dom": "19.3.0",
     "@typescript-eslint/parser": "8.71.2",
     "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "husky": "9.1.7",
+    "lint-staged": "16.4.0",
     "pdfjs-dist": "4.10.38",
     "playwright": "1.62.1",
+    "prettier": "3.9.10",
     "typescript": "6.0.3",
     "vite": "8.3.4"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx,json,css,html,md,yml,yaml}": "prettier --write --ignore-unknown"
   }
 }

@@ -39,7 +39,7 @@ Distribution is this repository's source download; no installer, published relea
 
 ## Verification and build
 
-Run `npm run check` for strict TypeScript checking, lint, unit/PDF tests, build and browser tests. The [maintenance guide](docs/maintenance.md#choose-verification-by-the-change) owns focused check commands and the contributor edit map, including validation, input help, PDF styles, filenames and UI state.
+Run `npm run check` for formatting, strict TypeScript checking, lint, unit/PDF tests, build and browser tests. The [maintenance guide](docs/maintenance.md#choose-verification-by-the-change) owns focused check commands and the contributor edit map, including validation, input help, PDF styles, filenames and UI state.
 
 Browser checks use installed desktop Chrome by default. Run `npm run build` before running the browser command on its own, and leave ports 4173 and 4174 free. The browser command starts and stops its own servers; do not also run `proof:serve` or `preview` while testing.
 
