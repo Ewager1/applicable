@@ -14,7 +14,7 @@
 - Keep the interface focused on paste, submit, and PDF delivery.
 - Preserve source wording and job order. Only section ordering is normalized.
 - Keep processing local. Do not add remote services, analytics, accounts, storage, or AI features.
-- The user approved the sequential TypeScript core and React interface migration in issues #39–#41. Keep core modules independent of React and use simple typed components/local state. Preserve the current implementation until its migration issue is reached; additional frameworks remain outside scope.
+- Keep the strict TypeScript parser/contracts/PDF core independent of React. Use small typed React components and local state for the interface; preserve the generation/resource lifetime invariants in the [maintenance guide](docs/maintenance.md#data-flow-and-invariants). Additional frameworks remain outside scope. The [plan](docs/project-plan.md) records the approved migration sequence/history.
 - Explain new dependencies and keep their number small. Ask before adding major dependencies.
 - Do not silently discard unrecognized or malformed resume content.
 - Keep personal resumes, generated PDFs, and real contact details out of committed fixtures and documentation. Use synthetic examples.
