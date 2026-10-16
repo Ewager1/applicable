@@ -1,5 +1,4 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { HowItWorks } from './HowItWorks.tsx';
 import { JobFinderSetup } from './JobFinderSetup.tsx';
 import { ResumeWriter } from './ResumeWriter.tsx';
 import { ChatbotInstructions } from './ChatbotInstructions.tsx';
@@ -41,10 +40,6 @@ export function App() {
         <a className="brand" href="./" aria-label="Applicable home">
           Applicable<span aria-hidden="true">.</span>
         </a>
-        <span className="privacy">No resume uploads</span>
-        <a className="how-it-works-link" href="#how-it-works">
-          How it works
-        </a>
       </header>
       <section className="homepage-intro" aria-labelledby="home-title">
         <h1 id="home-title">Job searching takes enough time already.</h1>
@@ -53,7 +48,7 @@ export function App() {
           professional PDFs.
         </p>
         <p>
-          <strong>Use one tool or all three. You stay in control of your applications.</strong>
+          <strong>Use one tool or all three in conjunction.</strong>
         </p>
         <details>
           <summary>Why I built Applicable</summary>
@@ -167,7 +162,6 @@ export function App() {
           }}
         />
       </div>
-      <HowItWorks />
       <footer>
         Resume text, contact details and target company stay on this page and are not saved or
         uploaded.
