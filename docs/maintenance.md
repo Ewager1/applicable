@@ -17,6 +17,7 @@ Start with the [input contract](input-format.md), [project specification](projec
 | Oversized heading groups | [header-fit.js](../app/pdf/header-fit.js): same-engine, fresh-page measurement of those explicit keep-groups |
 | PDF bytes and engine failures | [render.js](../app/pdf/render.js): fit check, synchronous local stream, recoverable errors |
 | Local fonts and glyph support | [fonts.js](../app/pdf/fonts.js), [font-coverage.js](../app/pdf/font-coverage.js), [coverage generator](../scripts/font-coverage.mjs), [font source/license](../assets/fonts/SOURCE.md) |
+| Local development agent/model metrics | [usage CLI](../scripts/agent-usage.mjs), [measurement guide](agent-usage.md); ignored `output/agent-usage/` reports, synthetic [tests](../tests/agent-usage.test.mjs) |
 | Build, browsers and CI | [package.json](../package.json), [Vite config](../vite.config.js), [browser runner](../tests/run-browser.mjs), [browser selection](../tests/browser-options.mjs), [CI workflow](../.github/workflows/checks.yml) |
 
 The app is native JavaScript/HTML/CSS with Vite, local pdfmake and bundled Source Sans 3. No backend, account, resume storage or application analytics is involved.
@@ -34,6 +35,7 @@ Use the supported Node/npm version and browser setup in the [README](../README.m
 
 | Area | Focused check |
 | --- | --- |
+| Agent usage aggregation/privacy and baseline lifecycle | `node --test tests/agent-usage.test.mjs` |
 | Download filename sanitization | `node --test tests/download-filename.test.mjs` |
 | Parser/input contract | `node --test tests/parser.test.mjs` |
 | PDF rendering, fonts, pagination or fit guard | `node --test proof/render.test.mjs tests/production-pdf.test.mjs` |

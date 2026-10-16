@@ -9,14 +9,17 @@
   "scripts": {
     "proof:generate": "node proof/generate.mjs",
     "proof:serve": "node proof/serve.mjs",
-    "test": "node --test proof/render.test.mjs tests/parser.test.mjs tests/production-pdf.test.mjs tests/download-filename.test.mjs",
+    "test": "node --test proof/render.test.mjs tests/parser.test.mjs tests/production-pdf.test.mjs tests/download-filename.test.mjs tests/agent-usage.test.mjs",
     "test:browser": "node tests/run-browser.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "check": "npm run lint && npm test && npm run build && npm run test:browser",
-    "fonts:coverage": "node scripts/font-coverage.mjs"
+    "fonts:coverage": "node scripts/font-coverage.mjs",
+    "usage:snapshot": "node scripts/agent-usage.mjs snapshot",
+    "usage:start": "node scripts/agent-usage.mjs start",
+    "usage:finish": "node scripts/agent-usage.mjs finish"
   },
   "dependencies": {
     "pdfmake": "0.2.20"
