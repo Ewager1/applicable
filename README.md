@@ -1,8 +1,12 @@
 # Applicable
 
-Turn chatbot text into a polished resume with a lightweight browser PDF formatter.
+Three independent tools to help with your job search:
 
-Paste a complete resume, submit it, and download a PDF using one consistent template. Section order is fixed, while jobs appear in the order supplied in the source text. The pasted structured text supplies all resume content, including the name/contact header and optional target-company filename metadata.
+- **Job Finder** prepares a ChatGPT conversation for finding relevant opportunities.
+- **Resume Writer** prepares a separate ChatGPT conversation for writing and tailoring resumes.
+- **Resume PDF Maker** converts structured resume text into a professional PDF using one consistent template.
+
+Use one tool or all three in conjunction. Applicable assembles prompts and generates PDFs in your browser; you use ChatGPT separately, review its results and apply yourself.
 
 ## Download and run locally
 
@@ -56,23 +60,35 @@ GitHub Actions is configured to run the same checks on pull requests to `main` a
 
 ## Using Applicable
 
-1. Open **Start with your chatbot** and choose **Copy chatbot instructions**. Paste those instructions together with your current resume into ChatGPT or another chatbot. If clipboard access is blocked, the complete instructions appear for manual copying.
-2. Ask the chatbot to format your complete resume. Use the returned text code block’s **Copy** button, then paste the formatted resume into **Your resume** in Applicable. The [input format](docs/input-format.md) describes its literal markers; you do not need to rebuild sections by hand.
-3. Select **Create PDF** above the field, or press Cmd/Ctrl + Enter while editing. The app names the file from the resume’s professional title, for example `Full-Stack Software Engineer Resume.pdf`, and shows the same PDF for review. Optionally include `@@TARGET_COMPANY@@` followed by the company name in the pasted text to receive `Full-Stack Software Engineer at Example Company Resume.pdf`. Company affects only the filename; it is never displayed in your PDF. Use **Download PDF** to download it again. If your browser cannot display PDFs inline, the download remains available without an embedded viewer.
+Resume PDF Maker opens by default. Switch between the three tabs with a click or tap, or use Left/Right arrows, Home and End while a tab has keyboard focus. Your answers, pasted text, validation and current PDF survive tool switches; reloading clears them. The introduction includes an expandable personal story.
 
-Filename whitespace is normalized and unsafe path/control characters are replaced. Long names are bounded to 180 UTF-8 bytes including `.pdf`, reserving a readable portion of both title and company when both are supplied; source capitalization and safe Unicode are preserved. If no usable filename content remains, the fallback is `Resume.pdf` (`Untitled` stands in for an unusable title when a company remains). Editing the pasted text, including contact/company metadata, clears the previous download/preview, so create the PDF again after a change.
+### Job Finder
 
-Resume PDF Maker opens by default. The three primary tabs are **Job Finder**, **Resume Writer** and **Resume PDF Maker**; use one tool or all three. A compact introduction above the tabs includes an expandable personal story. Switch tools without losing the current pasted resume, validation, PDF, or Job Finder answers/settings/copy feedback. Use Left/Right arrows, Home or End when a tab has keyboard focus. Reloading returns to Resume PDF Maker and clears the pasted resume as usual.
+Optionally answer the seven questions, adjust **Search U.S. jobs only** and **Prefer recently posted positions** (both on by default), and choose **Copy Prompt**. Paste the prompt into a new ChatGPT conversation and upload your existing resumes there. Answer its clarification questions; for future searches, ask “Look for jobs.” Verify openings and apply yourself. Applicable does not search or apply for jobs.
 
-Resume Writer offers twelve optional background questions and **Copy Setup Prompt**. Paste the prompt into a separate ChatGPT conversation and upload one or more existing resumes there; no job description is needed to get started. Reuse that conversation for future jobs. Standard Resume uses conventional headings and bullets by default; ask for Applicable Format to get structured text for Resume PDF Maker. Only clipboard failure shows a selectable manual-copy prompt. Answers and prompts remain on the current page, survive tool switches and reset on reload. **Open chatbot formatting instructions** still switches to the existing instructions in Resume PDF Maker and focuses their expanded help. You review resumes and submit applications yourself.
+### Resume Writer
 
-In Job Finder, optionally answer seven questions, adjust **Search U.S. jobs only** and **Prefer recently posted positions** (both on by default), and choose **Copy Prompt** to create and copy your setup instructions in one step. Paste them into a new ChatGPT conversation, then upload your existing resumes there. For future searches, ask “Look for jobs.” Applicable only assembles this text locally; it does not search or apply for jobs. Questionnaire answers and search settings survive tab switches but reset on reload; answers, settings and prompts are never saved. The prompt guides broad discovery, responsibility-based fit, role-specific deduplication, verification and ranking. Freshness is a preference, not an age cutoff; official employer listings increase confidence without being mandatory. The prompt is shown and selected for manual copying only if copying is unavailable. Editing an answer or setting, or successfully copying, clears that fallback and its old feedback.
+Optionally answer the twelve background questions and choose **Copy Setup Prompt**. Paste it into a separate ChatGPT conversation and upload one or more existing resumes there; no job description is needed to get started. Share job descriptions when ready, review every result and reuse the conversation for future jobs.
 
-`@@CONTACT@@` with `Name:` is required in the pasted text; Email, LinkedIn, Website and Phone are optional. Older body-only input receives guidance to add contact metadata. Included blank or malformed body sections block export with clear warnings and source lines where applicable. Your pasted text stays available for correction. Editing it removes the old preview/download so an earlier file is not mistaken for the updated resume. During generation the button is disabled; edits remain possible, and an outdated result will not download.
+Standard Resume uses conventional headings and bullets by default. Ask for Applicable Format when you want structured text for Resume PDF Maker. **Open chatbot formatting instructions** opens PDF Maker’s standalone formatting help; you can also use that help without setting up Resume Writer.
 
-The field grows with your text up to the available viewport, then scrolls. There are no upload controls, profiles, accounts, saved resume history, AI calls or remote processing. A browser may require you to use the visible download link if it blocks automatic downloads. Native PDF controls and rendering vary by browser; no separate viewer library is included.
+Both prompt tools show next steps after copying. If clipboard access is unavailable, the full prompt appears selected for manual copying.
+
+### Resume PDF Maker
+
+1. If your text is not already in Applicable Format, open **Start with your chatbot** and choose **Copy chatbot instructions**. Paste them with your current resume into ChatGPT or another chatbot. If copying is unavailable, the complete instructions appear for manual copying.
+2. Copy the chatbot’s complete text code block and paste it into **Your resume**. The [input format](docs/input-format.md) describes the literal markers; there is no need to rebuild sections by hand.
+3. Select **Create PDF** above the field, or press Cmd/Ctrl + Enter while editing. Review the resulting PDF and use **Download PDF** to download it again. If inline viewing is unavailable, the download remains available.
+
+The pasted text supplies the name/contact header and resume sections. `@@CONTACT@@` with `Name:` and at least one valid nonempty body section are required; Email, Phone, LinkedIn and Website are optional. Omit inapplicable sections instead of adding placeholders. Included blank or malformed sections block export with correction messages and source lines where applicable. Pasted text stays available for correction. Section order is fixed; entries and bullets retain the supplied order and wording.
+
+The professional title determines the filename, for example `Full-Stack Software Engineer Resume.pdf`. Optionally include `@@TARGET_COMPANY@@` followed by a company name to get `Full-Stack Software Engineer at Example Company Resume.pdf`. Company metadata affects only the filename. Filename whitespace and unsafe path/control characters are normalized, names are limited to 180 UTF-8 bytes including `.pdf`, and missing usable content falls back to `Resume.pdf` (`Untitled` stands in for a missing title when a company remains).
+
+The input expands with your text up to the available viewport, then scrolls. Editing clears the old preview/download, including during generation, so outdated results cannot download. The button is disabled while generating; review and automatic downloads depend on browser capabilities and settings.
 
 ## Development documents
+
+For contributions, read [AGENTS.md](AGENTS.md), keep changes focused and use the [maintenance guide](docs/maintenance.md#choose-verification-by-the-change) to choose verification. The edit map and source structure below identify where each feature belongs.
 
 - [Maintenance guide and edit/check map](docs/maintenance.md)
 - [Source structure and tooling](docs/development.md)
@@ -89,9 +105,11 @@ The field grows with your text up to the available viewport, then scrolls. There
 
 ## Privacy, limits and troubleshooting
 
-Resume text, contact details and target company stay in the current browser page and are never saved or sent to a remote service. There are no separate contact or company fields. On startup, Applicable attempts to delete only its old `applicable.contact.v1` saved-contact key without reading or reusing it; unavailable cleanup does not block PDF creation. Other storage is untouched. PDFs are generated locally and saved wherever your browser downloads files. Copying chatbot instructions is an explicit clipboard action; no chatbot is contacted by the app. If the static app is served on a website, loading its code/fonts makes ordinary hosting requests; resume text is still processed in the browser rather than uploaded.
+Applicable does not upload or persist pasted resumes, contact details, target company, questionnaire answers or generated prompts. They remain in the current page until it is reloaded or closed. There are no accounts, profiles or saved resume history. Copying prompts is an explicit clipboard action; Applicable makes no AI calls. When you paste a prompt or upload a resume into ChatGPT, you share that information with that separate service.
 
-- Use the documented format and include at least one valid nonempty body group. All eight body groups are optional individually; omit inapplicable sections and their markers rather than adding placeholders. Included sections must satisfy their entry requirements. Prefer standalone `@@PROFESSIONAL_TITLE@@`, `@@SUMMARY@@`, `@@RELEVANT_EXPERIENCE@@`, `@@VOLUNTEER_EXPERIENCE@@`, `@@PROJECTS@@`, `@@EDUCATION@@`, `@@CERTIFICATIONS@@`, `@@SKILLS@@`, with `@@JOB@@`, `@@VOLUNTEER@@`, `@@PROJECT@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` entry boundaries. Legacy `#`/`##` markers still work, but unmarked headings are not inferred. Paste the code block’s contents, or one enclosing text code block; extra commentary and nested/unknown fences are rejected. Arbitrary free-form resumes and file uploads are unsupported.
+Contact and company information comes from the structured resume text, with no separate fields. On startup, Applicable attempts to delete only its old `applicable.contact.v1` saved-contact key without reading or reusing it; unavailable cleanup does not block PDF creation. Other storage is untouched. PDFs are generated in the browser and saved wherever it downloads files. If the app is hosted, loading code/fonts makes ordinary hosting requests; your resume is not uploaded for processing.
+
+- Resume PDF Maker accepts the [documented text format](docs/input-format.md), not arbitrary free-form resumes or file uploads. Use the chatbot code block’s Copy button; extra commentary and unsupported formatting produce correction messages.
 - Unsupported characters outside the bundled font's coverage produce a correction message instead of silently disappearing. See [template limits](docs/pdf-template.md).
 - If an entry’s heading details cannot fit together with the beginning of their following content on one page, export stops with a correction message. Your pasted text remains available; shorten the oversized details and try again. Content is never shortened automatically.
 - Inline PDF viewing and automatic downloads depend on browser capabilities/settings. Use **Download PDF** when needed; no extra viewer installation is required.

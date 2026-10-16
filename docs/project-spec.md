@@ -4,7 +4,7 @@ This document records the application contract. Use [GitHub issues](https://gith
 
 ## Purpose
 
-Turn an entire resume copied from a chat into a consistently formatted PDF with minimal interaction. Applicable formats supplied content; the chat handles writing and tailoring.
+Provide three independent tools: Job Finder and Resume Writer assemble setup prompts for separate ChatGPT conversations; Resume PDF Maker converts structured resume text into a consistently formatted PDF. Users review results and submit applications themselves. Applicable makes no AI calls.
 
 ## Confirmed requirements
 

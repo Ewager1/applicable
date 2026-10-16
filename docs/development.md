@@ -4,7 +4,8 @@ For routine changes, start with [the maintenance guide](maintenance.md). This do
 
 ## Structure
 
-- `src/index.html`, `src/main.tsx`, `src/styles.css`: HTML shell, React StrictMode entry and existing CSS. `src/ui/` contains typed function components for chatbot instructions, pasted-resume form, accessible feedback and PDF result, plus the focused `useResumePdf.ts` resource/async hook.
+- `src/index.html`, `src/main.tsx`, `src/styles.css`: HTML shell, React StrictMode entry and existing CSS. `src/ui/` contains the mounted Job Finder, Resume Writer and Resume PDF Maker panels, local navigation, chatbot instructions, accessible feedback and PDF delivery. `useResumePdf.ts` owns PDF resource/async state.
+- `src/job-finder/` and `src/resume-writer/`: deterministic setup prompts and typed questionnaire contracts; no AI calls.
 - `src/resume/parse.ts`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors. `types.ts` supplies the single canonical TypeScript contracts.
 - `examples/`: synthetic canonical resume and reusable chatbot instruction.
 - `src/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
