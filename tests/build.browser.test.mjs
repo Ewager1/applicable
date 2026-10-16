@@ -675,7 +675,7 @@ test('contact edits invalidate pending work and revoke completed artifacts', asy
   }
 });
 
-test('three local tools default to PDF Maker with personal introduction and keyboard navigation', async (t) => {
+test('three local tools default to PDF Maker in one workspace with keyboard navigation', async (t) => {
   const page = await openPage(t);
   const builder = page.getByRole('tab', { name: 'Resume PDF Maker', exact: true });
   const finder = page.getByRole('tab', { name: 'Job Finder', exact: true });
@@ -690,14 +690,10 @@ test('three local tools default to PDF Maker with personal introduction and keyb
   assert.equal(await writer.getAttribute('tabindex'), '-1');
   assert.equal(await page.locator('#job-finder-panel').isVisible(), false);
   assert.equal(
-    await page.locator('.homepage-intro strong').textContent(),
-    'Use one tool or all three in conjunction.',
+    await page.getByRole('heading', { level: 1 }).textContent(),
+    'Find better jobs. Apply faster.',
   );
-  const story = page.locator('.homepage-intro details');
-  assert.equal(await story.getAttribute('open'), null);
-  await story.getByText('Why I built Applicable', { exact: true }).press('Enter');
-  assert.equal(await story.getByText(/After spending months looking for work/).isVisible(), true);
-  assert.equal(await builder.getAttribute('aria-selected'), 'true');
+  assert.equal(await page.locator('.workspace > [role="tabpanel"]').count(), 3);
   await builder.press('ArrowRight');
   assert.equal(await finder.getAttribute('aria-selected'), 'true');
   assert.equal(await page.getByRole('form', { name: 'Job Finder setup' }).isVisible(), true);
@@ -806,10 +802,10 @@ for (const width of [320, 375, 1280]) {
     const page = await openPage(t, { viewport: { width, height: 900 }, hasTouch: width < 600 });
     const guide = page.getByRole('tab', { name: 'Job Finder', exact: true });
     const builder = page.getByRole('tab', { name: 'Resume PDF Maker', exact: true });
-    const intro = await page.locator('.homepage-intro').boundingBox();
+    const intro = await page.getByRole('heading', { level: 1 }).boundingBox();
     const navigation = await page.getByRole('tablist').boundingBox();
     assert.ok(intro.y + intro.height <= navigation.y);
-    assert.ok(navigation.y < 550, 'Compact introduction keeps tools near the top on mobile');
+    assert.ok(navigation.y < 350, 'Compact tagline keeps tools near the top on mobile');
     for (const tab of [
       guide,
       page.getByRole('tab', { name: 'Resume Writer', exact: true }),
@@ -822,6 +818,13 @@ for (const width of [320, 375, 1280]) {
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         true,
       );
+      const panel = page.getByRole('tabpanel');
+      const panelBounds = await panel.boundingBox();
+      for (const button of await panel.getByRole('button').all()) {
+        const control = await button.boundingBox();
+        assert.ok(control.x >= panelBounds.x);
+        assert.ok(control.x + control.width <= panelBounds.x + panelBounds.width);
+      }
       const bounds = await tab.boundingBox();
       assert.ok(bounds.height >= 44 && bounds.width >= 44);
       await mkdir('output/ui', { recursive: true });
