@@ -9,7 +9,7 @@
   "scripts": {
     "proof:generate": "node --experimental-strip-types proof/generate.mjs",
     "proof:serve": "node --experimental-strip-types proof/serve.mjs",
-    "test": "node --experimental-strip-types --test proof/render.test.mjs tests/parser.test.mjs tests/contact.test.mjs tests/production-pdf.test.mjs tests/download-filename.test.mjs tests/agent-usage.test.mjs",
+    "test": "node --experimental-strip-types --test proof/render.test.mjs tests/parser.test.mjs tests/contact.test.mjs tests/production-pdf.test.mjs tests/download-filename.test.mjs tests/agent-usage.test.mjs tests/build-notices.test.mjs",
     "test:browser": "node tests/run-browser.mjs",
     "dev": "vite",
     "build": "vite build",

@@ -1,0 +1,1648 @@
+{
+  "schemaVersion": 1,
+  "reviewed": "2026-10-16",
+  "scope": "Reviewed artifact-specific notice inventory, not a general-purpose license scanner. Reference releases for transformed modules are not asserted embedded versions. All source-map entries are accounted for; comments and nested vendored code/data are retained conservatively.",
+  "upstreamBuild": "https://github.com/bpampuch/pdfmake/blob/0.2.20/webpack.config.js",
+  "versions": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "scheduler": "0.28.0",
+    "pdfmake": "0.2.20",
+    "vite": "8.3.4",
+    "rolldown": "1.2.14"
+  },
+  "files": {
+    "LICENSE": "1002eea86671b65aa96b5e5b89d6eedd8f3703f104b25d17fe54d67079fcb957",
+    "assets/fonts/OFL.txt": "937d1985d2d6d003b6efdfa47e098b96c69d55395175f154d7f56410c942f978",
+    "assets/fonts/SourceSans3-Bold.ttf": "9214b9d95e4231c609802815c2646c98174e2102d0d37f88978a7f8e71006e6a",
+    "assets/fonts/SourceSans3-Regular.ttf": "4644c81b86ec9caaa76b634889968ed3c4f4f52f054855933acc7c2b21e53b0f",
+    "assets/fonts/SourceSans3-Semibold.ttf": "a3f4f8dcf343a8f24dc61951de93f3ba1558b15cd250ba24af8a40e957081b7d",
+    "licenses/browser-runtime-NOTICES.txt": "46d1c2feb1d9a5b2d48dd412bbdd2ad08c3056bd1331d7d9ce5b5866348d34d9",
+    "licenses/pdfmake-LICENSE.txt": "a0de409db922b4fba53e86db4c3d64f7808dc5ec6de7a9eb4c7943b8a2f40975",
+    "licenses/react-LICENSE.txt": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+    "node_modules/pdfmake/build/pdfmake.js": "bfd0e78ae7fd12ecf4ab0b4aae4b5eb3f97865b0ed5932f1d9e947fc91f54930",
+    "node_modules/pdfmake/build/pdfmake.js.map": "ca965339b45166a9a9304b1de2d4aa09c849bfc28230f80031939d33eaae6edb",
+    "node_modules/react-dom/cjs/react-dom-client.production.js": "a319b413b7a19ee34422d9a12a8e7afd003c07846716d278ba1a0898e8cb6251",
+    "node_modules/react-dom/cjs/react-dom.production.js": "7a05d7f7bb2b02aae84018a88d4815a2181eef48d2cb8172d403eaa2b131eefd",
+    "node_modules/react-dom/client.js": "00e348ab3d6bc2eef908345d0bc4e008c95bcfecec060dfda5c4967953761396",
+    "node_modules/react-dom/index.js": "ba1a3e33489f868371561777607e3ee5091df0f7ea3f1a10f789d6b86e4c1505",
+    "node_modules/react/cjs/react-jsx-runtime.production.js": "1e46f15002696985e80c61d47aaa30dabb03c954270a690f5f7dfbbacfa9002b",
+    "node_modules/react/cjs/react.production.js": "0b5529981841afa1b58c76ba85c29bb681ff5f07cd8cde6a10b967d3915b8e1c",
+    "node_modules/react/index.js": "60caffdecbdc5db3bc4ec4e83df9488345ccb271d07533b9210bf5750918d97e",
+    "node_modules/react/jsx-runtime.js": "b392951a77d0a2e6a6bd017e49d768481ae5b63c4109c6c31f622cf7b2433edc",
+    "node_modules/scheduler/cjs/scheduler.production.js": "679adff761d31e9426604f80c0e99be44a3e6f4c6834b0218ecf0312a67c171f",
+    "node_modules/scheduler/index.js": "145965504d60007bc25486ab930b0367867dcd5d579ccd343c148d69349a7cfb"
+  },
+  "virtualModules": {
+    "\u0000rolldown/runtime.js": "967258928d5ea00be66165ef77f636512a5b0882bac3548cc7d1c917b6abac06",
+    "\u0000vite/modulepreload-polyfill.js": "dd838b55e315f155e8a0093fdc4a80b2da5f069c433fc49a15b9962807791374",
+    "\u0000vite/preload-helper.js": "efb6d7cf97d0661b8f531ccd89c96ecae37c1ee4dd0c1d76be5b6ea286288e3f"
+  },
+  "components": [
+    {
+      "name": "@foliojs-fork/fontkit",
+      "licenseReferenceVersion": "1.9.2",
+      "tarball": "https://registry.npmjs.org/@foliojs-fork/fontkit/-/fontkit-1.9.2.tgz",
+      "tarballIntegrity": "sha512-IfB5EiIb+GZk+77TRB86AHroVaqfq8JRFlUbz0WEwsInyCG0epX2tCPOy+UfaWPju30DeVoUAXfzWXmhn753KA==",
+      "gitHead": "1586124d6b82615d675336278fbd840734ea5f04",
+      "sourceRoot": "webpack://pdfmake/./node_modules/@foliojs-fork/fontkit/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/@foliojs-fork/fontkit/index.js"
+      ],
+      "exactReferenceMatches": 0,
+      "notices": [
+        "notice-689a081b21f3af6a"
+      ],
+      "versionLimit": "License-reference release; transformed or composed sources do not establish an exact embedded release version."
+    },
+    {
+      "name": "@foliojs-fork/linebreak",
+      "licenseReferenceVersion": "1.1.2",
+      "tarball": "https://registry.npmjs.org/@foliojs-fork/linebreak/-/linebreak-1.1.2.tgz",
+      "tarballIntegrity": "sha512-ZPohpxxbuKNE0l/5iBJnOAfUaMACwvUIKCvqtWGKIMv1lPYoNjYXRfhi9FeeV9McBkBLxsMFWTVVhHJA8cyzvg==",
+      "gitHead": "a88123c1401cf85f4eec83cdccbed350730819b1",
+      "sourceRoot": "webpack://pdfmake/./node_modules/@foliojs-fork/linebreak/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/@foliojs-fork/linebreak/src/pairs.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/linebreak/src/linebreaker.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/linebreak/src/classes.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-cf22b8198f0886a8"
+      ],
+      "versionLimit": "License-reference release; transformed or composed sources do not establish an exact embedded release version."
+    },
+    {
+      "name": "@foliojs-fork/pdfkit",
+      "licenseReferenceVersion": "0.15.3",
+      "tarball": "https://registry.npmjs.org/@foliojs-fork/pdfkit/-/pdfkit-0.15.3.tgz",
+      "tarballIntegrity": "sha512-Obc0Wmy3bm7BINFVvPhcl2rnSSK61DQrlHU8aXnAqDk9LCjWdUOPwhgD8Ywz5VtuFjRxmVOM/kQ/XLIBjDvltw==",
+      "gitHead": "dcdf7cd67d6385b1061c2cf3fae8b71989380f90",
+      "sourceRoot": "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/abstract_reference.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/tree.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/spotcolor.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/object.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/reference.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/page.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/name_tree.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/saslprep/lib/util.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/saslprep/lib/code-points.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/saslprep/index.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/security.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/gradient.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/pattern.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/color.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/path.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/vector.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/font/afm.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/font.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/font/standard.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/font/embedded.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/font_factory.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/fonts.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/line_wrapper.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/text.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/image/jpeg.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/image/png.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/image.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/images.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/annotations.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/outline.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/outline.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/structure_content.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/structure_element.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/number_tree.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/markings.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/acroform.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/attachments.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/pdfa.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/pdfua.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/subsets.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/metadata.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/mixins/metadata.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/pdfkit/lib/document.js"
+      ],
+      "exactReferenceMatches": 0,
+      "notices": [
+        "notice-6280262da3f2d6a5"
+      ],
+      "versionLimit": "License-reference release; transformed or composed sources do not establish an exact embedded release version."
+    },
+    {
+      "name": "@foliojs-fork/restructure",
+      "licenseReferenceVersion": "2.0.2",
+      "tarball": "https://registry.npmjs.org/@foliojs-fork/restructure/-/restructure-2.0.2.tgz",
+      "tarballIntegrity": "sha512-59SgoZ3EXbkfSX7b63tsou/SDGzwUEK6MuB5sKqgVK1/XE0fxmpsOb9DQI8LXW3KfGnAjImCGhhEb7uPPAUVNA==",
+      "gitHead": "d07f5ef08f4bd72b5439fd8bdb1cf93f15a93bf4",
+      "sourceRoot": "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Pointer.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/LazyArray.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Reserved.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/utils.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Enum.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/String.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Number.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Buffer.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Bitfield.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/index.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Optional.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Array.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/DecodeStream.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Boolean.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/Struct.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/EncodeStream.js",
+        "webpack://pdfmake/./node_modules/@foliojs-fork/restructure/src/VersionedStruct.js"
+      ],
+      "exactReferenceMatches": 17,
+      "notices": [
+        "notice-c0df7f551401f8f8"
+      ]
+    },
+    {
+      "name": "assert",
+      "licenseReferenceVersion": "2.1.0",
+      "tarball": "https://registry.npmjs.org/assert/-/assert-2.1.0.tgz",
+      "tarballIntegrity": "sha512-eLHpSK/Y4nhMJ07gDaAzoX/XAKS8PSaojml3M0DM4JpV1LAi5JOJ/p6H/XWrl8L+DzVEvVCW1z3vWAaB9oTsQw==",
+      "gitHead": "fc65923fdbbc3ae72de1ddb15ee54088d201b4f9",
+      "sourceRoot": "webpack://pdfmake/./node_modules/assert/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/assert/build/internal/errors.js",
+        "webpack://pdfmake/./node_modules/assert/build/assert.js",
+        "webpack://pdfmake/./node_modules/assert/build/internal/assert/assertion_error.js",
+        "webpack://pdfmake/./node_modules/assert/build/internal/util/comparisons.js"
+      ],
+      "exactReferenceMatches": 4,
+      "notices": [
+        "notice-6239c6144c31e58c"
+      ]
+    },
+    {
+      "name": "available-typed-arrays",
+      "licenseReferenceVersion": "1.0.7",
+      "tarball": "https://registry.npmjs.org/available-typed-arrays/-/available-typed-arrays-1.0.7.tgz",
+      "tarballIntegrity": "sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==",
+      "gitHead": "d72cd6154ce39482ca83bed2200ff3b56c76e8d8",
+      "sourceRoot": "webpack://pdfmake/./node_modules/available-typed-arrays/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/available-typed-arrays/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-6d0917530cf3b3dc"
+      ]
+    },
+    {
+      "name": "base64-js",
+      "licenseReferenceVersion": "1.3.1",
+      "tarball": "https://registry.npmjs.org/base64-js/-/base64-js-1.3.1.tgz",
+      "tarballIntegrity": "sha512-mLQ4i2QO1ytvGWFWmcngKO//JXAQueZvwEKtjgQFM4jIK0kU+ytMfplL8j+n5mspOfjHwoAg+9yhb7BwAHm36g==",
+      "gitHead": "08a344d6ca13772acc42df2515312ceac75b5456",
+      "sourceRoot": "webpack://pdfmake/./node_modules/base64-js/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/base64-js/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-5b37224c080cdcc9"
+      ]
+    },
+    {
+      "name": "brotli",
+      "licenseReferenceVersion": "1.3.3",
+      "tarball": "https://registry.npmjs.org/brotli/-/brotli-1.3.3.tgz",
+      "tarballIntegrity": "sha512-oTKjJdShmDuGW94SyyaoQvAjf30dZaHnjJ8uAF+u2/vGJkJbJPJAT1gDiOJP5v1Zb6f9KEyW/1HpuaWIXtGHPg==",
+      "gitHead": "e36051345f6d27a56e5f39ea70d2f789b8574046",
+      "sourceRoot": "webpack://pdfmake/./node_modules/brotli/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/brotli/dec/context.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/dictionary.bin.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/decode.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/bit_reader.js",
+        "webpack://pdfmake/./node_modules/brotli/decompress.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/prefix.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/dictionary.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/huffman.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/dictionary-browser.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/transform.js",
+        "webpack://pdfmake/./node_modules/brotli/dec/streams.js"
+      ],
+      "exactReferenceMatches": 11,
+      "notices": [
+        "notice-28557dc0b4a4d40f"
+      ]
+    },
+    {
+      "name": "browserify-zlib",
+      "licenseReferenceVersion": "0.2.0",
+      "tarball": "https://registry.npmjs.org/browserify-zlib/-/browserify-zlib-0.2.0.tgz",
+      "tarballIntegrity": "sha512-Z942RysHXmJrhqk88FmKBVq/v5tqmSkDz7p54G/MGyjMnCFFnC79XWNbg+Vta8W6Wb2qtSZTSxIGkJrRpCFEiA==",
+      "gitHead": "6257713c1dc3b69d781a43c10e58a6d75875eef8",
+      "sourceRoot": "webpack://pdfmake/./node_modules/browserify-zlib/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/browserify-zlib/lib/index.js",
+        "webpack://pdfmake/./node_modules/browserify-zlib/lib/binding.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-ddd770379e07bf05"
+      ]
+    },
+    {
+      "name": "buffer",
+      "licenseReferenceVersion": "6.0.3",
+      "tarball": "https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz",
+      "tarballIntegrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==",
+      "gitHead": "f52dffd9df0445b93c0c9065c2f8f0f46b2c729a",
+      "sourceRoot": "webpack://pdfmake/./node_modules/buffer/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/buffer/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-06bafa45fdad2579"
+      ]
+    },
+    {
+      "name": "call-bind",
+      "licenseReferenceVersion": "1.0.8",
+      "tarball": "https://registry.npmjs.org/call-bind/-/call-bind-1.0.8.tgz",
+      "tarballIntegrity": "sha512-oKlSFMcMwpUg2ednkhQ454wfWiU/ul3CkJe/PEHcTKuiX6RpbehUiFMXu13HalGZxfUwCQzZG747YXBn1im9ww==",
+      "gitHead": "1f1dfc86a9d1b9ed3b39b8fdd922f7d2eb913c15",
+      "sourceRoot": "webpack://pdfmake/./node_modules/call-bind/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/call-bind/index.js",
+        "webpack://pdfmake/./node_modules/call-bind/callBound.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-39c5ec504cf6bd5c"
+      ]
+    },
+    {
+      "name": "call-bind-apply-helpers",
+      "licenseReferenceVersion": "1.0.2",
+      "tarball": "https://registry.npmjs.org/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.2.tgz",
+      "tarballIntegrity": "sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==",
+      "gitHead": "7068296a67b98424d5299606599d2f8117ded880",
+      "sourceRoot": "webpack://pdfmake/./node_modules/call-bind-apply-helpers/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/call-bind-apply-helpers/functionCall.js",
+        "webpack://pdfmake/./node_modules/call-bind-apply-helpers/actualApply.js",
+        "webpack://pdfmake/./node_modules/call-bind-apply-helpers/applyBind.js",
+        "webpack://pdfmake/./node_modules/call-bind-apply-helpers/index.js",
+        "webpack://pdfmake/./node_modules/call-bind-apply-helpers/reflectApply.js",
+        "webpack://pdfmake/./node_modules/call-bind-apply-helpers/functionApply.js"
+      ],
+      "exactReferenceMatches": 6,
+      "notices": [
+        "notice-5e325595b4ea8cfe"
+      ]
+    },
+    {
+      "name": "call-bound",
+      "licenseReferenceVersion": "1.0.4",
+      "tarball": "https://registry.npmjs.org/call-bound/-/call-bound-1.0.4.tgz",
+      "tarballIntegrity": "sha512-+ys997U96po4Kx/ABpBCqhA9EuxJaQWDQg7295H4hBphv3IZg0boBKuwYpt4YXp6MZ5AmZQnU/tyMTlRpaSejg==",
+      "gitHead": "75d922c1f92a3de1ff9ab94453f45b5f64b50041",
+      "sourceRoot": "webpack://pdfmake/./node_modules/call-bound/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/call-bound/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-5e325595b4ea8cfe"
+      ]
+    },
+    {
+      "name": "clone",
+      "licenseReferenceVersion": "1.0.4",
+      "tarball": "https://registry.npmjs.org/clone/-/clone-1.0.4.tgz",
+      "tarballIntegrity": "sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==",
+      "gitHead": "3095b1b4182ea1babc453b3a46924754831b66bf",
+      "sourceRoot": "webpack://pdfmake/./node_modules/clone/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/clone/clone.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-3fb0857ef0133928"
+      ]
+    },
+    {
+      "name": "core-js",
+      "licenseReferenceVersion": "3.19.0",
+      "tarball": "https://registry.npmjs.org/core-js/-/core-js-3.19.0.tgz",
+      "tarballIntegrity": "sha512-L1TpFRWXZ76vH1yLM+z6KssLZrP8Z6GxxW4auoCj+XiViOzNPJCAuTIkn03BGdFe6Z5clX5t64wRIRypsZQrUg==",
+      "gitHead": "6123ff17d26eddf3ba8d456feb97decab3a9e9f6",
+      "sourceRoot": "webpack://pdfmake/./node_modules/core-js/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/core-js/internals/shared.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/html.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-is-webos-webkit.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/esnext.string.match-all.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.replace-all.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/enum-bug-keys.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-primitive.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/copy-constructor-properties.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/function-call.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.for-each.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/an-instance.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.number.is-integer.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.float32-array.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-is-browser.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-ff-version.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-set-prototype-of.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.some.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.reduce.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/native-promise-constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.symbol.to-primitive.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/iterators-core.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.match.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-get-own-property-names.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/task.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/function-name.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.number.constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/set-global.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/string-html-forced.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/indexed-object.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.date.to-primitive.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.split.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-get-own-property-names-external.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array-buffer.constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/use-symbol-as-uid.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/collection-strong.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-define-properties.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/inspect-source.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-create.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.number.to-fixed.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/path.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.from.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/fix-regexp-well-known-symbol-logic.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/document-create-element.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-includes.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.slice.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.index-of.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/redefine.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/get-iterator-method.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/create-iterator-constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.to-string.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/set-to-string-tag.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/redefine-all.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/iterators.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/descriptors.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/get-iterator.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/this-number-value.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-integral-number.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-is-ios.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.strike.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.assign.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.map.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/ie8-dom-define.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/has-own-property.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.slice.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.filter.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/regexp-flags.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/own-keys.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-is-ie-or-edge.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/dom-iterables.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-length.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.splice.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-object.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.last-index-of.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-string-tag-support.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.function.name.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-string.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/function-bind-context.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/native-weak-map.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.code-point-at.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-integer-or-infinity.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/species-constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.repeat.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.get-own-property-descriptors.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.bold.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/promise-resolve.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-regexp.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/typed-array-constructors-require-wrappers.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/get-substitution.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/string-trim.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.every.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-buffer-native.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/global.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/a-callable.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-reduce.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/clear-error-stack.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-from-constructor-and-list.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/typed-array-species-constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/string-repeat.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/an-object.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.fill.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/advance-string-index.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/collection.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.keys.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/function-uncurry-this.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/get-built-in.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/create-property.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/well-known-symbol.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.concat.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-forced.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/ordinary-to-primitive.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-user-agent.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.fill.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-webkit-version.js",
+        "webpack://pdfmake/./node_modules/core-js/es/promise/index.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/web.dom-collections.for-each.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-object.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/whitespaces.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-sort.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.reverse.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.promise.any.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/error-stack-installable.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.sort.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/length-of-array-like.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-species-create.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/define-well-known-symbol.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-symbol.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.replace.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/check-correctness-of-iteration.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/uid.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/native-symbol.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/fails.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.link.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.includes.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.uint16-array.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/create-non-enumerable-property.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.filter.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/esnext.global-this.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/esnext.promise.try.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/regexp-exec.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/iterator-close.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/set-species.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/get-method.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/inherit-if-required.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.to-string.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/classof.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-to-string.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/date-to-primitive.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/shared-store.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/freezing.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-property-is-enumerable.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-method-has-species-support.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/export.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/new-promise-capability.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.uint8-array.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.regexp.to-string.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.get-own-property-descriptor.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.includes.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.uint8-clamped-array.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.iterator.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/function-apply.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.number.epsilon.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/a-possible-prototype.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-array.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/typed-array-from-species-and-list.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.uint32-array.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-buffer-view-core.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/microtask.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/number-is-finite.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.values.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/host-report-errors.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-get-own-property-symbols.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.regexp.exec.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/perform.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.italics.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/internal-metadata.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.join.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-pure.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-property-key.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.global-this.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/ieee754.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-keys-internal.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/esnext.string.replace-all.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.subarray.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-positive-integer.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.symbol.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.int8-array.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.from-code-point.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.set.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/regexp-exec-abstract.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/dom-token-list-prototype.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/esnext.promise.any.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.promise.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/correct-prototype-getter.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.copy-within.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/try-to-string.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/string-trim-forced.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/a-constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.symbol.iterator.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/string-multibyte.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-get-prototype-of.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-v8-version.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.number.is-finite.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/internal-state.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-is-prototype-of.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-is-ios-pebble.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/add-to-unscopables.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-index.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.match-all.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.get-prototype-of.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-get-own-property-descriptor.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.string.trim.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-fill.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-slice.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.copy-within.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.symbol.description.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.to-locale-string.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.regexp.flags.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-absolute-index.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/regexp-sticky-helpers.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.object.freeze.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.int16-array.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/well-known-symbol-wrapped.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.set.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.promise.all-settled.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.map.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/iterate.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-offset.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-to-array.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.promise.finally.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-method-is-strict.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.iterator.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/shared-key.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-for-each.js",
+        "webpack://pdfmake/./node_modules/core-js/es/object/values.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-buffer.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.from.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/typed-array-from.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/require-object-coercible.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/regexp-unsupported-dot-all.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/esnext.aggregate-error.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-last-index-of.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.sort.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-keys.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/normalize-string-argument.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-assign.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/install-error-cause.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.map.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.find.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-array-iterator-method.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/hidden-keys.js",
+        "webpack://pdfmake/./node_modules/core-js/stable/promise/index.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.float64-array.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-iteration.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.iterator.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/correct-is-regexp-logic.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/create-html.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.reduce-right.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-copy-within.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/not-a-regexp.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/classof-raw.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/is-callable.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/web.dom-collections.iterator.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.includes.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.join.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.aggregate-error.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/engine-is-node.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-from.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.int32-array.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/object-define-property.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/define-iterator.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.typed-array.find-index.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/es.array.find.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/call-with-safe-iteration-closing.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/regexp-unsupported-ncg.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/create-property-descriptor.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/to-indexed-object.js",
+        "webpack://pdfmake/./node_modules/core-js/features/promise/index.js",
+        "webpack://pdfmake/./node_modules/core-js/modules/esnext.promise.all-settled.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/array-species-constructor.js",
+        "webpack://pdfmake/./node_modules/core-js/internals/typed-array-constructor.js"
+      ],
+      "exactReferenceMatches": 281,
+      "notices": [
+        "notice-153d958ab424a0b0",
+        "notice-58354d0add0fdb3a"
+      ]
+    },
+    {
+      "name": "crypto-js",
+      "licenseReferenceVersion": "4.2.0",
+      "tarball": "https://registry.npmjs.org/crypto-js/-/crypto-js-4.2.0.tgz",
+      "tarballIntegrity": "sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==",
+      "gitHead": "ac34a5a584337b33a2e567f50d96819a96ac44bf",
+      "sourceRoot": "webpack://pdfmake/./node_modules/crypto-js/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/crypto-js/ripemd160.js",
+        "webpack://pdfmake/./node_modules/crypto-js/enc-utf16.js",
+        "webpack://pdfmake/./node_modules/crypto-js/hmac.js",
+        "webpack://pdfmake/./node_modules/crypto-js/mode-ofb.js",
+        "webpack://pdfmake/./node_modules/crypto-js/rabbit.js",
+        "webpack://pdfmake/./node_modules/crypto-js/sha224.js",
+        "webpack://pdfmake/./node_modules/crypto-js/lib-typedarrays.js",
+        "webpack://pdfmake/./node_modules/crypto-js/pad-iso97971.js",
+        "webpack://pdfmake/./node_modules/crypto-js/enc-base64url.js",
+        "webpack://pdfmake/./node_modules/crypto-js/sha3.js",
+        "webpack://pdfmake/./node_modules/crypto-js/x64-core.js",
+        "webpack://pdfmake/./node_modules/crypto-js/aes.js",
+        "webpack://pdfmake/./node_modules/crypto-js/tripledes.js",
+        "webpack://pdfmake/./node_modules/crypto-js/sha384.js",
+        "webpack://pdfmake/./node_modules/crypto-js/pad-ansix923.js",
+        "webpack://pdfmake/./node_modules/crypto-js/mode-ecb.js",
+        "webpack://pdfmake/./node_modules/crypto-js/sha1.js",
+        "webpack://pdfmake/./node_modules/crypto-js/pbkdf2.js",
+        "webpack://pdfmake/./node_modules/crypto-js/mode-ctr.js",
+        "webpack://pdfmake/./node_modules/crypto-js/core.js",
+        "webpack://pdfmake/./node_modules/crypto-js/cipher-core.js",
+        "webpack://pdfmake/./node_modules/crypto-js/sha512.js",
+        "webpack://pdfmake/./node_modules/crypto-js/pad-nopadding.js",
+        "webpack://pdfmake/./node_modules/crypto-js/mode-cfb.js",
+        "webpack://pdfmake/./node_modules/crypto-js/mode-ctr-gladman.js",
+        "webpack://pdfmake/./node_modules/crypto-js/sha256.js",
+        "webpack://pdfmake/./node_modules/crypto-js/enc-base64.js",
+        "webpack://pdfmake/./node_modules/crypto-js/md5.js",
+        "webpack://pdfmake/./node_modules/crypto-js/blowfish.js",
+        "webpack://pdfmake/./node_modules/crypto-js/format-hex.js",
+        "webpack://pdfmake/./node_modules/crypto-js/rabbit-legacy.js",
+        "webpack://pdfmake/./node_modules/crypto-js/evpkdf.js",
+        "webpack://pdfmake/./node_modules/crypto-js/pad-zeropadding.js",
+        "webpack://pdfmake/./node_modules/crypto-js/pad-iso10126.js",
+        "webpack://pdfmake/./node_modules/crypto-js/index.js",
+        "webpack://pdfmake/./node_modules/crypto-js/rc4.js"
+      ],
+      "exactReferenceMatches": 36,
+      "notices": [
+        "notice-df15cb64ddb4b92d"
+      ]
+    },
+    {
+      "name": "deep-equal",
+      "licenseReferenceVersion": "1.1.2",
+      "tarball": "https://registry.npmjs.org/deep-equal/-/deep-equal-1.1.2.tgz",
+      "tarballIntegrity": "sha512-5tdhKF6DbU7iIzrIOa1AOUt39ZRm13cmL1cGEh//aqR8x9+tNfbywRf0n5FD/18OKMdo7DNEtrX2t22ZAkI+eg==",
+      "gitHead": "be5f0362c99f4f205628f289a04f703a1023005f",
+      "sourceRoot": "webpack://pdfmake/./node_modules/deep-equal/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/deep-equal/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-4839125439c51ef7"
+      ]
+    },
+    {
+      "name": "define-data-property",
+      "licenseReferenceVersion": "1.1.4",
+      "tarball": "https://registry.npmjs.org/define-data-property/-/define-data-property-1.1.4.tgz",
+      "tarballIntegrity": "sha512-rBMvIzlpA8v6E+SJZoo++HAYqsLrkg7MSfIinMPFhmkorw7X+dOXVJQs+QT69zGkzMyfDnIMN2Wid1+NbL3T+A==",
+      "gitHead": "e313da59d1f65e1549ac59539a7a8ac17632df60",
+      "sourceRoot": "webpack://pdfmake/./node_modules/define-data-property/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/define-data-property/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-b41d08bc3624d8c4"
+      ]
+    },
+    {
+      "name": "define-properties",
+      "licenseReferenceVersion": "1.2.1",
+      "tarball": "https://registry.npmjs.org/define-properties/-/define-properties-1.2.1.tgz",
+      "tarballIntegrity": "sha512-8QmQKqEASLd5nx0U1B1okLElbUuuttJ/AnYmRXbbbGDWh6uS208EjD4Xqq/I9wK7u0v6O08XhTWnt5XtEbR6Dg==",
+      "gitHead": "d7a4db30214eb06d3997dc3e662c11dfe95b25bd",
+      "sourceRoot": "webpack://pdfmake/./node_modules/define-properties/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/define-properties/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-210549bd75abec34"
+      ]
+    },
+    {
+      "name": "dfa",
+      "licenseReferenceVersion": "1.2.0",
+      "tarball": "https://registry.npmjs.org/dfa/-/dfa-1.2.0.tgz",
+      "tarballIntegrity": "sha512-ED3jP8saaweFTjeGX8HQPjeC1YYyZs98jGNZx6IiBvxW7JG5v492kamAQB3m2wop07CvU/RQmzcKr6bgcC5D/Q==",
+      "gitHead": "3f5e603e5082caedabefefdf53e8a6ca3111e966",
+      "sourceRoot": "webpack://pdfmake/./node_modules/dfa/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/dfa/src/StateMachine.js"
+      ],
+      "exactReferenceMatches": 0,
+      "notices": [
+        "notice-a563650c0c21d8a7"
+      ],
+      "versionLimit": "License-reference release; transformed or composed sources do not establish an exact embedded release version."
+    },
+    {
+      "name": "dunder-proto",
+      "licenseReferenceVersion": "1.0.1",
+      "tarball": "https://registry.npmjs.org/dunder-proto/-/dunder-proto-1.0.1.tgz",
+      "tarballIntegrity": "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==",
+      "gitHead": "c6f4b69ab80c495777870f6a5f6a22db16ecaecb",
+      "sourceRoot": "webpack://pdfmake/./node_modules/dunder-proto/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/dunder-proto/get.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-2b770a704c15de23"
+      ]
+    },
+    {
+      "name": "es-define-property",
+      "licenseReferenceVersion": "1.0.1",
+      "tarball": "https://registry.npmjs.org/es-define-property/-/es-define-property-1.0.1.tgz",
+      "tarballIntegrity": "sha512-e3nRfgfUZ4rNGL232gUgX06QNyyez04KdjFrF+LTRoOXmrOgFKDg4BCdsjW8EnT69eqdYGmRpJwiPVYNrCaW3g==",
+      "gitHead": "50ef129225ae17336a774f0eefc4e6bc88c79b8e",
+      "sourceRoot": "webpack://pdfmake/./node_modules/es-define-property/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/es-define-property/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-5e325595b4ea8cfe"
+      ]
+    },
+    {
+      "name": "es-errors",
+      "licenseReferenceVersion": "1.3.0",
+      "tarball": "https://registry.npmjs.org/es-errors/-/es-errors-1.3.0.tgz",
+      "tarballIntegrity": "sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==",
+      "gitHead": "5599cf0ebe75cc3685445f83ca80207a357fdb12",
+      "sourceRoot": "webpack://pdfmake/./node_modules/es-errors/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/es-errors/index.js",
+        "webpack://pdfmake/./node_modules/es-errors/range.js",
+        "webpack://pdfmake/./node_modules/es-errors/eval.js",
+        "webpack://pdfmake/./node_modules/es-errors/ref.js",
+        "webpack://pdfmake/./node_modules/es-errors/uri.js",
+        "webpack://pdfmake/./node_modules/es-errors/syntax.js",
+        "webpack://pdfmake/./node_modules/es-errors/type.js"
+      ],
+      "exactReferenceMatches": 7,
+      "notices": [
+        "notice-5e325595b4ea8cfe"
+      ]
+    },
+    {
+      "name": "es-object-atoms",
+      "licenseReferenceVersion": "1.1.1",
+      "tarball": "https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.1.tgz",
+      "tarballIntegrity": "sha512-FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==",
+      "gitHead": "fe8db15106acf15abec2e76818d1aa4713293109",
+      "sourceRoot": "webpack://pdfmake/./node_modules/es-object-atoms/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/es-object-atoms/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-5e325595b4ea8cfe"
+      ]
+    },
+    {
+      "name": "events",
+      "licenseReferenceVersion": "3.3.0",
+      "tarball": "https://registry.npmjs.org/events/-/events-3.3.0.tgz",
+      "tarballIntegrity": "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==",
+      "gitHead": "aed9f91fee236bdedab8d593f7aa418ae6ed2718",
+      "sourceRoot": "webpack://pdfmake/./node_modules/events/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/events/events.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-631987b7616a325a"
+      ]
+    },
+    {
+      "name": "expose-loader",
+      "licenseReferenceVersion": "5.0.1",
+      "tarball": "https://registry.npmjs.org/expose-loader/-/expose-loader-5.0.1.tgz",
+      "tarballIntegrity": "sha512-5YPZuszN/eWND/B+xuq5nIpb/l5TV1HYmdO6SubYtHv+HenVw9/6bn33Mm5reY8DNid7AVtbARvyUD34edfCtg==",
+      "gitHead": "5ccef252cf9bab282f10579d00ae771def6e124e",
+      "sourceRoot": "webpack://pdfmake/./node_modules/expose-loader/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/expose-loader/dist/runtime/getGlobalThis.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-9068a8782d2fb4c6"
+      ]
+    },
+    {
+      "name": "file-saver",
+      "licenseReferenceVersion": "2.0.5",
+      "tarball": "https://registry.npmjs.org/file-saver/-/file-saver-2.0.5.tgz",
+      "tarballIntegrity": "sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==",
+      "gitHead": "5bb701bd6ea05a02836daf8ef88ec350a1dd4d83",
+      "sourceRoot": "webpack://pdfmake/./node_modules/file-saver/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/file-saver/src/FileSaver.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-2d1d7a93b46e4274"
+      ]
+    },
+    {
+      "name": "for-each",
+      "licenseReferenceVersion": "0.3.5",
+      "tarball": "https://registry.npmjs.org/for-each/-/for-each-0.3.5.tgz",
+      "tarballIntegrity": "sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==",
+      "gitHead": "45229651ed893773058ba9ccc42af8999014409f",
+      "sourceRoot": "webpack://pdfmake/./node_modules/for-each/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/for-each/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-d07913d776eef217"
+      ]
+    },
+    {
+      "name": "function-bind",
+      "licenseReferenceVersion": "1.1.2",
+      "tarball": "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+      "tarballIntegrity": "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==",
+      "gitHead": "40197beb5f4cf89dd005f0b268256c1e4716ea81",
+      "sourceRoot": "webpack://pdfmake/./node_modules/function-bind/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/function-bind/index.js",
+        "webpack://pdfmake/./node_modules/function-bind/implementation.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-773e131a76847260"
+      ]
+    },
+    {
+      "name": "functions-have-names",
+      "licenseReferenceVersion": "1.2.3",
+      "tarball": "https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz",
+      "tarballIntegrity": "sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==",
+      "gitHead": "3ac881daaf2066bff7c422fd606271f4976efa8f",
+      "sourceRoot": "webpack://pdfmake/./node_modules/functions-have-names/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/functions-have-names/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-cfc3f455254c0af0"
+      ]
+    },
+    {
+      "name": "get-intrinsic",
+      "licenseReferenceVersion": "1.3.0",
+      "tarball": "https://registry.npmjs.org/get-intrinsic/-/get-intrinsic-1.3.0.tgz",
+      "tarballIntegrity": "sha512-9fSjSaos/fRIVIp+xSJlE6lfwhES7LNtKaCBIamHsjr2na1BiABJPo0mOjjz8GJDURarmCPGqaiVg5mfjb98CQ==",
+      "gitHead": "9d747e0540e5e03421e7411b7946c23f4b010fd5",
+      "sourceRoot": "webpack://pdfmake/./node_modules/get-intrinsic/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/get-intrinsic/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-39c5ec504cf6bd5c"
+      ]
+    },
+    {
+      "name": "get-proto",
+      "licenseReferenceVersion": "1.0.1",
+      "tarball": "https://registry.npmjs.org/get-proto/-/get-proto-1.0.1.tgz",
+      "tarballIntegrity": "sha512-sTSfBjoXBp89JvIKIefqw7U2CCebsc74kiY6awiGogKtoSGbgjYE/G/+l9sF3MWFPNc9IcoOC4ODfKHfxFmp0g==",
+      "gitHead": "1b92a72e80c026d391589a807272c50469d37c43",
+      "sourceRoot": "webpack://pdfmake/./node_modules/get-proto/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/get-proto/Object.getPrototypeOf.js",
+        "webpack://pdfmake/./node_modules/get-proto/Reflect.getPrototypeOf.js",
+        "webpack://pdfmake/./node_modules/get-proto/index.js"
+      ],
+      "exactReferenceMatches": 3,
+      "notices": [
+        "notice-be46ce1e3b0479af"
+      ]
+    },
+    {
+      "name": "gopd",
+      "licenseReferenceVersion": "1.2.0",
+      "tarball": "https://registry.npmjs.org/gopd/-/gopd-1.2.0.tgz",
+      "tarballIntegrity": "sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==",
+      "gitHead": "7f867f97d7c895a982a3b631287fd2c36d39c2ff",
+      "sourceRoot": "webpack://pdfmake/./node_modules/gopd/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/gopd/index.js",
+        "webpack://pdfmake/./node_modules/gopd/gOPD.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-d90bf0a089da4cf4"
+      ]
+    },
+    {
+      "name": "has-property-descriptors",
+      "licenseReferenceVersion": "1.0.2",
+      "tarball": "https://registry.npmjs.org/has-property-descriptors/-/has-property-descriptors-1.0.2.tgz",
+      "tarballIntegrity": "sha512-55JNKuIW+vq4Ke1BjOTjM2YctQIvCT7GFzHwmfZPGo5wnrgkid0YQtnAleFSqumZm4az3n2BS+erby5ipJdgrg==",
+      "gitHead": "69037fc06a4ec7a5a14e66ea029f2769e243c454",
+      "sourceRoot": "webpack://pdfmake/./node_modules/has-property-descriptors/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/has-property-descriptors/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-0f0ca96f50793990"
+      ]
+    },
+    {
+      "name": "has-symbols",
+      "licenseReferenceVersion": "1.1.0",
+      "tarball": "https://registry.npmjs.org/has-symbols/-/has-symbols-1.1.0.tgz",
+      "tarballIntegrity": "sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==",
+      "gitHead": "270f0a67b5f4cb12715e0a84e672aaee64d1b4f1",
+      "sourceRoot": "webpack://pdfmake/./node_modules/has-symbols/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/has-symbols/shams.js",
+        "webpack://pdfmake/./node_modules/has-symbols/index.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-206c1adcf206dc00"
+      ]
+    },
+    {
+      "name": "has-tostringtag",
+      "licenseReferenceVersion": "1.0.2",
+      "tarball": "https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.2.tgz",
+      "tarballIntegrity": "sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==",
+      "gitHead": "690da6a3afbddcf018aa162c42869dcf4f8375f1",
+      "sourceRoot": "webpack://pdfmake/./node_modules/has-tostringtag/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/has-tostringtag/shams.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-e2560e002e132815"
+      ]
+    },
+    {
+      "name": "hasown",
+      "licenseReferenceVersion": "2.0.2",
+      "tarball": "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+      "tarballIntegrity": "sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==",
+      "gitHead": "d00d35005baf16a33d691a13f8ad627f35040742",
+      "sourceRoot": "webpack://pdfmake/./node_modules/hasown/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/hasown/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-bf9b0d665be2a689"
+      ]
+    },
+    {
+      "name": "iconv-lite",
+      "licenseReferenceVersion": "0.6.3",
+      "tarball": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz",
+      "tarballIntegrity": "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==",
+      "gitHead": "d13de386c07a1574425811f8f219c181c633e88d",
+      "sourceRoot": "webpack://pdfmake/./node_modules/iconv-lite/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/utf7.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/internal.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/utf16.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/utf32.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/index.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/lib/streams.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/dbcs-codec.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/lib/bom-handling.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/lib/index.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/sbcs-data-generated.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/dbcs-data.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/sbcs-data.js",
+        "webpack://pdfmake/./node_modules/iconv-lite/encodings/sbcs-codec.js"
+      ],
+      "exactReferenceMatches": 13,
+      "notices": [
+        "notice-ac779f7314c74f23"
+      ]
+    },
+    {
+      "name": "ieee754",
+      "licenseReferenceVersion": "1.2.1",
+      "tarball": "https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz",
+      "tarballIntegrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==",
+      "gitHead": "b60d148be9cad718f9ff007c211c2427cdc180a4",
+      "sourceRoot": "webpack://pdfmake/./node_modules/ieee754/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/ieee754/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-18d45466ba3253de"
+      ]
+    },
+    {
+      "name": "inherits",
+      "licenseReferenceVersion": "2.0.4",
+      "tarball": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
+      "tarballIntegrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
+      "gitHead": "9a2c29400c6d491e0b7beefe0c32efa3b462545d",
+      "sourceRoot": "webpack://pdfmake/./node_modules/inherits/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/inherits/inherits_browser.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-5ffe28e7ade7d8f1"
+      ]
+    },
+    {
+      "name": "is-arguments",
+      "licenseReferenceVersion": "1.2.0",
+      "tarball": "https://registry.npmjs.org/is-arguments/-/is-arguments-1.2.0.tgz",
+      "tarballIntegrity": "sha512-7bVbi0huj/wrIAOzb8U1aszg9kdi3KN/CyU19CTI7tAoZYEZoL9yCDXpbXN+uPsuWnP02cyug1gleqq+TU+YCA==",
+      "gitHead": "d81247609b56fa56571d9d74ffc97ed4a3780364",
+      "sourceRoot": "webpack://pdfmake/./node_modules/is-arguments/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/is-arguments/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-dc0fe5a22d9336f3"
+      ]
+    },
+    {
+      "name": "is-callable",
+      "licenseReferenceVersion": "1.2.7",
+      "tarball": "https://registry.npmjs.org/is-callable/-/is-callable-1.2.7.tgz",
+      "tarballIntegrity": "sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==",
+      "gitHead": "f23584dd25c26473e702e80a5e8e7e79e2a89aee",
+      "sourceRoot": "webpack://pdfmake/./node_modules/is-callable/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/is-callable/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-c61652db3d2808f6"
+      ]
+    },
+    {
+      "name": "is-date-object",
+      "licenseReferenceVersion": "1.1.0",
+      "tarball": "https://registry.npmjs.org/is-date-object/-/is-date-object-1.1.0.tgz",
+      "tarballIntegrity": "sha512-PwwhEakHVKTdRNVOw+/Gyh0+MzlCl4R6qKvkhuvLtPMggI1WAHt9sOwZxQLSGpUaDnrdyDsomoRgNnCfKNSXXg==",
+      "gitHead": "a22f8d7d60cbddb809da08e4b47ed510b40a2dd9",
+      "sourceRoot": "webpack://pdfmake/./node_modules/is-date-object/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/is-date-object/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-c61652db3d2808f6"
+      ]
+    },
+    {
+      "name": "is-generator-function",
+      "licenseReferenceVersion": "1.1.0",
+      "tarball": "https://registry.npmjs.org/is-generator-function/-/is-generator-function-1.1.0.tgz",
+      "tarballIntegrity": "sha512-nPUB5km40q9e8UfN/Zc24eLlzdSf9OfKByBw9CIdw4H1giPMeA0OIJvbchsCu4npfI2QcMVBsGEBHKZ7wLTWmQ==",
+      "gitHead": "2ac26fe76d5cdbc8db7525f0ee07f65cc99b0abd",
+      "sourceRoot": "webpack://pdfmake/./node_modules/is-generator-function/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/is-generator-function/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-dc0fe5a22d9336f3"
+      ]
+    },
+    {
+      "name": "is-nan",
+      "licenseReferenceVersion": "1.3.2",
+      "tarball": "https://registry.npmjs.org/is-nan/-/is-nan-1.3.2.tgz",
+      "tarballIntegrity": "sha512-E+zBKpQ2t6MEo1VsonYmluk9NxGrbzpeeLC2xIViuO2EjU2xsXsBPwTr3Ykv9l08UYEVEdWeRZNouaZqF6RN0w==",
+      "gitHead": "6a83a0a7d12cdd1a10933b5b32e5d9acb57297cc",
+      "sourceRoot": "webpack://pdfmake/./node_modules/is-nan/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/is-nan/index.js",
+        "webpack://pdfmake/./node_modules/is-nan/shim.js",
+        "webpack://pdfmake/./node_modules/is-nan/polyfill.js",
+        "webpack://pdfmake/./node_modules/is-nan/implementation.js"
+      ],
+      "exactReferenceMatches": 4,
+      "notices": [
+        "notice-dc0fe5a22d9336f3"
+      ]
+    },
+    {
+      "name": "is-regex",
+      "licenseReferenceVersion": "1.2.1",
+      "tarball": "https://registry.npmjs.org/is-regex/-/is-regex-1.2.1.tgz",
+      "tarballIntegrity": "sha512-MjYsKHO5O7mCsmRGxWcLWheFqN9DJ/2TmngvjKXihe6efViPqc274+Fx/4fYj/r03+ESvBdTXK0V6tA3rgez1g==",
+      "gitHead": "7c5a8cf9456d3cfe5e905bc620acb0e1bad61812",
+      "sourceRoot": "webpack://pdfmake/./node_modules/is-regex/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/is-regex/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-dc0fe5a22d9336f3"
+      ]
+    },
+    {
+      "name": "is-typed-array",
+      "licenseReferenceVersion": "1.1.15",
+      "tarball": "https://registry.npmjs.org/is-typed-array/-/is-typed-array-1.1.15.tgz",
+      "tarballIntegrity": "sha512-p3EcsicXjit7SaskXHs1hA91QxgTw46Fv6EFKKGS5DRFLD8yKnohjF3hxoju94b/OcMZoQukzpPpBE9uLVKzgQ==",
+      "gitHead": "4310dcb2d390f090bc74f557174301cd8aed5d5c",
+      "sourceRoot": "webpack://pdfmake/./node_modules/is-typed-array/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/is-typed-array/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-c61652db3d2808f6"
+      ]
+    },
+    {
+      "name": "jpeg-exif",
+      "licenseReferenceVersion": "1.1.4",
+      "tarball": "https://registry.npmjs.org/jpeg-exif/-/jpeg-exif-1.1.4.tgz",
+      "tarballIntegrity": "sha512-a+bKEcCjtuW5WTdgeXFzswSrdqi0jk4XlEtZlx5A94wCoBpFjfFTbo/Tra5SpNCl/YFZPvcV1dJc+TAYeg6ROQ==",
+      "gitHead": "8c3d3d1951123bc1e82c378de882720b28c8f402",
+      "sourceRoot": "webpack://pdfmake/./node_modules/jpeg-exif/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/jpeg-exif/src/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-a8202d59ed0629ee"
+      ]
+    },
+    {
+      "name": "math-intrinsics",
+      "licenseReferenceVersion": "1.1.0",
+      "tarball": "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz",
+      "tarballIntegrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==",
+      "gitHead": "84ffc824e044a91da1b847bde30c0286519eabf1",
+      "sourceRoot": "webpack://pdfmake/./node_modules/math-intrinsics/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/math-intrinsics/max.js",
+        "webpack://pdfmake/./node_modules/math-intrinsics/isNaN.js",
+        "webpack://pdfmake/./node_modules/math-intrinsics/round.js",
+        "webpack://pdfmake/./node_modules/math-intrinsics/sign.js",
+        "webpack://pdfmake/./node_modules/math-intrinsics/min.js",
+        "webpack://pdfmake/./node_modules/math-intrinsics/abs.js",
+        "webpack://pdfmake/./node_modules/math-intrinsics/pow.js",
+        "webpack://pdfmake/./node_modules/math-intrinsics/floor.js"
+      ],
+      "exactReferenceMatches": 8,
+      "notices": [
+        "notice-2b770a704c15de23"
+      ]
+    },
+    {
+      "name": "object-is",
+      "licenseReferenceVersion": "1.1.6",
+      "tarball": "https://registry.npmjs.org/object-is/-/object-is-1.1.6.tgz",
+      "tarballIntegrity": "sha512-F8cZ+KfGlSGi09lJT7/Nd6KJZ9ygtvYC0/UYYLI9nmQKLMnydpB9yvbv9K1uSkEu7FU9vYPmVwLg328tX+ot3Q==",
+      "gitHead": "a4d045ace233763a3715d90c3d3af5052a290dc4",
+      "sourceRoot": "webpack://pdfmake/./node_modules/object-is/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/object-is/shim.js",
+        "webpack://pdfmake/./node_modules/object-is/implementation.js",
+        "webpack://pdfmake/./node_modules/object-is/polyfill.js",
+        "webpack://pdfmake/./node_modules/object-is/index.js"
+      ],
+      "exactReferenceMatches": 4,
+      "notices": [
+        "notice-dc0fe5a22d9336f3"
+      ]
+    },
+    {
+      "name": "object-keys",
+      "licenseReferenceVersion": "1.1.1",
+      "tarball": "https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz",
+      "tarballIntegrity": "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==",
+      "gitHead": "ba2c1989270c7de969aa8498fc3b7c8e677806f3",
+      "sourceRoot": "webpack://pdfmake/./node_modules/object-keys/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/object-keys/index.js",
+        "webpack://pdfmake/./node_modules/object-keys/implementation.js",
+        "webpack://pdfmake/./node_modules/object-keys/isArguments.js"
+      ],
+      "exactReferenceMatches": 3,
+      "notices": [
+        "notice-61b723ee61d8544f"
+      ]
+    },
+    {
+      "name": "object.assign",
+      "licenseReferenceVersion": "4.1.7",
+      "tarball": "https://registry.npmjs.org/object.assign/-/object.assign-4.1.7.tgz",
+      "tarballIntegrity": "sha512-nK28WOo+QIjBkDduTINE4JkF/UJJKyf2EJxvJKfblDpyg0Q+pkOHNTL0Qwy6NP6FhE/EnzV73BxxqcJaXY9anw==",
+      "gitHead": "0aa92bc8f1d87c9cae87881cf2e9245093f39bda",
+      "sourceRoot": "webpack://pdfmake/./node_modules/object.assign/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/object.assign/implementation.js",
+        "webpack://pdfmake/./node_modules/object.assign/polyfill.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-7365a9e1142d7dbc"
+      ]
+    },
+    {
+      "name": "pako",
+      "licenseReferenceVersion": "1.0.11",
+      "tarball": "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz",
+      "tarballIntegrity": "sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==",
+      "gitHead": "a718e4f6e5ce87b0964d8f84541d92a23263365b",
+      "sourceRoot": "webpack://pdfmake/./node_modules/pako/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/inflate.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/trees.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/deflate.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/zstream.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/adler32.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/messages.js",
+        "webpack://pdfmake/./node_modules/pako/lib/utils/common.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/constants.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/inftrees.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/inffast.js",
+        "webpack://pdfmake/./node_modules/pako/lib/zlib/crc32.js"
+      ],
+      "exactReferenceMatches": 11,
+      "notices": [
+        "notice-a04665b3b2de56c6"
+      ]
+    },
+    {
+      "name": "png-js",
+      "licenseReferenceVersion": "1.0.0",
+      "tarball": "https://registry.npmjs.org/png-js/-/png-js-1.0.0.tgz",
+      "tarballIntegrity": "sha512-k+YsbhpA9e+EFfKjTCH3VW6aoKlyNYI6NYdTfDL4CIvFnvsuO84ttonmZE7rc+v23SLTH8XX+5w/Ak9v0xGY4g==",
+      "gitHead": "977b857a11676c1e720e79ed8d9178a005a9abd6",
+      "sourceRoot": "webpack://pdfmake/./node_modules/png-js/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/png-js/png-node.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-bdb26a2ec815931e"
+      ]
+    },
+    {
+      "name": "possible-typed-array-names",
+      "licenseReferenceVersion": "1.1.0",
+      "tarball": "https://registry.npmjs.org/possible-typed-array-names/-/possible-typed-array-names-1.1.0.tgz",
+      "tarballIntegrity": "sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==",
+      "gitHead": "2f74e2d3a02309b48fa6d6d48f8fd3359681707f",
+      "sourceRoot": "webpack://pdfmake/./node_modules/possible-typed-array-names/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/possible-typed-array-names/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-5e325595b4ea8cfe"
+      ]
+    },
+    {
+      "name": "process",
+      "licenseReferenceVersion": "0.11.10",
+      "tarball": "https://registry.npmjs.org/process/-/process-0.11.10.tgz",
+      "tarballIntegrity": "sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==",
+      "gitHead": "557aa46f283caccce603dbb9c376b3d81067c510",
+      "sourceRoot": "webpack://pdfmake/./node_modules/process/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/process/browser.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-59a400d04c507857"
+      ]
+    },
+    {
+      "name": "regexp.prototype.flags",
+      "licenseReferenceVersion": "1.5.4",
+      "tarball": "https://registry.npmjs.org/regexp.prototype.flags/-/regexp.prototype.flags-1.5.4.tgz",
+      "tarballIntegrity": "sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==",
+      "gitHead": "36fcf221a351d8451d02bcdf91e63cf3ee83b1db",
+      "sourceRoot": "webpack://pdfmake/./node_modules/regexp.prototype.flags/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/regexp.prototype.flags/polyfill.js",
+        "webpack://pdfmake/./node_modules/regexp.prototype.flags/shim.js",
+        "webpack://pdfmake/./node_modules/regexp.prototype.flags/index.js",
+        "webpack://pdfmake/./node_modules/regexp.prototype.flags/implementation.js"
+      ],
+      "exactReferenceMatches": 4,
+      "notices": [
+        "notice-9616325393b574ca"
+      ]
+    },
+    {
+      "name": "safe-regex-test",
+      "licenseReferenceVersion": "1.1.0",
+      "tarball": "https://registry.npmjs.org/safe-regex-test/-/safe-regex-test-1.1.0.tgz",
+      "tarballIntegrity": "sha512-x/+Cz4YrimQxQccJf5mKEbIa1NzeCRNI5Ecl/ekmlYaampdNLPalVyIcCZNNH3MvmqBugV5TMYZXv0ljslUlaw==",
+      "gitHead": "ea4173e88d68d8e9a95717fa5548a3ea524c2dc9",
+      "sourceRoot": "webpack://pdfmake/./node_modules/safe-regex-test/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/safe-regex-test/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-d90bf0a089da4cf4"
+      ]
+    },
+    {
+      "name": "safer-buffer",
+      "licenseReferenceVersion": "2.1.2",
+      "tarball": "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz",
+      "tarballIntegrity": "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==",
+      "gitHead": "e8ac214944eda30e1e6c6b7d7e7f6a21cf7dce7c",
+      "sourceRoot": "webpack://pdfmake/./node_modules/safer-buffer/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/safer-buffer/safer.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-4bc935e71be198c6"
+      ]
+    },
+    {
+      "name": "sax",
+      "licenseReferenceVersion": "1.4.1",
+      "tarball": "https://registry.npmjs.org/sax/-/sax-1.4.1.tgz",
+      "tarballIntegrity": "sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==",
+      "gitHead": "25ab118a3184d2070495e7eecf2e762f9044442c",
+      "sourceRoot": "webpack://pdfmake/./node_modules/sax/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/sax/lib/sax.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-e8bf477df410baa4"
+      ]
+    },
+    {
+      "name": "set-function-length",
+      "licenseReferenceVersion": "1.2.2",
+      "tarball": "https://registry.npmjs.org/set-function-length/-/set-function-length-1.2.2.tgz",
+      "tarballIntegrity": "sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==",
+      "gitHead": "85f4b57ec0560b9fd3ad75eb7b13c05c6af9f42d",
+      "sourceRoot": "webpack://pdfmake/./node_modules/set-function-length/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/set-function-length/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-bf9b0d665be2a689"
+      ]
+    },
+    {
+      "name": "set-function-name",
+      "licenseReferenceVersion": "2.0.2",
+      "tarball": "https://registry.npmjs.org/set-function-name/-/set-function-name-2.0.2.tgz",
+      "tarballIntegrity": "sha512-7PGFlmtwsEADb0WYyvCMa1t+yke6daIG4Wirafur5kcf+MhUnPms1UeR0CKQdTZD81yESwMHbtn+TR+dMviakQ==",
+      "gitHead": "2ff8b304c8795e8d76ce992622eb046ff88d1c48",
+      "sourceRoot": "webpack://pdfmake/./node_modules/set-function-name/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/set-function-name/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-bf9b0d665be2a689"
+      ]
+    },
+    {
+      "name": "stream-browserify",
+      "licenseReferenceVersion": "3.0.0",
+      "tarball": "https://registry.npmjs.org/stream-browserify/-/stream-browserify-3.0.0.tgz",
+      "tarballIntegrity": "sha512-H73RAHsVBapbim0tU2JwwOiXUj+fikfiaoYAKHF3VJfA0pe2BCzkhAHBlLG6REzE+2WNZcxOXjK7lkso+9euLA==",
+      "gitHead": "a3625cb4181c4bcdf09884e677d4320c641b8724",
+      "sourceRoot": "webpack://pdfmake/./node_modules/stream-browserify/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/stream-browserify/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-96e5193183476a03"
+      ]
+    },
+    {
+      "name": "readable-stream",
+      "licenseReferenceVersion": "3.6.2",
+      "tarball": "https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.2.tgz",
+      "tarballIntegrity": "sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==",
+      "gitHead": "6c32003bd8607da54f8ca1b096c4411778b060bc",
+      "sourceRoot": "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/end-of-stream.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/_stream_duplex.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/_stream_passthrough.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/buffer_list.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/_stream_writable.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/destroy.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/pipeline.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/_stream_transform.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/from-browser.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/state.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/async_iterator.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/errors-browser.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/_stream_readable.js",
+        "webpack://pdfmake/./node_modules/stream-browserify/node_modules/readable-stream/lib/internal/streams/stream-browser.js"
+      ],
+      "exactReferenceMatches": 14,
+      "notices": [
+        "notice-ec62dc96da0099b8"
+      ]
+    },
+    {
+      "name": "string_decoder",
+      "licenseReferenceVersion": "1.3.0",
+      "tarball": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz",
+      "tarballIntegrity": "sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==",
+      "gitHead": "60db81e031c126112039157ba9437484b1329dff",
+      "sourceRoot": "webpack://pdfmake/./node_modules/string_decoder/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/string_decoder/lib/string_decoder.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-11f2aafb37d06b3e"
+      ]
+    },
+    {
+      "name": "safe-buffer",
+      "licenseReferenceVersion": "5.1.2",
+      "tarball": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz",
+      "tarballIntegrity": "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==",
+      "gitHead": "649435cc8e2d1f3ecdc7caf323f1cb1187307a16",
+      "sourceRoot": "webpack://pdfmake/./node_modules/string_decoder/node_modules/safe-buffer/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/string_decoder/node_modules/safe-buffer/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-c7cc929b57080f4b"
+      ]
+    },
+    {
+      "name": "tiny-inflate",
+      "licenseReferenceVersion": "1.0.3",
+      "tarball": "https://registry.npmjs.org/tiny-inflate/-/tiny-inflate-1.0.3.tgz",
+      "tarballIntegrity": "sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==",
+      "gitHead": "f4999b9c77263a97eb3a6942be247ece85a3d457",
+      "sourceRoot": "webpack://pdfmake/./node_modules/tiny-inflate/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/tiny-inflate/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-c0df7f551401f8f8"
+      ]
+    },
+    {
+      "name": "unicode-properties",
+      "licenseReferenceVersion": "1.4.1",
+      "tarball": "https://registry.npmjs.org/unicode-properties/-/unicode-properties-1.4.1.tgz",
+      "tarballIntegrity": "sha512-CLjCCLQ6UuMxWnbIylkisbRj31qxHPAurvena/0iwSVbQ2G1VY5/HjV0IRabOEbDHlzZlRdCrD4NhB0JtU40Pg==",
+      "gitHead": "6cc2e62ba83258584bd54bc15034afce3fb7de8e",
+      "sourceRoot": "webpack://pdfmake/./node_modules/unicode-properties/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/unicode-properties/dist/index.js",
+        "webpack://pdfmake/./node_modules/unicode-properties/dist/data.json"
+      ],
+      "exactReferenceMatches": 0,
+      "notices": [
+        "notice-43439dbd4f43837a"
+      ],
+      "versionLimit": "License-reference release; transformed or composed sources do not establish an exact embedded release version."
+    },
+    {
+      "name": "unicode-trie",
+      "licenseReferenceVersion": "2.0.0",
+      "tarball": "https://registry.npmjs.org/unicode-trie/-/unicode-trie-2.0.0.tgz",
+      "tarballIntegrity": "sha512-x7bc76x0bm4prf1VLg79uhAzKw8DVboClSN5VxJuQ+LKDOVEW9CdH+VY7SP+vX7xCYQqzzgQpFqz15zeLvAtZQ==",
+      "gitHead": "916656f45abab135face2b53ee5e32488cc9b47f",
+      "sourceRoot": "webpack://pdfmake/./node_modules/unicode-trie/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/unicode-trie/index.js",
+        "webpack://pdfmake/./node_modules/unicode-trie/swap.js"
+      ],
+      "exactReferenceMatches": 2,
+      "notices": [
+        "notice-43439dbd4f43837a"
+      ]
+    },
+    {
+      "name": "util",
+      "licenseReferenceVersion": "0.12.5",
+      "tarball": "https://registry.npmjs.org/util/-/util-0.12.5.tgz",
+      "tarballIntegrity": "sha512-kZf/K6hEIrWHI6XqOFUiiMa+79wE/D8Q+NCNAWclkyg3b4d2k7s0QGepNjiABc+aR3N1PAyHL7p6UcLY6LmrnA==",
+      "gitHead": "ef984721db7150f651800e051de4314c9517d42c",
+      "sourceRoot": "webpack://pdfmake/./node_modules/util/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/util/util.js",
+        "webpack://pdfmake/./node_modules/util/support/types.js",
+        "webpack://pdfmake/./node_modules/util/support/isBufferBrowser.js"
+      ],
+      "exactReferenceMatches": 3,
+      "notices": [
+        "notice-6239c6144c31e58c"
+      ]
+    },
+    {
+      "name": "util-deprecate",
+      "licenseReferenceVersion": "1.0.2",
+      "tarball": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+      "tarballIntegrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
+      "gitHead": "475fb6857cd23fafff20c1be846c1350abf8e6d4",
+      "sourceRoot": "webpack://pdfmake/./node_modules/util-deprecate/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/util-deprecate/browser.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-0154425673db15cd"
+      ]
+    },
+    {
+      "name": "which-typed-array",
+      "licenseReferenceVersion": "1.1.19",
+      "tarball": "https://registry.npmjs.org/which-typed-array/-/which-typed-array-1.1.19.tgz",
+      "tarballIntegrity": "sha512-rEvr90Bck4WZt9HHFC4DJMsjvu7x+r6bImz0/BrbWb7A2djJ8hnZMrWnHo9F8ssv0OMErasDhftrfROTyqSDrw==",
+      "gitHead": "45ddc94559dc520794397d5724e76cac402a09e5",
+      "sourceRoot": "webpack://pdfmake/./node_modules/which-typed-array/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/which-typed-array/index.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-c61652db3d2808f6"
+      ]
+    },
+    {
+      "name": "xmldoc",
+      "licenseReferenceVersion": "2.0.1",
+      "tarball": "https://registry.npmjs.org/xmldoc/-/xmldoc-2.0.1.tgz",
+      "tarballIntegrity": "sha512-sOOqgsjl3PU6iBw+fBUGAkTCE+JFK+sBaOL3pnZgzqk2/yvOD7RlFmZtDRJAEBzdpOYxSXyOQH4mjubdfs3MSg==",
+      "gitHead": "78911d03f0b528e9b7cf1680f86152a528710c0d",
+      "sourceRoot": "webpack://pdfmake/./node_modules/xmldoc/",
+      "sources": [
+        "webpack://pdfmake/./node_modules/xmldoc/lib/xmldoc.js"
+      ],
+      "exactReferenceMatches": 1,
+      "notices": [
+        "notice-decc26c3118890c4"
+      ]
+    }
+  ],
+  "otherPdfmakeSources": [
+    "webpack://pdfmake/webpack/universalModuleDefinition",
+    "webpack://pdfmake/./src/traversalTracker.js",
+    "webpack://pdfmake/./src/3rd-party/svg-to-pdfkit.js",
+    "webpack://pdfmake/./src/browser-extensions/URLBrowserResolver.js",
+    "webpack://pdfmake/./src/pageElementWriter.js",
+    "webpack://pdfmake/./src/textTools.js",
+    "webpack://pdfmake/ignored|C:\\Users\\Libor\\Documents\\GitHub\\pdfmake\\node_modules\\iconv-lite\\lib|stream",
+    "webpack://pdfmake/./src/fontProvider.js",
+    "webpack://pdfmake/./src/docMeasure.js",
+    "webpack://pdfmake/./src/browser-extensions/pdfMake.js",
+    "webpack://pdfmake/./src/browser-extensions/virtual-fs.js",
+    "webpack://pdfmake/ignored|C:\\Users\\Libor\\Documents\\GitHub\\pdfmake\\node_modules\\crypto-js|crypto",
+    "webpack://pdfmake/./src/elementWriter.js",
+    "webpack://pdfmake/ignored|C:\\Users\\Libor\\Documents\\GitHub\\pdfmake\\node_modules\\stream-browserify\\node_modules\\readable-stream\\lib\\internal\\streams|util",
+    "webpack://pdfmake/./src/3rd-party/svg-to-pdfkit/source.js",
+    "webpack://pdfmake/./src/layoutBuilder.js",
+    "webpack://pdfmake/./src/standardPageSizes.js",
+    "webpack://pdfmake/./src/line.js",
+    "webpack://pdfmake/./src/qrEnc.js",
+    "webpack://pdfmake/./src/browser-extensions/pdfMake-exposed.js",
+    "webpack://pdfmake/./src/styleContextStack.js",
+    "webpack://pdfmake/ignored|C:\\Users\\Libor\\Documents\\GitHub\\pdfmake\\node_modules\\stream-browserify\\node_modules\\readable-stream\\lib|util",
+    "webpack://pdfmake/./src/columnCalculator.js",
+    "webpack://pdfmake/./src/documentContext.js",
+    "webpack://pdfmake/./src/printer.js",
+    "webpack://pdfmake/./src/textDecorator.js",
+    "webpack://pdfmake/./src/pdfKitEngine.js",
+    "webpack://pdfmake/./src/svgMeasure.js",
+    "webpack://pdfmake/./src/tableProcessor.js",
+    "webpack://pdfmake/./src/helpers.js",
+    "webpack://pdfmake/./src/imageMeasure.js",
+    "webpack://pdfmake/./src/docPreprocessor.js",
+    "webpack://pdfmake/webpack/bootstrap",
+    "webpack://pdfmake/webpack/runtime/global",
+    "webpack://pdfmake/webpack/runtime/node module decorator",
+    "webpack://pdfmake/webpack/before-startup",
+    "webpack://pdfmake/webpack/startup",
+    "webpack://pdfmake/webpack/after-startup"
+  ]
+}
