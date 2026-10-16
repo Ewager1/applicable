@@ -41,7 +41,7 @@ The complete application flow is implemented and clean-source verification has p
 
 | Command | Purpose |
 | --- | --- |
-| `npm run typecheck` | Strict no-emit TypeScript checking of the parser and PDF core |
+| `npm run typecheck` | Strict no-emit TypeScript checking of the core and React interface |
 | `npm run lint` | ESLint checks JavaScript and TypeScript, with strict equality and no `eval` |
 | `npm test` | Resume parsing/validation plus selectable PDF text, fonts, links, bounds and pagination |
 | `npm run build` | Bundle the application into `dist/` |
@@ -61,7 +61,7 @@ PLAYWRIGHT_BROWSER=chromium npm run check
 
 The environment-variable form above works in macOS/Linux shells. In PowerShell, use `$env:PLAYWRIGHT_BROWSER = "chromium"` and then `npm run check`. Alternatively set `CHROME_PATH` to a Chromium executable's absolute path. On Linux, Playwright's `install --with-deps chromium` command can install the system libraries needed for testing. Browser downloads are development-only and are not needed to run the application.
 
-GitHub Actions is configured to run the same checks on pull requests to `main` and pushes to `main`, using Node 22 on Ubuntu 24.04 and the pinned Playwright Chromium in its full/new headless mode (including native PDF viewing). Dependency/browser installation requires an internet connection; resume PDF generation uses local assets. The separate synthetic PDF investigation runs with `npm run proof:serve` at http://127.0.0.1:4173/; its [developer notes](proof/README.md) describe visual QA. The parser and PDF core use strict TypeScript; the interface and developer scripts remain JavaScript. `npm run typecheck` checks the core without emitting files. See [tooling and module structure](docs/development.md).
+GitHub Actions is configured to run the same checks on pull requests to `main` and pushes to `main`, using Node 22 on Ubuntu 24.04 and the pinned Playwright Chromium in its full/new headless mode (including native PDF viewing). Dependency/browser installation requires an internet connection; resume PDF generation uses local assets. The separate synthetic PDF investigation runs with `npm run proof:serve` at http://127.0.0.1:4173/; its [developer notes](proof/README.md) describe visual QA. The parser/PDF core and React interface use strict TypeScript; developer scripts remain JavaScript. `npm run typecheck` checks the core and interface without emitting files. See [tooling and module structure](docs/development.md).
 
 ## Using Applicable
 

@@ -5,72 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Turn chatbot text into a polished resume PDF. Your resume text stays in your browser.">
     <title>Applicable — Resume to PDF</title>
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="./main.tsx"></script>
   </head>
   <body>
-    <main>
-      <header class="masthead">
-        <a class="brand" href="./" aria-label="Applicable home">Applicable<span aria-hidden="true">.</span></a>
-        <span class="privacy">No resume uploads</span>
-      </header>
-
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">READY FOR YOUR NEXT OPPORTUNITY</p>
-        <h1 id="page-title">Turn chatbot text into a polished resume.</h1>
-        <p>Use ChatGPT or another chatbot to format your current resume with our instructions. Paste the formatted resume here to create your PDF.</p>
-      </section>
-
-      <details class="format-help" open>
-        <summary>Start with your chatbot</summary>
-        <div class="help-content">
-          <ol>
-            <li>Copy the instructions below. Paste them into ChatGPT or another chatbot together with your current resume.</li>
-            <li>Ask the chatbot to format your complete resume. Use its code block’s Copy button to copy all of the returned text.</li>
-            <li>Paste that text into <strong>Your resume</strong> below, then choose <strong>Create PDF</strong>.</li>
-          </ol>
-          <button id="copy-instructions" class="secondary" type="button">Copy chatbot instructions</button>
-          <p id="copy-status" role="status" aria-live="polite"></p>
-          <pre id="instructions-fallback" tabindex="0" role="region" aria-label="Chatbot instructions to copy" hidden></pre>
-        </div>
-      </details>
-
-      <form id="resume-form" novalidate aria-busy="false">
-        <div class="company-field">
-          <label for="company">Company you’re applying to <span class="optional">(optional)</span></label>
-          <p id="company-help">Used only in the downloaded filename.</p>
-          <input id="company" name="company" type="text" autocomplete="off" aria-describedby="company-help">
-        </div>
-        <div class="form-top">
-          <div>
-            <label for="resume">Your resume</label>
-            <p id="resume-help">Paste the complete text from your chatbot. <span class="shortcut">⌘ / Ctrl + Enter to create.</span></p>
-          </div>
-          <button id="create-pdf" type="submit">Create PDF</button>
-        </div>
-
-        <section id="error-summary" class="errors" tabindex="-1" role="alert" aria-labelledby="error-title" hidden>
-          <h2 id="error-title">A few details need your attention</h2>
-          <ul id="error-list"></ul>
-        </section>
-
-        <textarea id="resume" name="resume" rows="13" aria-describedby="resume-help" spellcheck="false" placeholder="Paste the complete resume text from your chatbot here…"></textarea>
-      </form>
-
-      <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
-
-      <section id="result" class="result" aria-labelledby="result-title" hidden>
-        <div class="result-top">
-          <div>
-            <p class="eyebrow">READY TO SEND</p>
-            <h2 id="result-title" tabindex="-1">Your resume PDF</h2>
-          </div>
-          <a id="download" class="download" download>Download PDF <span aria-hidden="true">↓</span></a>
-        </div>
-        <p id="preview-note">Preview the same file you download. If your browser cannot show the preview, use Download PDF to open it.</p>
-        <iframe id="preview" title="Your generated resume PDF" aria-describedby="preview-note"></iframe>
-      </section>
-
-      <footer>Your resume text stays in this browser. Applicable does not upload it.</footer>
-    </main>
+    <div id="root"></div>
   </body>
 </html>

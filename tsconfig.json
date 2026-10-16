@@ -7,16 +7,20 @@
       "ES2022",
       "DOM"
     ],
-    "types": [],
+    "types": [
+      "vite/client"
+    ],
     "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "jsx": "react-jsx"
   },
   "include": [
-    "app/**/*.ts"
+    "app/**/*.ts",
+    "app/**/*.tsx"
   ]
 }
