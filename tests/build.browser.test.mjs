@@ -534,6 +534,31 @@ test('Full Name is the only required contact field; old pasted contacts require 
   assert.equal(await page.locator('#resume').inputValue(), oldSource);
 });
 
+test('missing name and invalid resume show both errors in order and retain source line details', async (t) => {
+  const page = await openPage(t);
+  const invalidSource = 'Unrecognized resume line';
+  const nameError = 'Enter your Full Name in the contact fields above before creating a PDF.';
+  const sourceError =
+    'Line 1: Put this content under a section marker, such as @@PROFESSIONAL_TITLE@@. Copy the complete resume using the chatbot code block’s Copy button; plain headings are not recognized.';
+  await page.locator('#fullName').fill('   ');
+  await page.locator('#resume').fill(invalidSource);
+  await page.locator('#create-pdf').click();
+  await page.locator('#error-summary').waitFor();
+  assert.deepEqual(await page.locator('#error-list li').allTextContents(), [
+    nameError,
+    sourceError,
+  ]);
+  assert.equal(await page.locator('#fullName').getAttribute('aria-invalid'), 'true');
+  assert.equal(await page.locator('#resume').getAttribute('aria-invalid'), 'true');
+  assert.equal(await page.locator('#resume').inputValue(), invalidSource);
+  await page.locator('#fullName').fill('Taylor Example');
+  await page.locator('#create-pdf').click();
+  await page.waitForFunction(() => document.querySelectorAll('#error-list li').length === 1);
+  assert.deepEqual(await page.locator('#error-list li').allTextContents(), [sourceError]);
+  assert.equal(await page.locator('#fullName').getAttribute('aria-invalid'), null);
+  assert.equal(await page.locator('#resume').getAttribute('aria-invalid'), 'true');
+});
+
 test('only contact fields persist across reload; clearing every field persists', async (t) => {
   const page = await openPage(t);
   await page.locator('#resume').fill(source);

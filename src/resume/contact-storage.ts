@@ -24,12 +24,12 @@ export function loadContact(storage: ContactStorage): ContactLoad {
       typeof data !== 'object' ||
       !('version' in data) ||
       data.version !== 1 ||
-      !('fields' in data) ||
-      !data.fields ||
-      typeof data.fields !== 'object'
+      !('fields' in data)
     )
       throw new Error('Invalid saved contact');
-    const fields = data.fields as Record<string, unknown>;
+    const storedFields = data.fields;
+    if (!storedFields || typeof storedFields !== 'object') throw new Error('Invalid saved contact');
+    const fields = storedFields as Record<string, unknown>;
     const result = { ...emptyContact };
     for (const key of contactKeys) {
       if (!(key in fields) || typeof fields[key] !== 'string')
