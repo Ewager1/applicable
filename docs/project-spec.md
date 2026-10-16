@@ -95,7 +95,7 @@ Keep parsing, validation, PDF rendering and interface handling separate enough t
 
 The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. The parser, contracts and PDF core use strict TypeScript independent of React. The interface uses small React/TypeScript function components and local state under StrictMode; developer scripts and proof fixtures remain JavaScript.
 
-`app/resume/types.ts` owns the canonical model and parse/error contracts; `parse.ts` supplies runtime validation. The optional company belongs only to interface/filename state. `app/pdf/pdfmake-adapter.ts` validates pinned engine internals; `app/ui/useResumePdf.ts` owns generation revisions and Blob URL lifetime. Preserve the [data-flow invariants and recovery limits](maintenance.md#data-flow-and-invariants) when changing these boundaries. Agent-usage scripts measure development activity only and are outside the application bundle.
+`src/resume/types.ts` owns the canonical model and parse/error contracts; `parse.ts` supplies runtime validation. The optional company belongs only to interface/filename state. `src/pdf/pdfmake-adapter.ts` validates pinned engine internals; `src/ui/useResumePdf.ts` owns generation revisions and Blob URL lifetime. Preserve the [data-flow invariants and recovery limits](maintenance.md#data-flow-and-invariants) when changing these boundaries. Agent-usage scripts measure development activity only and are outside the application bundle.
 
 ## Privacy and examples
 

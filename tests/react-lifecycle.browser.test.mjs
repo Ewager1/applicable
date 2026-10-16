@@ -23,7 +23,7 @@ test('StrictMode cancels unmounted work, delivers once after remount and revokes
         // Exercise real components with a test-only mounting host. No production
         // globals or lifecycle escape hatches are added to the application.
         transform(code, id) {
-          if (!id.endsWith('/app/main.tsx')) return;
+          if (!id.endsWith('/src/main.tsx')) return;
           return code.replace('createRoot(container).render(<StrictMode><App /></StrictMode>);', `
             let root;
             window.mountApp = () => {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { parseResume } from '../app/resume/parse.ts';
+import { parseResume } from '../src/resume/parse.ts';
 
 const source = await readFile(new URL('./fixtures/legacy-resume.txt', import.meta.url), 'utf8');
 const blocks = source.trim().split(/\n(?=# )/);

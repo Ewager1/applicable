@@ -1,6 +1,6 @@
 # PDF rendering investigation (A1)
 
-This is a synthetic, developer-only proof, not the finished paste-to-PDF application. A4 promotes its template into shared production modules under `app/pdf/`; see [the production template and verification record](../docs/pdf-template.md). The fixture objects do not define the future text input contract. No reference resumes or personal information are included.
+This is a synthetic, developer-only proof, not the finished paste-to-PDF application. A4 promotes its template into shared production modules under `src/pdf/`; see [the production template and verification record](../docs/pdf-template.md). The fixture objects do not define the future text input contract. No reference resumes or personal information are included.
 
 ## Reproduce
 

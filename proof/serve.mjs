@@ -2,11 +2,11 @@ import ts from 'typescript';
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { fontFiles } from '../app/pdf/fonts.ts';
+import { fontFiles } from '../src/pdf/fonts.ts';
 const routes = new Map([
   ['/', ['proof/index.html', 'text/html']],
   ...['browser.mjs', 'fixtures.mjs', 'document.mjs'].map(file => [`/proof/${file}`, [`proof/${file}`, 'text/javascript']]),
-  ...['document.ts', 'fonts.ts', 'font-coverage.ts', 'render.ts', 'pagination.ts', 'header-fit.ts', 'pdfmake-adapter.ts'].map(file => [`/app/pdf/${file}`, [`app/pdf/${file}`, 'text/javascript']]),
+  ...['document.ts', 'fonts.ts', 'font-coverage.ts', 'render.ts', 'pagination.ts', 'header-fit.ts', 'pdfmake-adapter.ts'].map(file => [`/src/pdf/${file}`, [`src/pdf/${file}`, 'text/javascript']]),
   ['/node_modules/pdfmake/build/pdfmake.min.js', ['node_modules/pdfmake/build/pdfmake.min.js', 'text/javascript']],
   ...fontFiles.map(file => [`/assets/fonts/${file}`, [`assets/fonts/${file}`, 'font/ttf']]),
 ]);

@@ -4,10 +4,10 @@ For routine changes, start with [the maintenance guide](maintenance.md). This do
 
 ## Structure
 
-- `app/index.html`, `app/main.tsx`, `app/styles.css`: HTML shell, React StrictMode entry and existing CSS. `app/ui/` contains typed function components for chatbot instructions, resume/company form, accessible feedback and PDF result, plus the focused `useResumePdf.ts` resource/async hook.
-- `app/resume/parse.ts`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors. `types.ts` supplies the single canonical TypeScript contracts.
+- `src/index.html`, `src/main.tsx`, `src/styles.css`: HTML shell, React StrictMode entry and existing CSS. `src/ui/` contains typed function components for chatbot instructions, resume/company form, accessible feedback and PDF result, plus the focused `useResumePdf.ts` resource/async hook.
+- `src/resume/parse.ts`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors. `types.ts` supplies the single canonical TypeScript contracts.
 - `examples/`: synthetic canonical resume and reusable chatbot instruction.
-- `app/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
+- `src/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
 - `assets/fonts/`: bundled Source Sans 3 static Regular/Semibold/Bold fonts, source record and OFL license.
 - `proof/`: synthetic PDF renderer, fixtures, baseline and PDF/browser verification. Direct synthetic fixtures and parsed canonical fixtures use the shared Resume shape.
 - `tests/`: browser launch options, temporary-server ownership, actual development/production exports and recovery tests.
@@ -36,7 +36,7 @@ F2 verification on 2026-10-15: `npm run check` passed on Node **24.19.0** (93 un
 
 ### TypeScript/JavaScript boundary
 
-`tsconfig.json` checks `app/**/*.ts` and `app/**/*.tsx`, using the automatic React JSX transform and Vite asset types, with `strict`, unused checks, DOM/library boundaries, and erasable syntax. Shared contracts are imported with `import type`; runtime inputs/errors use `unknown` and narrowing. `app/main.tsx` mounts typed components through Vite. React runtime/types are the only interface additions; Vite handles TSX without a React plugin. Existing JavaScript fixtures, scripts and test runners remain outside compiler checking; browser tests exercise their integration with the typed core.
+`tsconfig.json` checks `src/**/*.ts` and `src/**/*.tsx`, using the automatic React JSX transform and Vite asset types, with `strict`, unused checks, DOM/library boundaries, and erasable syntax. Shared contracts are imported with `import type`; runtime inputs/errors use `unknown` and narrowing. `src/main.tsx` mounts typed components through Vite. React runtime/types are the only interface additions; Vite handles TSX without a React plugin. Existing JavaScript fixtures, scripts and test runners remain outside compiler checking; browser tests exercise their integration with the typed core.
 
 Node commands importing the core use `--experimental-strip-types`, available from supported Node 22.13 and in Node 24+. Pass it when invoking a focused test directly (for example `node --experimental-strip-types --test tests/parser.test.mjs`). Only erasable TypeScript is allowed: no enums, namespaces, parameter properties or runtime path aliases. Explicit `.ts` imports work in Node and Vite without emitted files or a separate test build. The browser runner forwards the flag to its proof server/test children. The proof server transpiles only its explicit allowlisted `.ts` routes in memory with TypeScript's `transpileModule`; it serves JavaScript MIME types, adds no filesystem route, and writes no build output. Vite handles application development/production transformation.
 
@@ -58,7 +58,7 @@ Local checks do not establish that GitHub Actions has passed. The remote workflo
 
 ## Interface state and recovery
 
-`app/ui/useResumePdf.ts` owns a single pending submission using an explicit idle/generating/error/ready union and synchronous refs for revision, busy slot and current object URL. Every input event advances a revision, clears warnings and removes/revokes any generated Blob URL. A submission captures the current source/company revision; after each asynchronous boundary it checks the revision and mounted lifecycle before creating an artifact. Editing while fonts or generation are pending therefore cannot deliver an old resume. The form exposes busy state, disables duplicate submissions, and restores the button in `finally`.
+`src/ui/useResumePdf.ts` owns a single pending submission using an explicit idle/generating/error/ready union and synchronous refs for revision, busy slot and current object URL. Every input event advances a revision, clears warnings and removes/revokes any generated Blob URL. A submission captures the current source/company revision; after each asynchronous boundary it checks the revision and mounted lifecycle before creating an artifact. Editing while fonts or generation are pending therefore cannot deliver an old resume. The form exposes busy state, disables duplicate submissions, and restores the button in `finally`.
 
 Fonts load lazily and only successful data is cached. Missing/corrupt font errors discard that cache, so the same source can be retried without a page reload. User source is never replaced or stored. Errors use text content, a focusable alert summary and the original line numbers. A live status region announces progress; Cmd/Ctrl + Enter is available in the labeled input.
 

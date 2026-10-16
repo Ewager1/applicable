@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assembleResume, emptyContact } from '../app/resume/contact.ts';
-import { loadContact, saveContact, contactStorageKey } from '../app/resume/contact-storage.ts';
+import { assembleResume, emptyContact } from '../src/resume/contact.ts';
+import { loadContact, saveContact, contactStorageKey } from '../src/resume/contact-storage.ts';
 
 test('literal fields preserve display, order, optional blanks, and safe links', () => {
   const fields = { fullName: ' Alex  Morgan ', email: 'alex@example.com', linkedIn: 'linkedin.com/in/example', website: 'https://example.com/漢', phoneNumber: '+1 (555) 010-0142' };
