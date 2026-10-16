@@ -589,13 +589,15 @@ for (const kind of ['blocked', 'corrupt']) {
   test(`${kind} contact storage warns and permits correction/export`, async (t) => {
     const page = await openPage(t);
     if (kind === 'blocked') {
-      await page.addInitScript(() =>
+      await page.addInitScript((appOrigin) => {
+        // Deny storage in the app, without injecting failures into native PDF preview frames.
+        if (window !== window.top || window.location.origin !== appOrigin) return;
         Object.defineProperty(window, 'localStorage', {
           get() {
             throw new Error('blocked');
           },
-        }),
-      );
+        });
+      }, new URL(page.url()).origin);
     } else {
       await page.evaluate(() => window.localStorage.setItem('applicable.contact.v1', '{broken'));
     }
