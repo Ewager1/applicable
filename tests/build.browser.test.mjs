@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 import { browserOptions } from './browser-options.mjs';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { parsedExample } from '../proof/production-fixtures.mjs';
+import { parsedExample, exampleContact } from '../proof/production-fixtures.mjs';
 const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
 const chatbotInstructions = await readFile(new URL('../examples/chatbot-instruction.md', import.meta.url), 'utf8');
 const compact = text => text.replace(/\s/g, '');
@@ -24,6 +24,7 @@ async function openPage(t, { pdfViewer, ...options } = {}) {
   t.after(() => { assert.deepEqual(remote, []); assert.deepEqual(errors, []); });
   if (pdfViewer === false) await page.addInitScript(() => Object.defineProperty(navigator, 'pdfViewerEnabled', { get: () => false }));
   await page.goto('http://127.0.0.1:4174/');
+  for (const [id, value] of Object.entries(exampleContact)) await page.locator(`#${id}`).fill(value);
   return page;
 }
 async function submit(page) {
@@ -123,7 +124,7 @@ test('visible chatbot workflow copies the complete literal instructions with key
   await copy.press('Enter');
   await page.getByText('Instructions copied. Paste them into ChatGPT or another chatbot with your current resume.', { exact: true }).waitFor();
   assert.equal(await page.evaluate(() => window.copiedInstructions), chatbotInstructions);
-  assert.ok(chatbotInstructions.includes('@@CONTACT@@') && chatbotInstructions.includes('@@JOB@@'));
+  assert.ok(chatbotInstructions.includes('@@PROFESSIONAL_TITLE@@') && chatbotInstructions.includes('@@JOB@@'));
   assert.equal(await page.locator('#instructions-fallback').isVisible(), false);
 });
 
@@ -177,7 +178,7 @@ test('symbol markers and an outer text code block export complete ordered PDF co
   assert.ok(pdf.text.indexOf('ExampleStudio') < pdf.text.indexOf('ExampleSystems'));
   assert.ok(pdf.text.indexOf('EDUCATION') < pdf.text.indexOf('CERTIFICATIONS'));
   assert.ok(pdf.text.indexOf('CERTIFICATIONS') < pdf.text.indexOf('SKILLS'));
-  assert.deepEqual([...new Set(pdf.annotations.filter(annotation => annotation.subtype === 'Link').map(annotation => annotation.url))].sort(), ['https://example.com/alex', 'mailto:alex@example.com'].sort());
+  assert.deepEqual([...new Set(pdf.annotations.filter(annotation => annotation.subtype === 'Link').map(annotation => annotation.url))].sort(), ['https://example.com/alex', 'https://linkedin.com/in/example-alex', 'mailto:alex@example.com'].sort());
   assert.equal(downloads.length, 1, 'One automatic download for one submission');
   assert.equal(await page.evaluate(() => navigator.pdfViewerEnabled), true, 'Native viewer is available in this browser mode');
   const artifact = await artifactUrls(page);
@@ -282,7 +283,7 @@ test('edits during pending fonts discard stale output and repeated submissions d
     await request;
     assert.equal(await page.locator('#create-pdf').isDisabled(), true);
     await page.evaluate(() => { document.querySelector('#resume-form').requestSubmit(); document.querySelector('#resume-form').requestSubmit(); });
-    const edited = source.replace('Alex Morgan', 'Jamie Example');
+    const edited = source.replace('Product-focused engineer', 'Jamie Example engineer');
     await input.fill(edited);
     release();
     await page.waitForFunction(() => !document.querySelector('#create-pdf').disabled);
@@ -291,7 +292,7 @@ test('edits during pending fonts discard stale output and repeated submissions d
     assert.equal(await input.inputValue(), edited);
     const pdf = await readPdf(await submit(page));
     assert.ok(pdf.text.includes('JamieExample'));
-    assert.equal(pdf.text.includes('AlexMorgan'), false);
+    assert.equal(pdf.text.includes('Product-focusedengineer'), false);
     assert.equal(downloads.length, 1);
   } finally { release(); }
 });
@@ -302,7 +303,7 @@ test('editing an exported resume removes and revokes the old artifact before reg
   await input.fill(source);
   await submit(page);
   const url = (await artifactUrls(page)).download;
-  await input.fill(source.replace('Alex Morgan', 'Jamie Example'));
+  await input.fill(source.replace('Product-focused engineer', 'Jamie Example engineer'));
   assert.equal(await page.locator('#result').isVisible(), false);
   assert.equal(await page.locator('#download').getAttribute('href'), null);
   assert.equal(await page.locator('#preview').getAttribute('src'), null);
@@ -357,4 +358,91 @@ test('PDF assets stay lazy and engine load failure preserves source for reload r
   await page.reload();
   await input.fill(source);
   assert.ok((await readPdf(await submit(page))).text.includes('AlexMorgan'));
+});
+
+test('Full Name is the only required contact field; old pasted contacts require migration', async t => {
+  const page = await openPage(t);
+  for (const id of Object.keys(exampleContact)) await page.locator(`#${id}`).fill('');
+  await page.locator('#fullName').fill('   ');
+  await page.locator('#resume').fill(source);
+  await page.locator('#create-pdf').click();
+  await page.locator('#error-list').filter({ hasText: 'Enter your Full Name' }).waitFor();
+  assert.equal(await page.locator('#fullName').getAttribute('aria-invalid'), 'true');
+  assert.equal(await page.locator('#resume').inputValue(), source);
+  assert.equal(await page.locator('#resume').getAttribute('aria-invalid'), null);
+  await page.locator('#fullName').fill('Taylor  Example');
+  const pdf = await readPdf(await submit(page));
+  assert.ok(pdf.text.includes('TaylorExample'));
+  assert.equal(pdf.annotations.length, 0);
+  const oldSource = '@@CONTACT@@\nName: Another Person\nContact: old@example.com\n' + source;
+  await page.locator('#resume').fill(oldSource);
+  await page.locator('#create-pdf').click();
+  await page.locator('#error-list').filter({ hasText: 'Move contact details into the fields above' }).waitFor();
+  assert.equal(await page.locator('#resume').inputValue(), oldSource);
+});
+
+test('only contact fields persist across reload; clearing every field persists', async t => {
+  const page = await openPage(t);
+  await page.locator('#resume').fill(source);
+  await page.locator('#company').fill('Synthetic Company');
+  await page.reload();
+  for (const [id, value] of Object.entries(exampleContact)) assert.equal(await page.locator(`#${id}`).inputValue(), value);
+  assert.equal(await page.locator('#resume').inputValue(), '');
+  assert.equal(await page.locator('#company').inputValue(), '');
+  assert.deepEqual(await page.evaluate(() => Object.keys(JSON.parse(window.localStorage.getItem('applicable.contact.v1')).fields)), Object.keys(exampleContact));
+  for (const id of Object.keys(exampleContact)) await page.locator(`#${id}`).fill('');
+  await page.reload();
+  for (const id of Object.keys(exampleContact)) assert.equal(await page.locator(`#${id}`).inputValue(), '');
+  await page.locator('#fullName').focus();
+  for (const id of ['email', 'linkedIn', 'website', 'phoneNumber', 'company']) {
+    await page.keyboard.press('Tab');
+    assert.equal(await page.evaluate(() => document.activeElement.id), id);
+  }
+});
+
+for (const kind of ['blocked', 'corrupt']) {
+  test(`${kind} contact storage warns and permits correction/export`, async t => {
+    const page = await openPage(t);
+    if (kind === 'blocked') {
+      await page.addInitScript(() => Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } }));
+    } else {
+      await page.evaluate(() => window.localStorage.setItem('applicable.contact.v1', '{broken'));
+    }
+    await page.reload();
+    await page.locator('.storage-warning').waitFor();
+    assert.equal(await page.locator('#fullName').inputValue(), '');
+    await page.locator('#fullName').fill('Synthetic Candidate');
+    if (kind === 'blocked') assert.match(await page.locator('.storage-warning').textContent(), /could not be saved/);
+    else assert.equal(await page.locator('.storage-warning').count(), 0, 'Successful save clears the warning');
+    await page.locator('#resume').fill(source);
+    assert.ok((await readPdf(await submit(page))).text.includes('SyntheticCandidate'));
+  });
+}
+
+test('contact edits invalidate pending work and revoke completed artifacts', async t => {
+  const page = await openPage(t);
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route(/SourceSans3-Regular-.*\.ttf/, async route => { await held; await route.continue(); });
+  const downloads = [];
+  page.on('download', download => downloads.push(download));
+  try {
+    await page.locator('#resume').fill(source);
+    const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
+    await page.locator('#create-pdf').click();
+    await request;
+    await page.locator('#fullName').fill('Updated Candidate');
+    release();
+    await page.waitForFunction(() => !document.querySelector('#create-pdf').disabled);
+    assert.equal(downloads.length, 0);
+    assert.equal(await page.locator('#result').isVisible(), false);
+    assert.ok((await readPdf(await submit(page))).text.includes('UpdatedCandidate'));
+    const url = (await artifactUrls(page)).download;
+    await page.locator('#email').fill('available on request');
+    assert.equal(await page.locator('#result').isVisible(), false);
+    assert.equal(await page.evaluate(async url => { try { await fetch(url); return false; } catch { return true; } }, url), true);
+    const corrected = await readPdf(await submit(page));
+    assert.ok(corrected.text.includes('availableonrequest'));
+    assert.equal(corrected.annotations.some(row => row.url?.startsWith('mailto:')), false);
+  } finally { release(); }
 });

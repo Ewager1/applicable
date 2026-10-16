@@ -22,7 +22,7 @@ export function ChatbotInstructions() {
       <ol>
         <li>Copy the instructions below. Paste them into ChatGPT or another chatbot together with your current resume.</li>
         <li>Ask the chatbot to format your complete resume. Use its code block’s Copy button to copy all of the returned text.</li>
-        <li>Paste that text into <strong>Your resume</strong> below, then choose <strong>Create PDF</strong>.</li>
+        <li>Enter your contact details, paste the six body sections into <strong>Your resume</strong> below, then choose <strong>Create PDF</strong>.</li>
       </ol>
       <button id="copy-instructions" className="secondary" type="button" onClick={() => void copy()}>Copy chatbot instructions</button>
       <p id="copy-status" role="status" aria-live="polite">{status}</p>

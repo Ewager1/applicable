@@ -13,7 +13,7 @@
 - Work on one issue at a time once the GitHub workflow is established. Complete issues in the plan sequence; finish merging and closing one before starting the next.
 - Keep the interface focused on paste, submit, and PDF delivery.
 - Preserve source wording and job order. Only section ordering is normalized.
-- Keep processing local. Do not add remote services, analytics, accounts, storage, or AI features.
+- Keep processing local. Do not add remote services, analytics, accounts, resume/company storage, or AI features. The sole storage exception is the five contact fields (Full Name, Email, LinkedIn, Website, Phone Number), saved locally in this browser with a versioned whitelist; no other user content may persist.
 - Keep the strict TypeScript parser/contracts/PDF core independent of React. Use small typed React components and local state for the interface; preserve the generation/resource lifetime invariants in the [maintenance guide](docs/maintenance.md#data-flow-and-invariants). Additional frameworks remain outside scope. The [plan](docs/project-plan.md) records the approved migration sequence/history.
 - Explain new dependencies and keep their number small. Ask before adding major dependencies.
 - Do not silently discard unrecognized or malformed resume content.

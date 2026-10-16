@@ -34,6 +34,7 @@ test('a cold development cache exports a synthetic resume on the first submissio
     page.on('pageerror', error => errors.push(error.message));
     page.on('download', download => downloads.push(download));
     await page.goto(origin);
+    await page.locator('#fullName').fill('Alex Morgan');
     const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
     await page.getByLabel('Your resume', { exact: true }).fill(source);
     const downloaded = page.waitForEvent('download');

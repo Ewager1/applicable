@@ -71,6 +71,7 @@ test('StrictMode cancels unmounted work, delivers once after remount and revokes
     await page.route(/SourceSans3-Regular\.ttf/, async route => { await held; await route.continue(); });
     try {
       await page.goto(origin);
+    await page.locator('#fullName').fill('Alex Morgan');
       await page.getByLabel('Your resume', { exact: true }).fill(source);
       const requested = page.waitForRequest(/SourceSans3-Regular\.ttf/);
       await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
