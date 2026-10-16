@@ -36,6 +36,8 @@ export function verifyHeaderFit(
   fontData: Record<string, string>,
 ) {
   const definition = documentDefinition(resume);
+  // Title/summary-only resumes have no heading relationships to measure.
+  if (!definition.keepGroups.length) return;
   const groups = definition.keepGroups.map(({ header, content, label }, index) => {
     const start = definition.content.indexOf(header);
     const end = definition.content.indexOf(content);

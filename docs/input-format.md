@@ -4,11 +4,11 @@ The optional **Company you’re applying to** field is entered separately in the
 
 Applicable accepts a complete resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; use the chat code block’s Copy button and paste the entire result into the application. The parser, paste interface and shared production PDF integration are implemented. The application can copy the reusable chatbot instruction from its collapsible format help.
 
-See the complete [synthetic example](../examples/resume.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
+See the complete [synthetic example](../examples/resume.txt), the [sparse example](../examples/resume-sparse.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
 
-## Six required body sections
+## Six optional body sections
 
-Include each of these literal section markers exactly once, on its own line, in any order. These symbols survive copying rendered Markdown instead of relying on Markdown heading syntax:
+Include at least one body section with valid nonempty content. Omit any section that does not apply, including its marker; never add placeholder content such as "No certifications." Include each chosen literal section marker exactly once, on its own line, in any order. These symbols survive copying rendered Markdown instead of relying on Markdown heading syntax:
 
 ```text
 @@PROFESSIONAL_TITLE@@
@@ -29,9 +29,9 @@ Only standalone controls are structural. Unknown or malformed standalone marker-
 
 Existing `# Professional Title`, `# Summary`, `# Relevant Experience`, `# Education`, `# Certifications`, `# Skills` section controls still work. The old entry controls are `## Job`, `## Education`, `## Certification`. They retain case/whitespace tolerance and require whitespace after `#`/`##`. You may safely mix recognized old and new controls on separate lines; repeating one section using another spelling still counts as a duplicate. Prefer the symbol format for new resumes. The section `@@EDUCATION@@` and entry `@@EDUCATION_ENTRY@@` are deliberately distinct.
 
-The result always presents contact → professional title → summary → experience → education → certifications → skills. It preserves the input order of jobs, bullets, education entries, certifications, skill categories and skill items. Jobs are never sorted by date or relevance.
+The result presents included content in contact → professional title → summary → experience → education → certifications → skills order. Omitted sections produce no heading, divider or space. It preserves the input order of jobs, bullets, education entries, certifications, skill categories and skill items. Jobs are never sorted by date or relevance.
 
-Missing or blank sections block export. A marker by itself is empty. All requirements below are structural/nonempty checks, without judging the resume's writing, date formats, phone formats or email correctness. No missing fact is inferred.
+Omitted sections are accepted. Included blank or malformed sections block export, even when another section is valid. A marker by itself is empty. At least one valid nonempty body section is required. All requirements below are structural/nonempty checks, without judging the resume's writing, date formats, phone formats or email correctness. No missing fact is inferred.
 
 ## Contact fields and migration
 
@@ -43,7 +43,7 @@ An old `@@CONTACT@@` or `# Contact` section blocks export with migration guidanc
 
 ## Professional title and summary
 
-Professional Title contains exactly one nonempty plain-text line. Summary contains one or more plain-text paragraphs. Wrapped lines within a paragraph join with one space; blank lines preserve a paragraph break. Outer whitespace is structural. Internal spaces, wording, punctuation, capitalization, accents and repeated phrases remain unchanged. Additional Markdown headings and code fences are not accepted inside these blocks.
+When included, Professional Title contains exactly one nonempty plain-text line. When included, Summary contains one or more plain-text paragraphs. Wrapped lines within a paragraph join with one space; blank lines preserve a paragraph break. Outer whitespace is structural. Internal spaces, wording, punctuation, capitalization, accents and repeated phrases remain unchanged. Additional Markdown headings and code fences are not accepted inside these blocks.
 
 ```text
 @@PROFESSIONAL_TITLE@@
@@ -83,7 +83,7 @@ Each job requires nonempty Employer, Role, Dates and Location, plus at least one
 
 ## Education and certifications
 
-Use an explicit marker for every entry. Every displayed field below is required and nonempty, once per entry. Fields may appear in any order and values are single-line text. Their date values are preserved as supplied; the parser does not interpret them.
+Use an explicit marker for every entry. For an included section, every displayed field below is required and nonempty, once per entry. Fields may appear in any order and values are single-line text. Their date values are preserved as supplied; the parser does not interpret them.
 
 ```text
 @@EDUCATION@@
@@ -117,7 +117,7 @@ Each row must have **exactly one colon** separating a nonempty category from a n
 
 Unknown/duplicate sections, unknown field labels, duplicate single-value fields, wrong entry markers, extra content outside sections and malformed lines block the entire result. Repeated skill categories are permitted because their order/content is meaningful; entry metadata fields cannot repeat. Every nonempty line must belong to the documented format. Unrecognized structure blocks the entire result, even when related warnings are condensed. Only the explicitly accepted outer fence is omitted as a wrapper. There is no partial-success mode.
 
-Errors use human-language messages, such as “Education is missing. Add @@EDUCATION@@.” Each error includes the original 1-based line number where a location exists, or `null` for an absent section. The interface displays these messages while leaving the user's input intact and does not export when the parser returns failure. Unmarked preambles and missing entry markers produce concise guidance rather than one repeated warning per line.
+Errors use human-language messages, such as “Add content under Education.” Each error includes the original 1-based line number where a location exists, or `null` when no source location exists. The interface displays these messages while leaving the user's input intact and does not export when the parser returns failure. Unmarked preambles and missing entry markers produce concise guidance rather than one repeated warning per line.
 
 ## Parser interface and data shape
 
@@ -128,7 +128,7 @@ Errors use human-language messages, such as “Education is missing. Add @@EDUCA
 { ok: false, errors: [{ message, line }] }
 ```
 
-The successful `resume` is a `ResumeBody` with this shape. `assembleResume(body, fields)` combines it with current contact fields into the canonical `Resume` for PDF rendering:
+The successful `resume` is a `ResumeBody` with this shape. Omitted title/summary use empty strings; omitted entry sections use empty arrays. `assembleResume(body, fields)` combines it with current contact fields into the canonical `Resume` for PDF rendering:
 
 ```js
 {

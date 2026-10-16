@@ -50,17 +50,17 @@ Contact information, professional title, and summary are content blocks, not add
 
 Use the canonical [resume text format](input-format.md), with a complete [synthetic example](../examples/resume.txt) and [reusable chatbot instruction](../examples/chatbot-instruction.md). The pure parser implements this format without guessing at arbitrary free-form resumes.
 
-The preferred contract uses six required body standalone `@@...@@` section markers, repeated `@@JOB@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` boundaries, labeled metadata, and `Category: comma-separated skills` rows. Legacy `#`/`##` controls remain compatible, including safe mixed formats. A single optional outer plain-text code fence is accepted without changing source line numbers; unknown/nested fences and exterior content block export. Unmarked headings are not inferred. Section blocks may arrive in a different order. Jobs retain source order. Certification title, issuer and dates remain separate fields for the production template.
+The preferred contract uses six individually optional body standalone `@@...@@` section markers, repeated `@@JOB@@`, `@@EDUCATION_ENTRY@@` and `@@CERTIFICATION@@` boundaries, labeled metadata, and `Category: comma-separated skills` rows. Legacy `#`/`##` controls remain compatible, including safe mixed formats. A single optional outer plain-text code fence is accepted without changing source line numbers; unknown/nested fences and exterior content block export. Unmarked headings are not inferred. Section blocks may arrive in a different order. Jobs retain source order. Certification title, issuer and dates remain separate fields for the production template.
 
 Required labels, minimum entry values, whitespace normalization, indented bullet continuations, duplicate handling and human-language errors are documented in the input contract. Skills use exactly one colon per row; unsupported delimiters and malformed content cause blocking errors rather than silent guessing. No partial resume is exposed on failure.
 
 ### Validation
 
 - Use programmatic checks without AI or external requests.
-- Reject empty input and missing or whitespace-only required values, including the separately entered Full Name and skills.
-- The six body groups are required: professional title, summary, Relevant Experience, Education, Certifications, and Skills. Full Name is required separately; Email, LinkedIn, Website and Phone Number are optional. Contact sections in pasted text block export with explicit migration guidance. Missing or whitespace-only content blocks export.
+- Reject empty input and missing or whitespace-only required values, including the separately entered Full Name and values in included sections.
+- The six body groups are individually optional: professional title, summary, Relevant Experience, Education, Certifications, and Skills. Full Name is required separately; Email, LinkedIn, Website and Phone Number are optional. Contact sections in pasted text block export with explicit migration guidance. Require at least one valid nonempty body section. Included blank or malformed sections block export; omitted sections have no PDF heading, divider or spacing.
 - A heading by itself does not count as content.
-- Show clear human-language warnings naming what is missing, such as "Education is missing" or "Add at least one skill under Skills." Keep the source text available for correction; do not expose parser jargon or raw exceptions as validation feedback.
+- Show clear human-language warnings naming what is missing, such as "Add content under Education." Keep the source text available for correction; do not expose parser jargon or raw exceptions as validation feedback.
 - Report missing fields and malformed or unrecognized blocks with useful locations where practical.
 - Do not generate a partial PDF after a parsing failure.
 - Before export, measure required heading/content keep-groups with the same local PDF engine. Groups that cannot fit on a fresh page receive a recoverable warning; retain source, provide no artifact, and do not impose a blanket parser character cap.

@@ -99,8 +99,18 @@ test('shuffled sections normalize presentation groups while reversed jobs stay r
 });
 
 for (const name of blocks.map(blockName)) {
-  test(`missing ${name} blocks export`, () => {
-    rejected(blocks.filter((block) => blockName(block) !== name).join('\n'), `${name} is missing`);
+  test(`omitted ${name} is accepted with an empty canonical value`, () => {
+    const result = parseResume(blocks.filter((block) => blockName(block) !== name).join('\n'));
+    assert.equal(result.ok, true, JSON.stringify(result.errors));
+    const field = {
+      'Professional Title': 'title',
+      Summary: 'summary',
+      'Relevant Experience': 'jobs',
+      Education: 'education',
+      Certifications: 'certifications',
+      Skills: 'skills',
+    }[name];
+    assert.deepEqual(result.resume[field], ['title', 'summary'].includes(field) ? '' : []);
   });
   test(`blank ${name} blocks export`, () => {
     rejected(replaceBlock(name, `# ${name}\n  \n\t\n`), `Add content under ${name}`);
@@ -371,14 +381,15 @@ test('safe mixed symbol and legacy controls retain case/whitespace and line-endi
 });
 
 for (const marker of symbolSections) {
-  test(`symbol ${marker}: missing and blank content still blocks export`, () => {
+  test(`symbol ${marker}: omission works while blank included content blocks export`, () => {
     const title = marker.toLowerCase().replaceAll('_', ' ');
     const block = symbolBlocks.find((block) => block.startsWith(`@@${marker}@@`));
     const missing = parseResume(symbolBlocks.filter((value) => value !== block).join('\n'));
     const blank = parseResume(
       symbolBlocks.map((value) => (value === block ? `@@${marker}@@\n \t` : value)).join('\n'),
     );
-    for (const result of [missing, blank]) {
+    assert.equal(missing.ok, true, JSON.stringify(missing.errors));
+    for (const result of [blank]) {
       assert.equal(result.ok, false);
       assert.equal(Object.hasOwn(result, 'resume'), false);
       assert.ok(result.errors.some((error) => error.message.toLowerCase().includes(title)));
@@ -507,3 +518,28 @@ for (const heading of ['@@CONTACT@@', '# Contact', ' # CONTACT ']) {
     assert.equal(result.errors[0].line, 1);
   });
 }
+
+for (const name of blocks.map(blockName)) {
+  test(`only ${name} supplies the minimum meaningful body`, () => {
+    const block = blocks.find((value) => blockName(value) === name);
+    const result = parseResume(block);
+    assert.equal(result.ok, true, JSON.stringify(result.errors));
+  });
+}
+test('a few meaningful sections work without title, summary, jobs, education or certifications', () => {
+  const result = parseResume('@@SKILLS@@\nEngineering: Automated testing, Git');
+  assert.deepEqual(result, {
+    ok: true,
+    resume: {
+      title: '',
+      summary: '',
+      jobs: [],
+      education: [],
+      certifications: [],
+      skills: [{ category: 'Engineering', items: 'Automated testing, Git' }],
+    },
+  });
+  rejected('@@SUMMARY@@\nUseful summary.\n@@EDUCATION@@', 'Add content under Education');
+  rejected('@@EDUCATION@@\n@@EDUCATION_ENTRY@@\nQualification: Diploma', 'Add institution');
+  rejected('```text\n\n```', 'at least one nonempty body section');
+});

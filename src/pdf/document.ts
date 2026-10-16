@@ -150,9 +150,11 @@ export function documentDefinition(resume: Resume): ResumeDocument {
           },
         ]
       : []),
-    { text: resume.title, style: 'title', margin: [0, 0, 0, 10] },
-    { text: resume.summary },
-    experienceHeading,
+    ...(resume.title
+      ? [{ text: resume.title, style: 'title', margin: [0, 0, 0, 10] as Margins }]
+      : []),
+    ...(resume.summary ? [{ text: resume.summary }] : []),
+    ...(resume.jobs.length ? [experienceHeading] : []),
   ];
   for (const [jobIndex, job] of resume.jobs.entries()) {
     const header: ContentStack = {
@@ -173,7 +175,7 @@ export function documentDefinition(resume: Resume): ResumeDocument {
     content.push(header, ...bullets);
   }
   const educationHeading = sectionHeading('EDUCATION');
-  content.push(educationHeading);
+  if (resume.education.length) content.push(educationHeading);
   for (const [entryIndex, entry] of resume.education.entries()) {
     const qualification = { text: entry.qualification, style: 'entryHeading', headlineLevel: 1 };
     const institution: ContentColumns = {
@@ -185,7 +187,7 @@ export function documentDefinition(resume: Resume): ResumeDocument {
     content.push(qualification, institution);
   }
   const certificationsHeading = sectionHeading('CERTIFICATIONS');
-  content.push(certificationsHeading);
+  if (resume.certifications.length) content.push(certificationsHeading);
   for (const [entryIndex, entry] of resume.certifications.entries()) {
     const title = {
       ...entryRow(entry.title, entry.dates, 'entryHeading', 'date'),
@@ -198,7 +200,7 @@ export function documentDefinition(resume: Resume): ResumeDocument {
     content.push(title, issuer);
   }
   const skillsHeading = sectionHeading('SKILLS');
-  content.push(skillsHeading);
+  if (resume.skills.length) content.push(skillsHeading);
   for (const [rowIndex, row] of resume.skills.entries()) {
     const skills: LayoutNode = {
       text: [{ text: `${row.category}: `, style: 'skillsCategory' }, row.items],
