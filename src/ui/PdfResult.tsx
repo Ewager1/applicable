@@ -32,15 +32,13 @@ export function PdfResult({ artifact }: { artifact: PdfArtifact | undefined }) {
           Download PDF <span aria-hidden="true">↓</span>
         </a>
       </div>
-      <p id="preview-note">
-        {inlinePreview
-          ? 'Preview the same file you download. If your browser cannot show the preview, use Download PDF to open it.'
-          : 'Your browser does not display PDFs here. Use Download PDF to open your resume.'}
-      </p>
+      {!inlinePreview && (
+        <p id="preview-note">Your browser cannot show PDFs here. Use Download PDF.</p>
+      )}
       <iframe
         id="preview"
         title="Your generated resume PDF"
-        aria-describedby="preview-note"
+        aria-describedby={inlinePreview ? undefined : 'preview-note'}
         hidden={!inlinePreview}
         src={inlinePreview ? artifact?.url : undefined}
       />

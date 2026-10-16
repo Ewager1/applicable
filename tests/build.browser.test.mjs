@@ -145,7 +145,7 @@ test('company edits during generation discard obsolete names and allow corrected
   }
 });
 
-test('visible chatbot workflow copies the complete literal instructions with keyboard activation', async (t) => {
+test('collapsed chatbot help opens and copies the complete literal instructions with keyboard activation', async (t) => {
   const page = await openPage(t);
   await page.addInitScript(() =>
     Object.defineProperty(navigator, 'clipboard', {
@@ -161,11 +161,11 @@ test('visible chatbot workflow copies the complete literal instructions with key
     .getByRole('heading', { name: 'Turn your resume into a polished PDF.', exact: true })
     .waitFor();
   const copy = page.getByRole('button', { name: 'Copy chatbot instructions', exact: true });
-  assert.equal(
-    await copy.isVisible(),
-    true,
-    'Beginner workflow is visible without opening hidden help',
-  );
+  assert.equal(await copy.isVisible(), false);
+  const summary = page.getByText('Need help formatting your resume?', { exact: true });
+  await summary.focus();
+  await summary.press('Enter');
+  assert.equal(await copy.isVisible(), true);
   await copy.focus();
   await copy.press('Enter');
   await page
@@ -196,6 +196,7 @@ test('clipboard denial exposes focused complete instructions without changing th
   await page.reload();
   const input = page.getByLabel('Your resume', { exact: true });
   await input.fill(source);
+  await page.getByText('Need help formatting your resume?', { exact: true }).click();
   await page.getByRole('button', { name: 'Copy chatbot instructions', exact: true }).click();
   const fallback = page.getByRole('region', { name: 'Chatbot instructions to copy', exact: true });
   await fallback.waitFor();
@@ -277,6 +278,8 @@ test('symbol markers and an outer text code block export complete ordered PDF co
     true,
     'Native viewer is available in this browser mode',
   );
+  assert.equal(await page.locator('#preview-note').count(), 0);
+  assert.equal(await page.locator('#preview').getAttribute('aria-describedby'), null);
   const artifact = await artifactUrls(page);
   assert.equal(artifact.download, artifact.preview);
   assert.deepEqual(Buffer.from(artifact.bytes), pdf.bytes);
@@ -298,10 +301,11 @@ test('without native PDF viewing, one download is delivered with a usable fallba
   await page.getByLabel('Your resume', { exact: true }).fill(source);
   const first = await readPdf(await submit(page));
   await page
-    .getByText('Your browser does not display PDFs here. Use Download PDF to open your resume.', {
+    .getByText('Your browser cannot show PDFs here. Use Download PDF.', {
       exact: true,
     })
     .waitFor();
+  assert.equal(await page.locator('#preview').getAttribute('aria-describedby'), 'preview-note');
   assert.equal(await page.locator('#preview').getAttribute('src'), null);
   assert.equal(await page.locator('#preview').isVisible(), false);
   assert.equal(downloads.length, 1);
@@ -724,7 +728,7 @@ test('three local tools default to PDF Maker with personal introduction and keyb
   assert.equal(await builder.getAttribute('aria-selected'), 'true');
   assert.equal(
     await page.getByRole('button', { name: 'Copy chatbot instructions', exact: true }).isVisible(),
-    true,
+    false,
   );
 });
 
@@ -866,8 +870,8 @@ test('Job Finder copies latest optional answers in one action without preview an
   }
   for (const field of await fields.all()) {
     assert.equal(await field.getAttribute('required'), null);
-    const help = await field.getAttribute('aria-describedby');
-    assert.ok((await page.locator(`#${help}`).textContent()).startsWith('Example:'));
+    assert.ok(await field.getAttribute('placeholder'));
+    assert.equal(await field.evaluate((el) => el.labels.length), 1);
   }
   const copy = form.getByRole('button', { name: 'Copy Prompt', exact: true });
   assert.equal(await form.getByRole('button').count(), 1);
@@ -1208,8 +1212,9 @@ test('Resume Writer background is optional, keyboard expandable and transient ac
   for (const [index, field] of (await fields.all()).entries()) {
     const label = await field.evaluate((el) => el.labels[0].textContent);
     assert.match(label, /\(optional\)/);
+    assert.ok(await field.getAttribute('placeholder'));
     const description = await field.getAttribute('aria-describedby');
-    assert.match(await page.locator(`#${description}`).textContent(), /^Example: .+/);
+    if (description) assert.ok(await page.locator(`#${description}`).textContent());
     assert.equal(await field.getAttribute('required'), null);
     assert.equal(await field.getAttribute('minlength'), null);
     assert.equal(await field.getAttribute('maxlength'), null);

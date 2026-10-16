@@ -10,37 +10,37 @@ const questions: { key: keyof JobFinderAnswers; label: string; example: string }
   {
     key: 'roles',
     label: 'What kinds of jobs are you looking for?',
-    example: 'Customer success or operations roles; open to related titles.',
+    example: 'For example, customer support or operations.',
   },
   {
     key: 'location',
     label: 'Where would you like to work?',
-    example: 'Remote in the US, or hybrid near Boston.',
+    example: 'For example, remote in the U.S. or hybrid near Boston.',
   },
   {
     key: 'mustHaves',
     label: 'What are your must-haves?',
-    example: 'No overnight shifts. These are requirements I cannot compromise on.',
+    example: 'For example, no overnight shifts.',
   },
   {
     key: 'preferences',
     label: 'What would be nice to have?',
-    example: 'A small team and education benefits; I can be flexible.',
+    example: 'For example, a small team or education benefits.',
   },
   {
     key: 'salary',
     label: 'What salary range interests you?',
-    example: '$70,000–$90,000, depending on benefits and responsibilities.',
+    example: 'For example, $70,000–$90,000, depending on benefits.',
   },
   {
     key: 'experience',
     label: 'What experience level are you targeting?',
-    example: 'Mid-level individual contributor; open to a first team-lead role.',
+    example: 'For example, mid-level or a first team-lead role.',
   },
   {
     key: 'other',
     label: 'Is there anything else we should consider?',
-    example: 'Changing industries; interested in using my training experience.',
+    example: 'For example, changing industries or using training experience.',
   },
 ];
 const settingsFields: { key: keyof JobFinderSettings; label: string; description: string }[] = [
@@ -134,11 +134,10 @@ export function JobFinderSetup() {
             <label htmlFor={`job-finder-${key}`}>
               {label} <span className="optional">(optional)</span>
             </label>
-            <p id={`job-finder-${key}-example`}>Example: {example}</p>
             <textarea
               id={`job-finder-${key}`}
               rows={3}
-              aria-describedby={`job-finder-${key}-example`}
+              placeholder={example}
               value={answers[key]}
               onChange={(event) => {
                 clearCopyFeedback();
