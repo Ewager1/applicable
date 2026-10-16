@@ -860,6 +860,26 @@ test('Job Finder copies latest optional answers in one action without preview an
   const fields = form.locator('textarea');
   const output = page.getByLabel('Your Job Finder prompt', { exact: true });
   assert.equal(await fields.count(), 7);
+  const usOnly = form.getByRole('checkbox', { name: 'Search U.S. jobs only', exact: true });
+  const recent = form.getByRole('checkbox', {
+    name: 'Prefer recently posted positions',
+    exact: true,
+  });
+  assert.equal(await usOnly.isChecked(), true);
+  assert.equal(await recent.isChecked(), true);
+  for (const [checkbox, description] of [
+    [
+      usOnly,
+      'Limit results to positions based in the United States or remote jobs that accept U.S.-based applicants.',
+    ],
+    [
+      recent,
+      'Prioritize newer openings. Some older, legitimate positions may appear less often, but strong matches should still be considered.',
+    ],
+  ]) {
+    const help = await checkbox.getAttribute('aria-describedby');
+    assert.equal(await page.locator(`#${help}`).textContent(), description);
+  }
   for (const field of await fields.all()) {
     assert.equal(await field.getAttribute('required'), null);
     const help = await field.getAttribute('aria-describedby');
@@ -878,6 +898,31 @@ test('Job Finder copies latest optional answers in one action without preview an
   assert.ok(standard.includes('Ask me to upload one or more previous resumes here in ChatGPT'));
   assert.ok(!standard.includes('My questionnaire answers:'));
   assert.equal(await output.count(), 0);
+  // Native keyboard toggles exercise every combination through the actual copy action.
+  for (const [us, fresh] of [
+    [true, false],
+    [false, false],
+    [false, true],
+    [true, true],
+  ]) {
+    for (const [checkbox, checked] of [
+      [usOnly, us],
+      [recent, fresh],
+    ]) {
+      if ((await checkbox.isChecked()) !== checked) {
+        await checkbox.focus();
+        await page.keyboard.press('Space');
+        assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
+      }
+    }
+    await copy.click();
+    const copied = await page.evaluate(() => window.copiedJobFinderPrompt);
+    assert.ok(copied.includes(`Search U.S. jobs only: ${us ? 'On' : 'Off'}`));
+    assert.ok(copied.includes(`Prefer recently posted positions: ${fresh ? 'On' : 'Off'}`));
+    assert.equal(await output.count(), 0);
+  }
+  await usOnly.uncheck();
+  await recent.uncheck();
   const values = [
     '  Operations\nTraining 🚀  ',
     'Remote',
@@ -905,6 +950,10 @@ test('Job Finder copies latest optional answers in one action without preview an
   await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
   assert.equal(await output.count(), 0);
   assert.equal(await fields.first().inputValue(), values[0]);
+  assert.equal(await usOnly.isChecked(), false);
+  assert.equal(await recent.isChecked(), false);
+  await mkdir('output/ui', { recursive: true });
+  await page.screenshot({ path: 'output/ui/job-finder-desktop.png', fullPage: true });
   await fields.first().fill('Updated role');
   assert.equal(await output.count(), 0);
   assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
@@ -916,11 +965,15 @@ test('Job Finder copies latest optional answers in one action without preview an
   await page.reload();
   await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
   for (const field of await fields.all()) assert.equal(await field.inputValue(), '');
+  assert.equal(await usOnly.isChecked(), true);
+  assert.equal(await recent.isChecked(), true);
   assert.equal(await output.count(), 0);
   const storage = await page.evaluate(() => ({
     local: { ...window.localStorage },
     session: { ...window.sessionStorage },
   }));
+  assert.deepEqual(Object.keys(storage.session), []);
+  assert.deepEqual(Object.keys(storage.local), ['applicable.contact.v1']);
   assert.equal(JSON.stringify(storage).includes('Updated role'), false);
   assert.equal(JSON.stringify(storage).includes('Changing industries'), false);
 });
@@ -958,6 +1011,13 @@ test('Job Finder clipboard failure or absence focuses and selects manual output 
       await page.locator('#job-finder-copy-status').textContent(),
       /use your device’s Copy command/,
     );
+  }
+  for (const name of ['Search U.S. jobs only', 'Prefer recently posted positions']) {
+    await page.getByRole('checkbox', { name, exact: true }).tap();
+    assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+    assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
+    await page.getByRole('button', { name: 'Copy Prompt', exact: true }).tap();
+    assert.ok((await page.locator('#job-finder-prompt').inputValue()).includes(`${name}: Off`));
   }
   assert.equal(
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -1005,6 +1065,18 @@ test('pending Job Finder clipboard feedback is discarded after edits or newer co
     await page.evaluate((outcome) => window[outcome](), outcome);
     assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
     assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+  }
+  for (const name of ['Search U.S. jobs only', 'Prefer recently posted positions']) {
+    for (const outcome of ['finishJobFinderCopy', 'failJobFinderCopy']) {
+      await page.getByRole('button', { name: 'Copy Prompt', exact: true }).click();
+      await page.getByRole('checkbox', { name, exact: true }).press('Space');
+      await page.evaluate(async (outcome) => {
+        window[outcome]();
+        await new Promise(window.requestAnimationFrame);
+      }, outcome);
+      assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
+      assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+    }
   }
   const copy = page.getByRole('button', { name: 'Copy Prompt', exact: true });
   await copy.click();

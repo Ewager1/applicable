@@ -1,5 +1,10 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { buildJobFinderPrompt, type JobFinderAnswers } from '../job-finder/prompt.ts';
+import {
+  buildJobFinderPrompt,
+  defaultJobFinderSettings,
+  type JobFinderAnswers,
+  type JobFinderSettings,
+} from '../job-finder/prompt.ts';
 
 const questions: { key: keyof JobFinderAnswers; label: string; example: string }[] = [
   {
@@ -38,6 +43,21 @@ const questions: { key: keyof JobFinderAnswers; label: string; example: string }
     example: 'Changing industries; interested in using my training experience.',
   },
 ];
+const settingsFields: { key: keyof JobFinderSettings; label: string; description: string }[] = [
+  {
+    key: 'usJobsOnly',
+    label: 'Search U.S. jobs only',
+    description:
+      'Limit results to positions based in the United States or remote jobs that accept U.S.-based applicants.',
+  },
+  {
+    key: 'preferRecent',
+    label: 'Prefer recently posted positions',
+    description:
+      'Prioritize newer openings. Some older, legitimate positions may appear less often, but strong matches should still be considered.',
+  },
+];
+
 const emptyAnswers: JobFinderAnswers = {
   roles: '',
   location: '',
@@ -50,6 +70,7 @@ const emptyAnswers: JobFinderAnswers = {
 
 export function JobFinderSetup() {
   const [answers, setAnswers] = useState(emptyAnswers);
+  const [settings, setSettings] = useState<JobFinderSettings>({ ...defaultJobFinderSettings });
   const [fallbackPrompt, setFallbackPrompt] = useState('');
   const [status, setStatus] = useState('');
   const output = useRef<HTMLTextAreaElement>(null);
@@ -63,8 +84,14 @@ export function JobFinderSetup() {
     }
   }, [fallbackPrompt]);
 
+  function clearCopyFeedback() {
+    revision.current += 1;
+    setFallbackPrompt('');
+    setStatus('');
+  }
+
   async function copy() {
-    const prompt = buildJobFinderPrompt(answers);
+    const prompt = buildJobFinderPrompt(answers, settings);
     const currentRevision = ++revision.current;
     setFallbackPrompt('');
     setStatus('');
@@ -90,8 +117,8 @@ export function JobFinderSetup() {
       <p id="job-finder-help">
         All seven questions are optional. Must-haves are non-negotiable; nice-to-haves and other
         preferences are flexible. No account, uploads or personal information are needed here.
-        Answers stay on this page and are cleared on reload. Copy Prompt creates and copies your
-        setup instructions in one step.
+        Answers and search preferences stay on this page and reset on reload. Copy Prompt creates
+        and copies your setup instructions in one step.
       </p>
       <form
         aria-label="Job Finder setup"
@@ -113,14 +140,33 @@ export function JobFinderSetup() {
               aria-describedby={`job-finder-${key}-example`}
               value={answers[key]}
               onChange={(event) => {
-                revision.current += 1;
+                clearCopyFeedback();
                 setAnswers({ ...answers, [key]: event.target.value });
-                setFallbackPrompt('');
-                setStatus('');
               }}
             />
           </div>
         ))}
+        <fieldset className="job-finder-settings">
+          <legend>Search preferences</legend>
+          {settingsFields.map(({ key, label, description }) => (
+            <div className="job-finder-setting" key={key}>
+              <label htmlFor={`job-finder-${key}`}>
+                <input
+                  id={`job-finder-${key}`}
+                  type="checkbox"
+                  checked={settings[key]}
+                  aria-describedby={`job-finder-${key}-description`}
+                  onChange={(event) => {
+                    clearCopyFeedback();
+                    setSettings({ ...settings, [key]: event.target.checked });
+                  }}
+                />
+                {label}
+              </label>
+              <p id={`job-finder-${key}-description`}>{description}</p>
+            </div>
+          ))}
+        </fieldset>
         <button type="submit">Copy Prompt</button>
       </form>
       {fallbackPrompt && (
