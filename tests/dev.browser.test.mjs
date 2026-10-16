@@ -43,7 +43,7 @@ test('a cold development cache exports a synthetic resume on the first submissio
     page.on('download', (download) => downloads.push(download));
     await page.goto(origin);
     const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
-    await page.getByLabel('Your resume', { exact: true }).fill(source);
+    await page.getByLabel('Resume text', { exact: true }).fill(source);
     const downloaded = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
     const download = await downloaded;
@@ -78,7 +78,7 @@ test('a cold development cache exports a synthetic resume on the first submissio
     });
     assert.deepEqual(Buffer.from(previewBytes), bytes);
     assert.equal(await page.locator('#error-summary').isVisible(), false);
-    assert.equal(await page.getByLabel('Your resume', { exact: true }).inputValue(), source);
+    assert.equal(await page.getByLabel('Resume text', { exact: true }).inputValue(), source);
     assert.equal(downloads.length, 1);
     assert.deepEqual(remote, []);
     assert.deepEqual(failures, []);

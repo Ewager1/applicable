@@ -86,7 +86,7 @@ Required labels, minimum entry values, whitespace normalization, indented bullet
 
 PDF delivery is required. Preview is conditional on a straightforward, reliable implementation.
 
-Prefer displaying the same generated PDF bytes that are offered for download, after submission. A separate HTML approximation must not be represented as an exact preview. Continuous live regeneration while typing is unnecessary. Verify whether the chosen local delivery method supports native PDF viewing; if it does not, document that limitation before adding a separate viewer dependency.
+Resume PDF Maker places its text editor beside the document preview on desktop and stacks them on narrow screens. Before generation, a restrained empty state explains that the PDF appears after creation; editing or failed generation restores that empty state. Create PDF follows the editor; Download PDF stays with the actual result. Prefer displaying the same generated PDF bytes that are offered for download, after submission. A separate HTML approximation must not be represented as an exact preview. Continuous live regeneration while typing is unnecessary. Verify whether the chosen local delivery method supports native PDF viewing; if it does not, document that limitation before adding a separate viewer dependency.
 
 ### Local operation and distribution
 

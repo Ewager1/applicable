@@ -77,8 +77,8 @@ Both prompt tools show next steps after copying. If clipboard access is unavaila
 ### Resume PDF Maker
 
 1. If your text is not already in Applicable Format, open **Need help formatting your resume?** and choose **Copy chatbot instructions**. Paste them with your current resume into ChatGPT or another chatbot. If copying is unavailable, the complete instructions appear for manual copying.
-2. Copy the chatbot’s complete text code block and paste it into **Your resume**. The [input format](docs/input-format.md) describes the literal markers; there is no need to rebuild sections by hand.
-3. Select **Create PDF** above the field, or press Cmd/Ctrl + Enter while editing. Review the resulting PDF and use **Download PDF** to download it again. If inline viewing is unavailable, the download remains available.
+2. Copy the chatbot’s complete text code block and paste it into **Resume text**. The [input format](docs/input-format.md) describes the literal markers; there is no need to rebuild sections by hand.
+3. Select **Create PDF** below the editor, or press Cmd/Ctrl + Enter while editing. Review the resulting PDF and use **Download PDF** to download it again. The document preview sits beside the editor on desktop and below it on mobile. If inline viewing is unavailable, the download remains available.
 
 The pasted text supplies the name/contact header and resume sections. `@@CONTACT@@` with `Name:` and at least one valid nonempty body section are required; Email, Phone, LinkedIn and Website are optional. Omit inapplicable sections instead of adding placeholders. Included blank or malformed sections block export with correction messages and source lines where applicable. Pasted text stays available for correction. Section order is fixed; entries and bullets retain the supplied order and wording.
 

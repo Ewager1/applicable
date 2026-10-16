@@ -37,15 +37,11 @@ export function ResumeForm({ visible, source, state, onSourceChange, onSubmit }:
     >
       <div className="form-top">
         <div>
-          <label htmlFor="resume">Your resume</label>
+          <label htmlFor="resume">Resume text</label>
           <p id="resume-help">
-            Paste the complete text from your chatbot.{' '}
-            <span className="shortcut">⌘ / Ctrl + Enter to create.</span>
+            Use Applicable Format. <span className="shortcut">⌘ / Ctrl + Enter to create.</span>
           </p>
         </div>
-        <button id="create-pdf" type="submit" disabled={generating}>
-          {generating ? 'Creating PDF…' : 'Create PDF'}
-        </button>
       </div>
       <ErrorSummary errors={errors} />
       <textarea
@@ -66,6 +62,11 @@ export function ResumeForm({ visible, source, state, onSourceChange, onSubmit }:
           }
         }}
       />
+      <div className="editor-actions">
+        <button id="create-pdf" type="submit" disabled={generating}>
+          {generating ? 'Creating PDF…' : 'Create PDF'}
+        </button>
+      </div>
     </form>
   );
 }
