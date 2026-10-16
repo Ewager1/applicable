@@ -71,13 +71,82 @@ test('storage round trips a strict whitelist and cleared values', () => {
   assert.deepEqual(Object.keys(loadContact(storage).fields), Object.keys(emptyContact));
 });
 
+test('web links preserve scheme, host, credential and URL serialization boundaries', () => {
+  const cases = [
+    ['example.com', 'https://example.com/'],
+    ['example.com/path?query=yes#section', 'https://example.com/path?query=yes#section'],
+    ['https://example.com', 'https://example.com/'],
+    ['HTTP://EXAMPLE.COM:80/path', 'http://example.com/path'],
+    ['https://localhost/path', 'https://localhost/path'],
+    ['localhost', undefined],
+    ['  example.com  ', 'https://example.com/'],
+    ['example.com/!', 'https://example.com/!'],
+    ['example.com/\u001f', undefined],
+    ['example.com/has space', undefined],
+    ['example.com/\u007f', undefined],
+    ['example.com/has\ttab', undefined],
+    ['https://[::1]/', 'https://[::1]/'],
+    ['https://[invalid]/', undefined],
+    ['https://example.com:invalid', undefined],
+    ['https://', undefined],
+    ['//example.com', undefined],
+    ['ftp://example.com', undefined],
+    ['javascript:alert(1)', undefined],
+    ['mailto:person@example.com', undefined],
+    ['https://user@example.com', undefined],
+    ['https://:password@example.com', undefined],
+    ['user@example.com', undefined],
+    ['https://@example.com', 'https://example.com/'],
+  ];
+  for (const [value, expectedLink] of cases) {
+    for (const field of ['website', 'linkedIn']) {
+      const [detail] = assembleResume({}, { ...emptyContact, [field]: value }).contact;
+      assert.equal(detail.text, value);
+      assert.equal(detail.link, expectedLink, `${field}: ${JSON.stringify(value)}`);
+    }
+  }
+});
+
+test('email links preserve explicit mailto and bare-address validation behavior', () => {
+  const cases = [
+    ['person@example.com', 'mailto:person@example.com'],
+    ['  person@example.com  ', 'mailto:person@example.com'],
+    ['Person+tag@EXAMPLE.COM', 'mailto:Person+tag@EXAMPLE.COM'],
+    ['MAILTO:person@example.com', 'mailto:person@example.com'],
+    ['mailto:person@example.com?subject=Hello', 'mailto:person@example.com?subject=Hello'],
+    ['mailto:', 'mailto:'],
+    ['person@localhost', 'mailto:person@localhost'],
+    ['person@@example.com', undefined],
+    ['person:password@example.com', undefined],
+    ['@example.com', undefined],
+    ['person@', undefined],
+    ['https://example.com', undefined],
+    ['person\u001f@example.com', undefined],
+    ['person name@example.com', undefined],
+    ['person\u007f@example.com', undefined],
+  ];
+  for (const [value, expectedLink] of cases) {
+    const [detail] = assembleResume({}, { ...emptyContact, email: value }).contact;
+    assert.equal(detail.text, value);
+    assert.equal(detail.link, expectedLink, JSON.stringify(value));
+  }
+});
+
 test('unknown, corrupt, wrong-version and blocked storage warn without throwing', () => {
   for (const value of [
     '{',
     'null',
     '[]',
     '{}',
+    'false',
+    '12',
+    '"saved contact"',
     JSON.stringify({ version: 2, fields: emptyContact }),
+    JSON.stringify({ version: 1 }),
+    JSON.stringify({ version: 1, fields: null }),
+    JSON.stringify({ version: 1, fields: false }),
+    JSON.stringify({ version: 1, fields: 'contact' }),
+    JSON.stringify({ version: 1, fields: [] }),
     JSON.stringify({ version: 1, fields: { ...emptyContact, email: 12 } }),
     JSON.stringify({ version: 1, fields: {} }),
   ]) {

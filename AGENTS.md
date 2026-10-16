@@ -20,6 +20,13 @@
 - Keep personal resumes, generated PDFs, and real contact details out of committed fixtures and documentation. Use synthetic examples.
 - Do not mention competing resume services in the README.
 
+## Code Readability
+
+- Prefer named constants for numeric values whose purpose is not immediately obvious; common, self-explanatory values do not need constants.
+- Prefer straightforward control flow over nested ternaries when conditions become difficult to follow. Simple ternaries are fine.
+- Favor clarity over brevity without adding unnecessary abstractions. Apply these preferences with judgment, not as absolute restrictions.
+- Regular expressions are acceptable. Make a complex regex's purpose understandable through naming or a brief explanation where useful.
+
 ## Verification
 
 - Add meaningful tests for parsing, validation, ordering, and PDF text preservation.

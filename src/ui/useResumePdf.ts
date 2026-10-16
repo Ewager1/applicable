@@ -62,23 +62,23 @@ export function useResumePdf() {
     const submissionRevision = ++revision.current;
     revokeArtifact();
     const parsed = parseResume(source);
-    if (!parsed.ok || !contact.fullName.trim()) {
-      const errors = [
-        ...(!contact.fullName.trim()
-          ? [
-              {
-                message: 'Enter your Full Name in the contact fields above before creating a PDF.',
-                line: null,
-              },
-            ]
-          : []),
-        ...(!parsed.ok ? parsed.errors : []),
-      ];
+    const invalidName = !contact.fullName.trim();
+    if (!parsed.ok || invalidName) {
+      const errors: ValidationError[] = [];
+      if (invalidName) {
+        errors.push({
+          message: 'Enter your Full Name in the contact fields above before creating a PDF.',
+          line: null,
+        });
+      }
+      if (!parsed.ok) {
+        for (const error of parsed.errors) errors.push(error);
+      }
       setState({
         phase: 'error',
         errors,
         invalidInput: !parsed.ok,
-        invalidName: !contact.fullName.trim(),
+        invalidName,
       });
       setStatus('Check the details above, then create your PDF again.');
       return;

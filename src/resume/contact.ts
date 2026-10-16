@@ -9,38 +9,41 @@ export const emptyContact: ContactFields = {
 };
 export const contactKeys = ['fullName', 'email', 'linkedIn', 'website', 'phoneNumber'] as const;
 
+const firstPrintableAsciiCode = 32;
+const deleteControlCode = 127;
+
 /** Link only recognized email/web destinations; all supplied display text stays literal. */
 function safeLink(value: string, email = false): string | undefined {
   const destination = value.trim();
   if (
     !destination ||
     /\s/.test(destination) ||
-    [...destination].some(
-      (character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
-    )
+    [...destination].some((character) => {
+      const code = character.charCodeAt(0);
+      return code < firstPrintableAsciiCode || code === deleteControlCode;
+    })
   )
     return;
-  const candidate = email
-    ? /^mailto:/i.test(destination)
-      ? destination
-      : /^[^:@]+@[^@]+$/.test(destination)
-        ? `mailto:${destination}`
-        : ''
-    : /^https?:\/\//i.test(destination)
-      ? destination
-      : /^[^:/?#]+\.[^:/?#]+(?:[/?#].*)?$/.test(destination)
-        ? `https://${destination}`
-        : '';
+  let candidate = '';
+  if (email) {
+    if (/^mailto:/i.test(destination)) candidate = destination;
+    else if (/^[^:@]+@[^@]+$/.test(destination)) candidate = `mailto:${destination}`;
+  } else {
+    if (/^https?:\/\//i.test(destination)) candidate = destination;
+    // A dotted bare host may include a path, query or fragment, but no scheme.
+    else if (/^[^:/?#]+\.[^:/?#]+(?:[/?#].*)?$/.test(destination))
+      candidate = `https://${destination}`;
+  }
   if (!candidate) return;
   try {
     const url = new URL(candidate);
-    if (
-      email
-        ? url.protocol !== 'mailto:'
-        : !['https:', 'http:'].includes(url.protocol) ||
-          !url.hostname ||
-          !!url.username ||
-          !!url.password
+    if (email) {
+      if (url.protocol !== 'mailto:') return;
+    } else if (
+      !['https:', 'http:'].includes(url.protocol) ||
+      !url.hostname ||
+      url.username ||
+      url.password
     )
       return;
     return url.href;
