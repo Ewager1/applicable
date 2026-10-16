@@ -35,20 +35,11 @@ npm run preview
 
 Open [the local build preview](http://127.0.0.1:4174/). Stop it with Ctrl+C. This builds local static assets; it does not publish or deploy anything.
 
-The complete application flow is implemented and clean-source verification has passed. Distribution is this repository's source download; no installer, published release or hosted service is provided. See the [verification record and tested platforms](docs/verification.md).
+Distribution is this repository's source download; no installer, published release or hosted service is provided. See the dated [clean-source verification records and tested platforms](docs/verification.md) for their exact source scope.
 
 ## Verification and build
 
-| Command | Purpose |
-| --- | --- |
-| `npm run typecheck` | Strict no-emit TypeScript checking of the core and React interface |
-| `npm run lint` | ESLint checks JavaScript and TypeScript, with strict equality and no `eval` |
-| `npm test` | Resume parsing/validation plus selectable PDF text, fonts, links, bounds and pagination |
-| `npm run build` | Bundle the application into `dist/` |
-| `npm run preview` | Serve the built application at http://127.0.0.1:4174/; stop with Ctrl+C |
-| `npm run test:browser` | Own temporary servers; verify paste, warnings, correction, real downloads, preview and recovery |
-| `npm run check` | Typecheck, lint, PDF tests, build, then browser tests |
-| `npm run proof:generate` | Generate synthetic PDFs in ignored `output/pdf/` |
+Run `npm run check` for strict TypeScript checking, lint, unit/PDF tests, build and browser tests. The [maintenance guide](docs/maintenance.md#choose-verification-by-the-change) owns focused check commands and the contributor edit map, including validation, input help, PDF styles, filenames and UI state.
 
 Browser checks use installed desktop Chrome by default. Run `npm run build` before running the browser command on its own, and leave ports 4173 and 4174 free. The browser command starts and stops its own servers; do not also run `proof:serve` or `preview` while testing.
 
@@ -61,7 +52,7 @@ PLAYWRIGHT_BROWSER=chromium npm run check
 
 The environment-variable form above works in macOS/Linux shells. In PowerShell, use `$env:PLAYWRIGHT_BROWSER = "chromium"` and then `npm run check`. Alternatively set `CHROME_PATH` to a Chromium executable's absolute path. On Linux, Playwright's `install --with-deps chromium` command can install the system libraries needed for testing. Browser downloads are development-only and are not needed to run the application.
 
-GitHub Actions is configured to run the same checks on pull requests to `main` and pushes to `main`, using Node 22 on Ubuntu 24.04 and the pinned Playwright Chromium in its full/new headless mode (including native PDF viewing). Dependency/browser installation requires an internet connection; resume PDF generation uses local assets. The separate synthetic PDF investigation runs with `npm run proof:serve` at http://127.0.0.1:4173/; its [developer notes](proof/README.md) describe visual QA. The parser/PDF core and React interface use strict TypeScript; developer scripts remain JavaScript. `npm run typecheck` checks the core and interface without emitting files. See [tooling and module structure](docs/development.md).
+GitHub Actions is configured to run the same checks on pull requests to `main` and pushes to `main`, using Node 22 on Ubuntu 24.04 and the pinned Playwright Chromium in its full/new headless mode (including native PDF viewing). Dependency/browser installation requires an internet connection; resume PDF generation uses local assets. The separate synthetic PDF investigation runs with `npm run proof:serve` at http://127.0.0.1:4173/; its [developer notes](proof/README.md) describe visual QA. The parser/PDF core is independent of React; the interface uses typed React components/local state, and developer scripts remain JavaScript. See [tooling and module structure](docs/development.md).
 
 ## Using Applicable
 

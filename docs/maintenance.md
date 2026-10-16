@@ -8,12 +8,13 @@ Start with the assigned [GitHub issue](https://github.com/Ewager1/applicable/iss
 | --- | --- |
 | Accepted text, validation and source lines | [parse.ts](../app/resume/parse.ts), [input format](input-format.md), [synthetic example](../examples/resume.txt), [chatbot instruction](../examples/chatbot-instruction.md) |
 | Shared data/result/error shape | [types.ts](../app/resume/types.ts): canonical TypeScript `Resume`, nested entries, discriminated `ParseResult` and `ValidationError`; type-only exports |
+| Input help and copied chatbot instructions | [ChatbotInstructions.tsx](../app/ui/ChatbotInstructions.tsx): visible steps and clipboard/manual fallback; imports [chatbot-instruction.md](../examples/chatbot-instruction.md) as raw text, so edit that single file for the copied instructions and keep it aligned with the [input contract](input-format.md) |
 | Website wording and structure | [App.tsx](../app/ui/App.tsx), [ChatbotInstructions.tsx](../app/ui/ChatbotInstructions.tsx), [ResumeForm.tsx](../app/ui/ResumeForm.tsx), [Feedback.tsx](../app/ui/Feedback.tsx), [PdfResult.tsx](../app/ui/PdfResult.tsx): semantic page structure, chatbot steps, copy fallback, form, accessible feedback and result |
 | Website appearance | [styles.css](../app/styles.css): variables/base, page, form, help/errors, result, responsive rules |
 | Portable PDF filename | [download-filename.ts](../app/download-filename.ts): parsed professional title plus optional company, sanitized/bounded only for filenames; never modify the resume model |
 | Submission, recovery, download and preview | [useResumePdf.ts](../app/ui/useResumePdf.ts): typed generation states, resume/company revision guards, lazy local loads, recovery and Blob URL ownership; `PdfResult.tsx` delivers once after commit |
 | PDF typography, palette, dimensions and entry rows | [document.ts](../app/pdf/document.ts): fixed semantic styles and section order; [current template details](pdf-template.md) |
-| Header/content relationships | [pagination.ts](../app/pdf/pagination.ts) and explicit `keepWith` calls in `document.ts`; keep links target actual nodes, including intermediate content |
+| Header/content relationships | [pagination.ts](../app/pdf/pagination.ts) and explicit `keepWith` calls in `document.ts`; layout relationships target actual nodes, including intermediate content |
 | Oversized heading groups | [header-fit.ts](../app/pdf/header-fit.ts): same-engine, fresh-page measurement of those explicit keep-groups |
 | PDF bytes and engine failures | [render.ts](../app/pdf/render.ts): fit check, synchronous local stream, recoverable errors |
 | Local fonts and glyph support | [fonts.ts](../app/pdf/fonts.ts), [font-coverage.ts](../app/pdf/font-coverage.ts), [coverage generator](../scripts/font-coverage.mjs), [font source/license](../assets/fonts/SOURCE.md) |
@@ -21,6 +22,8 @@ Start with the assigned [GitHub issue](https://github.com/Ewager1/applicable/iss
 | Build, browsers and CI | [package.json](../package.json), [Vite config](../vite.config.js), [browser runner](../tests/run-browser.mjs), [browser selection](../tests/browser-options.mjs), [CI workflow](../.github/workflows/checks.yml) |
 
 The app has a strict TypeScript parser/PDF core and React/TypeScript interface retaining the HTML/CSS, built with Vite, local pdfmake and bundled Source Sans 3. No backend, account, resume storage or application analytics is involved.
+
+`app/main.tsx` mounts the interface; `app/index.html` is only the HTML shell. `examples/` owns canonical text examples, `proof/` owns synthetic PDF/layout fixtures and frozen visual baselines, and `tests/` owns parser/filename/application/lifecycle checks. Keep developer-only proof, tests and agent-usage tools out of the production bundle. See [development boundaries](development.md#typescriptjavascript-boundary) for Node type stripping and the proof server's allowlisted TypeScript routes.
 
 ## Data flow and invariants
 
@@ -31,7 +34,7 @@ The app has a strict TypeScript parser/PDF core and React/TypeScript interface r
 
 ## Choose verification by the change
 
-Use the supported Node/npm version and browser setup in the [README](../README.md). Commands below run from the repository root; Chrome is the default developer browser, or select the pinned Chromium as documented there.
+Use Node **22.13 or newer in 22.x, or 24 or newer**, with npm (`^22.13.0 || >=24.0.0` in `package.json`; `.nvmrc` selects 22). Node 20 and 23 are unsupported. Commands below run from the repository root; installation/startup and browser setup are in the [README](../README.md). Chrome is the default developer browser, or select pinned Chromium as documented there.
 
 | Area | Focused check |
 | --- | --- |
