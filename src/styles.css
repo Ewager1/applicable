@@ -458,6 +458,37 @@ iframe {
 }
 
 /* Local view navigation and job-search guidance */
+.job-finder-setup {
+  margin-top: 18px;
+}
+
+.job-finder-setup form,
+.job-finder-output {
+  margin-top: 18px;
+}
+
+.job-finder-field {
+  margin-bottom: 24px;
+}
+
+.job-finder-field p,
+.job-finder-output p {
+  margin: 7px 0 10px;
+  font-size: 13px;
+}
+
+.job-finder-setup textarea {
+  min-height: 100px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.6;
+}
+
+.job-finder-output textarea {
+  min-height: 320px;
+  margin: 12px 0;
+}
+
 .masthead {
   flex-wrap: wrap;
 }

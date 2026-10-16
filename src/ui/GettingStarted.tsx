@@ -1,3 +1,5 @@
+import { JobFinderSetup } from './JobFinderSetup.tsx';
+
 export function GettingStarted() {
   return (
     <section aria-labelledby="getting-started-title">
@@ -21,10 +23,10 @@ export function GettingStarted() {
         <li>
           <h2>Set up a Job Finder conversation in ChatGPT</h2>
           <p>
-            Open ChatGPT yourself and start a conversation for your job search. Describe your target
-            roles, location and preferences so you can explore relevant positions together. Verify
-            each opening on the employer’s website.
+            Create a reusable setup prompt below, then open ChatGPT yourself to explore relevant
+            positions together. Verify each opening on the employer’s website.
           </p>
+          <JobFinderSetup />
         </li>
         <li>
           <h2>Set up a Resume Builder conversation in ChatGPT</h2>
