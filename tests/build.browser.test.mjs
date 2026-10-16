@@ -671,7 +671,7 @@ test('contact edits invalidate pending work and revoke completed artifacts', asy
   }
 });
 
-test('three local tools default to PDF Maker with informational discovery and keyboard navigation', async (t) => {
+test('three local tools default to PDF Maker with personal introduction and keyboard navigation', async (t) => {
   const page = await openPage(t);
   const builder = page.getByRole('tab', { name: 'Resume PDF Maker', exact: true });
   const finder = page.getByRole('tab', { name: 'Job Finder', exact: true });
@@ -685,20 +685,14 @@ test('three local tools default to PDF Maker with informational discovery and ke
   assert.equal(await finder.getAttribute('tabindex'), '-1');
   assert.equal(await writer.getAttribute('tabindex'), '-1');
   assert.equal(await page.locator('#job-finder-panel').isVisible(), false);
-  await page.getByRole('link', { name: 'How it works', exact: true }).click();
-  const overview = page.getByRole('region', { name: 'How it works', exact: true });
-  assert.equal(await overview.getByRole('listitem').count(), 4);
-  assert.deepEqual(await overview.getByRole('heading', { level: 3 }).allTextContents(), [
-    'Find the right jobs',
-    'Tailor your resume',
-    'Create your PDF',
-    'Review and apply',
-  ]);
-  assert.equal(await overview.getByRole('form').count(), 0);
-  assert.match(
-    await overview.textContent(),
-    /does not automatically search for jobs or submit applications/,
+  assert.equal(
+    await page.locator('.homepage-intro strong').textContent(),
+    'Use one tool or all three in conjunction.',
   );
+  const story = page.locator('.homepage-intro details');
+  assert.equal(await story.getAttribute('open'), null);
+  await story.getByText('Why I built Applicable', { exact: true }).press('Enter');
+  assert.equal(await story.getByText(/After spending months looking for work/).isVisible(), true);
   assert.equal(await builder.getAttribute('aria-selected'), 'true');
   await builder.press('ArrowRight');
   assert.equal(await finder.getAttribute('aria-selected'), 'true');
@@ -830,24 +824,6 @@ for (const width of [320, 375, 1280]) {
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         true,
       );
-      const overview = page.getByRole('region', { name: 'How it works', exact: true });
-      const cards = await overview.getByRole('listitem').all();
-      const cardBounds = await Promise.all(cards.map((card) => card.boundingBox()));
-      for (const [index, card] of cards.entries()) {
-        assert.equal(await card.getByRole('heading', { level: 3 }).isVisible(), true);
-        assert.ok(cardBounds[index].x >= 0);
-        assert.ok(cardBounds[index].x + cardBounds[index].width <= width);
-        if (index > 0) {
-          if (width === 1280) {
-            assert.ok(Math.abs(cardBounds[index].y - cardBounds[0].y) < 1);
-            assert.ok(cardBounds[index].x >= cardBounds[index - 1].x + cardBounds[index - 1].width);
-          } else {
-            assert.ok(
-              cardBounds[index].y >= cardBounds[index - 1].y + cardBounds[index - 1].height,
-            );
-          }
-        }
-      }
       const bounds = await tab.boundingBox();
       assert.ok(bounds.height >= 44 && bounds.width >= 44);
       await mkdir('output/ui', { recursive: true });
