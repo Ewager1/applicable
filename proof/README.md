@@ -32,7 +32,7 @@ pdftoppm -scale-to 1200 -png output/pdf/typical.pdf output/pdf/typical
 pdftoppm -scale-to 1200 -png output/pdf/long.pdf output/pdf/long
 ```
 
-A2 adds application development/build scripts, lint and CI; see the [main README](../README.md). This proof does not implement the parser, user resume form or final packaging. No TypeScript is configured.
+A2 adds application development/build scripts, lint and CI; see the [main README](../README.md). This proof does not implement the parser, user resume form or final packaging. F1 migrates the shared PDF core to strict TypeScript; fixtures and developer tools remain JavaScript. The allowlisted proof server erases core types in memory and serves JavaScript, without a second emitted build. Direct Node imports need `--experimental-strip-types`; the package commands include it.
 
 ## Decision
 

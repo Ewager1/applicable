@@ -1,3 +1,5 @@
+import type { TFontDictionary } from 'pdfmake/interfaces.js';
+
 const fontDescriptors = [
   {
     file: 'SourceSans3-Regular.ttf',
@@ -14,7 +16,7 @@ const fontDescriptors = [
 ];
 const [regular, semibold, bold] = fontDescriptors;
 export const fontFiles = fontDescriptors.map(font => font.file);
-export const fonts = {
+export const fonts: TFontDictionary = {
   SourceSans3: {
     normal: regular.file,
     bold: bold.file,
@@ -33,7 +35,7 @@ export const fonts = {
  * Load only bundled local assets. The caller can retain the map for later exports.
  * @returns {Promise<Record<string, string>>} Bundled filenames to base64 TTF data.
  */
-export async function loadBrowserFonts() {
+export async function loadBrowserFonts(): Promise<Record<string, string>> {
   try {
     return Object.fromEntries(await Promise.all(fontDescriptors.map(async ({ file, url }) => {
       const response = await fetch(url);

@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import tsParser from '@typescript-eslint/parser';
 
 const readonly = names => Object.fromEntries(names.map(name => [name, 'readonly']));
 
@@ -17,6 +18,12 @@ export default [
   {
     files: ['**/*.test.mjs', 'tests/**/*.mjs', 'proof/pdf.mjs', 'proof/generate.mjs', 'proof/serve.mjs', 'proof/production-fixtures.mjs', 'scripts/**/*.mjs'],
     languageOptions: { globals: readonly(['process', 'Buffer', 'console', 'URL', 'fetch', 'setTimeout', 'clearTimeout', 'structuredClone']) },
+  },
+  {
+    files: ['app/**/*.ts'],
+    languageOptions: { parser: tsParser, globals: readonly(['URL', 'fetch', 'btoa', 'Uint8Array']) },
+    // TypeScript checks names and unused declarations, including type-only imports.
+    rules: { 'no-undef': 'off', 'no-unused-vars': 'off', eqeqeq: 'error', 'no-eval': 'error' },
   },
   {
     files: ['**/*.test.mjs'],

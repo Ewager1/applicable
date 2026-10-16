@@ -6,21 +6,21 @@ Start with the assigned [GitHub issue](https://github.com/Ewager1/applicable/iss
 
 | Change | Files and responsibility |
 | --- | --- |
-| Accepted text, validation and source lines | [parse.js](../app/resume/parse.js), [input format](input-format.md), [synthetic example](../examples/resume.txt), [chatbot instruction](../examples/chatbot-instruction.md) |
-| Shared data/result/error shape | [types.js](../app/resume/types.js): editor-visible JSDoc `Resume`, nested entries, `ParseResult` and `ValidationError`; no runtime imports or build-time type checker |
+| Accepted text, validation and source lines | [parse.ts](../app/resume/parse.ts), [input format](input-format.md), [synthetic example](../examples/resume.txt), [chatbot instruction](../examples/chatbot-instruction.md) |
+| Shared data/result/error shape | [types.ts](../app/resume/types.ts): canonical TypeScript `Resume`, nested entries, discriminated `ParseResult` and `ValidationError`; type-only exports |
 | Website wording and structure | [index.html](../app/index.html): visible chatbot steps before the paste form; the chatbot instruction is imported into the copy control, with a labeled/focused fallback when clipboard access fails |
 | Website appearance | [styles.css](../app/styles.css): variables/base, page, form, help/errors, result, responsive rules |
-| Portable PDF filename | [download-filename.js](../app/download-filename.js): parsed professional title plus optional company, sanitized/bounded only for filenames; never modify the resume model |
+| Portable PDF filename | [download-filename.ts](../app/download-filename.ts): parsed professional title plus optional company, sanitized/bounded only for filenames; never modify the resume model |
 | Submission, recovery, download and preview | [main.js](../app/main.js): resume/company revision guards, busy state, warnings and Blob URL lifecycle |
-| PDF typography, palette, dimensions and entry rows | [document.js](../app/pdf/document.js): fixed semantic styles and section order; [current template details](pdf-template.md) |
-| Header/content relationships | [pagination.js](../app/pdf/pagination.js) and explicit `keepWith` calls in `document.js`; keep links target actual nodes, including intermediate content |
-| Oversized heading groups | [header-fit.js](../app/pdf/header-fit.js): same-engine, fresh-page measurement of those explicit keep-groups |
-| PDF bytes and engine failures | [render.js](../app/pdf/render.js): fit check, synchronous local stream, recoverable errors |
-| Local fonts and glyph support | [fonts.js](../app/pdf/fonts.js), [font-coverage.js](../app/pdf/font-coverage.js), [coverage generator](../scripts/font-coverage.mjs), [font source/license](../assets/fonts/SOURCE.md) |
+| PDF typography, palette, dimensions and entry rows | [document.ts](../app/pdf/document.ts): fixed semantic styles and section order; [current template details](pdf-template.md) |
+| Header/content relationships | [pagination.ts](../app/pdf/pagination.ts) and explicit `keepWith` calls in `document.ts`; keep links target actual nodes, including intermediate content |
+| Oversized heading groups | [header-fit.ts](../app/pdf/header-fit.ts): same-engine, fresh-page measurement of those explicit keep-groups |
+| PDF bytes and engine failures | [render.ts](../app/pdf/render.ts): fit check, synchronous local stream, recoverable errors |
+| Local fonts and glyph support | [fonts.ts](../app/pdf/fonts.ts), [font-coverage.ts](../app/pdf/font-coverage.ts), [coverage generator](../scripts/font-coverage.mjs), [font source/license](../assets/fonts/SOURCE.md) |
 | Local development agent/model metrics | [usage CLI](../scripts/agent-usage.mjs), [measurement guide](agent-usage.md); ignored `output/agent-usage/` reports, synthetic [tests](../tests/agent-usage.test.mjs) |
 | Build, browsers and CI | [package.json](../package.json), [Vite config](../vite.config.js), [browser runner](../tests/run-browser.mjs), [browser selection](../tests/browser-options.mjs), [CI workflow](../.github/workflows/checks.yml) |
 
-The app is native JavaScript/HTML/CSS with Vite, local pdfmake and bundled Source Sans 3. No backend, account, resume storage or application analytics is involved.
+The app has a strict TypeScript parser/PDF core and native JavaScript/HTML/CSS interface with Vite, local pdfmake and bundled Source Sans 3. No backend, account, resume storage or application analytics is involved.
 
 ## Data flow and invariants
 
@@ -36,18 +36,19 @@ Use the supported Node/npm version and browser setup in the [README](../README.m
 | Area | Focused check |
 | --- | --- |
 | Agent usage aggregation/privacy and baseline lifecycle | `node --test tests/agent-usage.test.mjs` |
-| Download filename sanitization | `node --test tests/download-filename.test.mjs` |
-| Parser/input contract | `node --test tests/parser.test.mjs` |
-| PDF rendering, fonts, pagination or fit guard | `node --test proof/render.test.mjs tests/production-pdf.test.mjs` |
+| Download filename sanitization | `node --experimental-strip-types --test tests/download-filename.test.mjs` |
+| Parser/input contract | `node --experimental-strip-types --test tests/parser.test.mjs` |
+| PDF rendering, fonts, pagination or fit guard | `node --experimental-strip-types --test proof/render.test.mjs tests/production-pdf.test.mjs` |
 | Development dependency loading | `node --test tests/dev.browser.test.mjs` (owns an ephemeral server and isolated cache) |
 | Website, download/preview, errors or async state | `npm run build`, then `npm run test:browser` |
-| Static JavaScript checks | `npm run lint` |
+| Strict core contracts | `npm run typecheck` |
+| Static JavaScript/TypeScript checks | `npm run lint` |
 | Full code-change gate | `npm run check` |
 | Documentation-only changes | Review content, relative links, commands and `git diff --check`; do not manufacture runtime tests |
 
 `npm run test:browser` owns proof/preview servers on ports 4173/4174 plus the isolated development check. Leave those ports free and do not launch duplicate test servers. Local success does not establish remote CI success: review and latest-commit CI remain merge gates under [AGENTS.md](../AGENTS.md).
 
-Run focused commands while developing; `npm run check` already includes lint, unit/PDF tests, build and browser tests. The [engineering rules](../AGENTS.md#verification) define ownership and when to repeat checks. Manual PDF inspection applies when output could change; it is not required for developer tooling or documentation.
+Run focused commands while developing; `npm run check` already includes typecheck, lint, unit/PDF tests, build and browser tests. The [engineering rules](../AGENTS.md#verification) define ownership and when to repeat checks. Manual PDF inspection applies when output could change; it is not required for developer tooling or documentation.
 
 ## Fonts, samples and visual baselines
 
@@ -69,6 +70,6 @@ Keep [the frozen pre-refresh fixture/PDF](../proof/baseline/pre-refresh/README.m
 
 Before dependency installation, cache removal, server restart or reload, copy any unsaved draft somewhere safe and stop only Applicable's own process. Input exists only in the current browser page; HMR may also reset it. Do not run `npm ci` or clear `node_modules/.vite` under a live server. Verify clean installation in a separate source directory, and give temporary development tests their own cache/server with cleanup. [Cache recovery](development.md) explains the stale-dependency 504 and forced restart.
 
-C5's fit guard performs one additional layout pass over independently cloned keep-groups using pdfmake **0.2.20 internal `_pdfMakePages` and `positions` metadata**. It requires a target's first line to fit with its heading/preceding details on a fresh page; later bullet lines may continue. Missing measurement metadata blocks export. The pass can repeat shared headers and measure a long first bullet in full, so very large input has extra CPU/memory cost. Engine upgrades require rechecking compatibility, large passing/failing boundaries, font errors, browser recovery and ordinary-layout equivalence. See [the guard's design and limits](pdf-template.md).
+The narrow [pdfmake adapter](../app/pdf/pdfmake-adapter.ts) owns runtime validation of the pinned engine's private page/position metadata. C5's fit guard performs one additional layout pass over independently cloned keep-groups using pdfmake **0.2.20 internal `_pdfMakePages` and `positions` metadata**. It requires a target's first line to fit with its heading/preceding details on a fresh page; later bullet lines may continue. Missing measurement metadata blocks export. The pass can repeat shared headers and measure a long first bullet in full, so very large input has extra CPU/memory cost. Engine upgrades require rechecking compatibility, large passing/failing boundaries, font errors, browser recovery and ordinary-layout equivalence. See [the guard's design and limits](pdf-template.md).
 
 Font coverage is finite, PDFs are selectable/searchable but not tagged accessibility PDFs, and native preview depends on browser settings. No universal layout guarantee is made for arbitrary documents. A failed fit check returns a warning and no partial artifact; do not truncate, shrink, rewrite or add a parser character cap to bypass it.

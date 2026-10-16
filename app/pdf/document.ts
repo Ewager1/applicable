@@ -1,17 +1,23 @@
-import { supportedRanges } from './font-coverage.js';
-import { createPagination } from './pagination.js';
+import type { ContentColumns, ContentStack, ContentUnorderedList, Margins, StyleDictionary, TDocumentDefinitions } from 'pdfmake/interfaces.js';
+import type { Resume } from '../resume/types.ts';
+import type { KeepGroup, LayoutNode } from './pagination.ts';
+
+import { supportedRanges } from './font-coverage.ts';
+import { createPagination } from './pagination.ts';
+
+export interface ResumeDocument extends TDocumentDefinitions { content: LayoutNode[]; keepGroups: KeepGroup[] }
 const palette = { primary: '#20252B', secondary: '#4B5563', accent: '#1F4E5F', divider: '#D8DEE6' };
 const semibold = { font: 'SourceSans3Semibold' };
-const pageMargins = [43, 43, 43, 43];
+const pageMargins: Margins = [43, 43, 43, 43];
 const metadataColumnWidth = 180;
 const metadataColumnGap = 12;
 const sectionColumnGap = 9;
-const sectionMargins = [0, 11, 0, 6];
+const sectionMargins: Margins = [0, 11, 0, 6];
 const dividerTopMargin = 6;
 const dividerLineWidth = 0.5;
 const entryBottomMargin = 5;
-const bulletMargins = [7, 0, 0, 1.5];
-const styles = {
+const bulletMargins: Margins = [7, 0, 0, 1.5];
+const styles: StyleDictionary = {
   // Source Sans 3's ascent/descent already yield 1.326 × fontSize baselines.
   // pdfmake's lineHeight multiplies that metric, unlike a CSS em line-height.
   body: { font: 'SourceSans3', fontSize: 9.75, lineHeight: 1, color: palette.primary },
@@ -25,7 +31,7 @@ const styles = {
   location: { ...semibold, fontSize: 9.5, color: palette.secondary },
   skillsCategory: { ...semibold },
 };
-const sectionHeading = text => ({
+const sectionHeading = (text: string): ContentColumns => ({
   columns: [
     { text, style: 'sectionHeading', width: 'auto' },
     // A table border uses the remaining column width; no text dashes or fixed
@@ -50,36 +56,34 @@ const sectionHeading = text => ({
   headlineLevel: 1,
   unbreakable: true,
 });
-const entryRow = (left, right, leftStyle, rightStyle) => ({
+const entryRow = (left: string, right: string, leftStyle: string, rightStyle: string): ContentColumns => ({
   columns: [
     { text: left, style: leftStyle, width: '*' },
     { text: right, style: rightStyle, width: metadataColumnWidth, alignment: 'right' },
   ],
   columnGap: metadataColumnGap,
 });
-/** @param {import('../resume/types.js').Resume} resume */
-function verifyCharacters(resume) {
+function verifyCharacters(resume: Resume) {
   const text = [resume.name, ...resume.contact.map(item => item.text), resume.title, resume.summary,
     ...resume.jobs.flatMap(job => [job.employer, job.role, job.dates, job.location, ...job.bullets]),
     ...resume.education.flatMap(entry => [entry.qualification, entry.institution, entry.dates]),
     ...resume.certifications.flatMap(entry => [entry.title, entry.issuer, entry.dates]),
     ...resume.skills.flatMap(row => [row.category, row.items])].join('\n');
   const unsupported = [...new Set([...text].filter(character => {
-    const code = character.codePointAt(0);
+    const code = character.codePointAt(0)!;
     if (['\n', '\r', '\t'].includes(character)) return false;
     return code < 32 || code >= 127 && code <= 159 || !supportedRanges.some(([first, last]) => code >= first && code <= last);
   }))];
   if (unsupported.length) {
-    const characters = unsupported.slice(0, 8).map(character => `“${character}” (U+${character.codePointAt(0).toString(16).toUpperCase()})`).join(', ');
+    const characters = unsupported.slice(0, 8).map(character => `“${character}” (U+${character.codePointAt(0)!.toString(16).toUpperCase()})`).join(', ');
     throw new Error(`The resume font cannot display ${characters}${unsupported.length > 8 ? ', and more characters' : ''}. Replace these characters in the source before exporting; no PDF was created.`);
   }
 }
 
 /**
  * Render a complete successful parser result; unsupported glyphs block generation.
- * @param {import('../resume/types.js').Resume} resume
  */
-export function documentDefinition(resume) {
+export function documentDefinition(resume: Resume): ResumeDocument {
   verifyCharacters(resume);
   const pagination = createPagination();
   let contact;
@@ -90,7 +94,7 @@ export function documentDefinition(resume) {
     throw new Error('A contact link is not a usable web or email address. Check its destination before exporting.');
   }
   const experienceHeading = sectionHeading('RELEVANT EXPERIENCE');
-  const content = [
+  const content: LayoutNode[] = [
     { text: resume.name, style: 'name', margin: [0, 0, 0, 3] },
     {
       text: contact.flatMap((item, index) => index ? [{ text: ' • ' }, item] : [item]),
@@ -102,7 +106,7 @@ export function documentDefinition(resume) {
     experienceHeading,
   ];
   for (const [jobIndex, job] of resume.jobs.entries()) {
-    const header = {
+    const header: ContentStack = {
       stack: [
         entryRow(job.employer, job.dates, 'entryHeading', 'date'),
         entryRow(job.role, job.location, 'role', 'location'),
@@ -111,7 +115,7 @@ export function documentDefinition(resume) {
       headlineLevel: 1,
       unbreakable: true,
     };
-    const bullets = job.bullets.map(bullet => ({ ul: [bullet], margin: bulletMargins }));
+    const bullets = job.bullets.map((bullet): ContentUnorderedList => ({ ul: [bullet], margin: bulletMargins }));
     pagination.keepWith(header, bullets[0], `job ${jobIndex + 1}`);
     if (jobIndex === 0) pagination.keepWith(experienceHeading, bullets[0], 'job 1');
     content.push(header, ...bullets);
@@ -120,7 +124,7 @@ export function documentDefinition(resume) {
   content.push(educationHeading);
   for (const [entryIndex, entry] of resume.education.entries()) {
     const qualification = { text: entry.qualification, style: 'entryHeading', headlineLevel: 1 };
-    const institution = {
+    const institution: ContentColumns = {
       ...entryRow(entry.institution, entry.dates, 'body', 'date'),
       margin: [0, 0, 0, entryBottomMargin],
     };
@@ -135,7 +139,7 @@ export function documentDefinition(resume) {
       ...entryRow(entry.title, entry.dates, 'entryHeading', 'date'),
       headlineLevel: 1,
     };
-    const issuer = { text: entry.issuer, margin: [0, 0, 0, entryBottomMargin] };
+    const issuer: LayoutNode = { text: entry.issuer, margin: [0, 0, 0, entryBottomMargin] };
     pagination.keepWith(title, issuer, `certification entry ${entryIndex + 1}`);
     if (entryIndex === 0) pagination.keepWith(certificationsHeading, issuer, 'certification entry 1');
     content.push(title, issuer);
@@ -143,7 +147,7 @@ export function documentDefinition(resume) {
   const skillsHeading = sectionHeading('SKILLS');
   content.push(skillsHeading);
   for (const [rowIndex, row] of resume.skills.entries()) {
-    const skills = {
+    const skills: LayoutNode = {
       text: [{ text: `${row.category}: `, style: 'skillsCategory' }, row.items],
       margin: [0, 0, 0, 3],
     };

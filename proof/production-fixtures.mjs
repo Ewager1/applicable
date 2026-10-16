@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { parseResume } from '../app/resume/parse.js';
+import { parseResume } from '../app/resume/parse.ts';
 const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
 export const parsedExample = parseResume(source).resume;
 export function stressFixture(kind) {
