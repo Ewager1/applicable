@@ -1,5 +1,5 @@
 import type { ParseResult, ValidationError } from './types.ts';
-import { contactDetails } from './contact.ts';
+import { contactDetails, safeLink } from './contact.ts';
 
 interface SourceLine {
   text: string;
@@ -16,6 +16,8 @@ const sectionTitles = new Map([
   ['professional title', 'Professional Title'],
   ['summary', 'Summary'],
   ['relevant experience', 'Relevant Experience'],
+  ['volunteer experience', 'Volunteer Experience'],
+  ['projects', 'Projects'],
   ['education', 'Education'],
   ['certifications', 'Certifications'],
   ['skills', 'Skills'],
@@ -32,6 +34,10 @@ const symbolMarkers = new Map([
   ['@@PROFESSIONAL_TITLE@@', '# Professional Title'],
   ['@@SUMMARY@@', '# Summary'],
   ['@@RELEVANT_EXPERIENCE@@', '# Relevant Experience'],
+  ['@@VOLUNTEER_EXPERIENCE@@', '# Volunteer Experience'],
+  ['@@PROJECTS@@', '# Projects'],
+  ['@@VOLUNTEER@@', '## Volunteer'],
+  ['@@PROJECT@@', '## Project'],
   ['@@EDUCATION@@', '# Education'],
   ['@@CERTIFICATIONS@@', '# Certifications'],
   ['@@SKILLS@@', '# Skills'],
@@ -167,6 +173,8 @@ export function parseResume(source: unknown): ParseResult {
   const titleLines = readSectionLines('professional title');
   const summaryLines = readSectionLines('summary');
   const jobLines = readSectionLines('relevant experience');
+  const volunteerLines = readSectionLines('volunteer experience');
+  const projectLines = readSectionLines('projects');
   const educationLines = readSectionLines('education');
   const certificationLines = readSectionLines('certifications');
   const skillLines = readSectionLines('skills');
@@ -286,7 +294,7 @@ export function parseResume(source: unknown): ParseResult {
     .map((paragraph) => paragraph.split('\n').join(' '))
     .join('\n\n');
 
-  const jobs = readEntries(jobLines, 'job', 'job').map((entry) => {
+  const readBulletedEntry = (entry: EntryBlock, context: string, allowDescription = false) => {
     const metadata: SourceLine[] = [];
     const bullets: string[] = [];
     for (const item of entry.lines) {
@@ -294,22 +302,37 @@ export function parseResume(source: unknown): ParseResult {
       const match = text.match(bulletPattern);
       if (match) {
         bullets.push(match[1]?.trim() ?? '');
-        if (!bullets.at(-1)) report('Add text after the job bullet marker.', item.line);
+        if (!bullets.at(-1)) report(`Add text after the ${context} bullet marker.`, item.line);
       } else if (/^(?: {2,}| *\t)[ \t]*\S/.test(item.text)) {
-        if (!bullets.length) {
-          report('Put continued bullet text after a job bullet.', item.line);
+        const previous = metadata.at(-1);
+        if (
+          !bullets.length &&
+          allowDescription &&
+          previous &&
+          parseField(previous)?.key === 'description'
+        ) {
+          previous.text += ` ${text}`;
+        } else if (!bullets.length) {
+          report(
+            `Put continued bullet text after a ${context} bullet${allowDescription ? ' or Description field' : ''}.`,
+            item.line,
+          );
         } else {
           bullets[bullets.length - 1] += ` ${text}`;
         }
       } else if (bullets.length) {
         report(
-          'Indent continued bullet text by at least two spaces, or start a new bullet. Put job fields above the bullets.',
+          `Indent continued bullet text by at least two spaces, or start a new bullet. Put ${context} fields above the bullets.`,
           item.line,
         );
       } else {
         metadata.push(item);
       }
     }
+    return { metadata, bullets };
+  };
+  const jobs = readEntries(jobLines, 'job', 'job').map((entry) => {
+    const { metadata, bullets } = readBulletedEntry(entry, 'job');
     const values = readFields(
       metadata,
       ['employer', 'role', 'dates', 'location'],
@@ -323,6 +346,50 @@ export function parseResume(source: unknown): ParseResult {
       role: values.role,
       dates: values.dates,
       location: values.location,
+      bullets,
+    };
+  });
+  const volunteerExperience = readEntries(volunteerLines, 'volunteer', 'volunteer entry').map(
+    (entry) => {
+      const { metadata, bullets } = readBulletedEntry(entry, 'volunteer');
+      const values = readFields(
+        metadata,
+        ['organization', 'role', 'dates', 'location'],
+        'this volunteer entry',
+        entry.line,
+        ['organization'],
+      );
+      if (!bullets.some((text) => text.trim()))
+        report('Add at least one bullet for this volunteer entry.', entry.line);
+      return {
+        organization: values.organization,
+        role: values.role ?? '',
+        dates: values.dates ?? '',
+        location: values.location ?? '',
+        bullets,
+      };
+    },
+  );
+  const projects = readEntries(projectLines, 'project', 'project').map((entry) => {
+    const { metadata, bullets } = readBulletedEntry(entry, 'project', true);
+    const values = readFields(
+      metadata,
+      ['name', 'dates', 'link', 'description'],
+      'this project',
+      entry.line,
+      ['name'],
+    );
+    if (values.link && !safeLink(values.link)) {
+      const linkLine = metadata.find((item) => parseField(item)?.key === 'link')!;
+      report('Use a usable HTTP(S) or bare web address for this project link.', linkLine.line);
+    }
+    if (!values.description?.trim() && !bullets.some((text) => text.trim()))
+      report('Add a description or at least one bullet for this project.', entry.line);
+    return {
+      name: values.name,
+      dates: values.dates ?? '',
+      link: values.link ?? '',
+      description: values.description ?? '',
       bullets,
     };
   });
@@ -378,7 +445,18 @@ export function parseResume(source: unknown): ParseResult {
   if (errors.length) return { ok: false, errors };
   return {
     ok: true,
-    resume: { name, contact, title, summary, jobs, education, certifications, skills },
+    resume: {
+      name,
+      contact,
+      title,
+      summary,
+      jobs,
+      volunteerExperience,
+      projects,
+      education,
+      certifications,
+      skills,
+    },
     targetCompany,
   };
 }

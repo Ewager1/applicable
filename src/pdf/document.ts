@@ -9,6 +9,7 @@ import type {
 import type { Resume } from '../resume/types.ts';
 import type { KeepGroup, LayoutNode } from './pagination.ts';
 
+import { safeLink } from '../resume/contact.ts';
 import { supportedRanges } from './font-coverage.ts';
 import { createPagination } from './pagination.ts';
 
@@ -78,6 +79,24 @@ const entryRow = (
   ],
   columnGap: metadataColumnGap,
 });
+const bulletsFor = (bullets: string[]): ContentUnorderedList[] =>
+  bullets.map((bullet) => ({ ul: [bullet], margin: bulletMargins }));
+const optionalRow = (left: string, right: string, leftStyle: string, rightStyle: string) =>
+  right ? entryRow(left, right, leftStyle, rightStyle) : { text: left, style: leftStyle };
+const experienceHeader = (
+  primary: string,
+  role: string,
+  dates: string,
+  location: string,
+): ContentStack => ({
+  stack: [
+    optionalRow(primary, dates, 'entryHeading', 'date'),
+    ...(role || location ? [optionalRow(role, location, 'role', 'location')] : []),
+  ],
+  margin: [0, 0, 0, entryBottomMargin],
+  headlineLevel: 1,
+  unbreakable: true,
+});
 function verifyCharacters(resume: Resume) {
   const text = [
     resume.name,
@@ -90,6 +109,20 @@ function verifyCharacters(resume: Resume) {
       job.dates,
       job.location,
       ...job.bullets,
+    ]),
+    ...resume.volunteerExperience.flatMap((entry) => [
+      entry.organization,
+      entry.role,
+      entry.dates,
+      entry.location,
+      ...entry.bullets,
+    ]),
+    ...resume.projects.flatMap((entry) => [
+      entry.name,
+      entry.dates,
+      entry.link,
+      entry.description,
+      ...entry.bullets,
     ]),
     ...resume.education.flatMap((entry) => [entry.qualification, entry.institution, entry.dates]),
     ...resume.certifications.flatMap((entry) => [entry.title, entry.issuer, entry.dates]),
@@ -156,23 +189,61 @@ export function documentDefinition(resume: Resume): ResumeDocument {
     ...(resume.summary ? [{ text: resume.summary }] : []),
     ...(resume.jobs.length ? [experienceHeading] : []),
   ];
+  const appendEntry = (
+    heading: LayoutNode,
+    first: boolean,
+    label: string,
+    header: LayoutNode,
+    details: LayoutNode[],
+  ) => {
+    pagination.keepWith(header, details[0], label);
+    if (first) pagination.keepWith(heading, details[0], label);
+    content.push(header, ...details);
+  };
   for (const [jobIndex, job] of resume.jobs.entries()) {
+    appendEntry(
+      experienceHeading,
+      jobIndex === 0,
+      `job ${jobIndex + 1}`,
+      experienceHeader(job.employer, job.role, job.dates, job.location),
+      bulletsFor(job.bullets),
+    );
+  }
+  const volunteerHeading = sectionHeading('VOLUNTEER EXPERIENCE');
+  if (resume.volunteerExperience.length) content.push(volunteerHeading);
+  for (const [index, entry] of resume.volunteerExperience.entries()) {
+    appendEntry(
+      volunteerHeading,
+      index === 0,
+      `volunteer entry ${index + 1}`,
+      experienceHeader(entry.organization, entry.role, entry.dates, entry.location),
+      bulletsFor(entry.bullets),
+    );
+  }
+  const projectsHeading = sectionHeading('PROJECTS');
+  if (resume.projects.length) content.push(projectsHeading);
+  for (const [index, project] of resume.projects.entries()) {
+    const link = project.link ? safeLink(project.link) : undefined;
+    if (project.link && !link)
+      throw new Error(
+        'A project link is not a usable web address. Check its destination before exporting.',
+      );
     const header: ContentStack = {
       stack: [
-        entryRow(job.employer, job.dates, 'entryHeading', 'date'),
-        entryRow(job.role, job.location, 'role', 'location'),
+        optionalRow(project.name, project.dates, 'entryHeading', 'date'),
+        ...(link ? [{ text: project.link, link, style: 'contact' }] : []),
       ],
       margin: [0, 0, 0, entryBottomMargin],
       headlineLevel: 1,
       unbreakable: true,
     };
-    const bullets = job.bullets.map((bullet): ContentUnorderedList => ({
-      ul: [bullet],
-      margin: bulletMargins,
-    }));
-    pagination.keepWith(header, bullets[0], `job ${jobIndex + 1}`);
-    if (jobIndex === 0) pagination.keepWith(experienceHeading, bullets[0], 'job 1');
-    content.push(header, ...bullets);
+    const details: LayoutNode[] = [
+      ...(project.description
+        ? [{ text: project.description, margin: [0, 0, 0, entryBottomMargin] as Margins }]
+        : []),
+      ...bulletsFor(project.bullets),
+    ];
+    appendEntry(projectsHeading, index === 0, `project ${index + 1}`, header, details);
   }
   const educationHeading = sectionHeading('EDUCATION');
   if (resume.education.length) content.push(educationHeading);

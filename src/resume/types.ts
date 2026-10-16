@@ -11,6 +11,21 @@ export interface Job {
   location: string;
   bullets: string[];
 }
+export interface VolunteerExperience {
+  organization: string;
+  role: string;
+  dates: string;
+  location: string;
+  bullets: string[];
+}
+export interface Project {
+  name: string;
+  dates: string;
+  /** Literal display value; validated as a safe web destination. */
+  link: string;
+  description: string;
+  bullets: string[];
+}
 export interface EducationEntry {
   institution: string;
   qualification: string;
@@ -36,6 +51,8 @@ export interface ResumeBody {
   /** Paragraphs separated by two newlines. */
   summary: string;
   jobs: Job[];
+  volunteerExperience: VolunteerExperience[];
+  projects: Project[];
   education: EducationEntry[];
   certifications: Certification[];
   skills: SkillCategory[];

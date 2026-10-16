@@ -9,6 +9,8 @@ export function fixture(kind = 'typical') {
   const count = { short: 1, typical: 4, long: 12 }[kind];
   if (!count) throw new Error(`Unknown fixture: ${kind}`);
   return {
+    volunteerExperience: [],
+    projects: [],
     name: 'Alex Morgan',
     contact: [
       { text: 'Portland, OR' },

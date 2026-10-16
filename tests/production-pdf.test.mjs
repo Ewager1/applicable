@@ -32,6 +32,20 @@ const values = (resume) => [
     job.location,
     ...job.bullets,
   ]),
+  ...resume.volunteerExperience.flatMap((entry) => [
+    entry.organization,
+    entry.role,
+    entry.dates,
+    entry.location,
+    ...entry.bullets,
+  ]),
+  ...resume.projects.flatMap((entry) => [
+    entry.name,
+    entry.dates,
+    entry.link,
+    entry.description,
+    ...entry.bullets,
+  ]),
   ...resume.education.flatMap((entry) => [entry.qualification, entry.institution, entry.dates]),
   ...resume.certifications.flatMap((entry) => [entry.title, entry.dates, entry.issuer]),
   ...resume.skills.flatMap((row) => [row.category, row.items]),
@@ -423,9 +437,13 @@ test('rendered hierarchy and shared dates use real semantic weights, sizes and p
 });
 
 test('frozen pre-refresh data retains complete content and approximately two pages after restyling', async () => {
-  const resume = JSON.parse(
-    await readFile(new URL('../proof/baseline/pre-refresh/resume.json', import.meta.url), 'utf8'),
-  );
+  const resume = {
+    volunteerExperience: [],
+    projects: [],
+    ...JSON.parse(
+      await readFile(new URL('../proof/baseline/pre-refresh/resume.json', import.meta.url), 'utf8'),
+    ),
+  };
   const old = await readFile(new URL('../proof/baseline/pre-refresh/poppins.pdf', import.meta.url));
   assert.equal(
     createHash('sha256').update(old).digest('hex'),
@@ -628,11 +646,15 @@ const emptyBody = {
   title: '',
   summary: '',
   jobs: [],
+  volunteerExperience: [],
+  projects: [],
   education: [],
   certifications: [],
   skills: [],
 };
-const bodyFields = Object.keys(emptyBody);
+const bodyFields = Object.keys(emptyBody).filter(
+  (field) => !['volunteerExperience', 'projects'].includes(field),
+);
 const entrySections = [
   ['jobs', 'RELEVANT EXPERIENCE', (resume) => resume.jobs[0].employer],
   ['education', 'EDUCATION', (resume) => resume.education[0].qualification],
@@ -734,4 +756,133 @@ test('parsed target metadata names the file but never appears in PDF or font pre
   assert.ok(text.includes('Resolvedcustomerquestions.'));
   assert.equal(text.includes('Company'), false);
   assert.deepEqual(pages[0].annotations, []);
+});
+
+const expandedExample = parseResume(
+  await readFile(new URL('../examples/resume-volunteer-projects.txt', import.meta.url), 'utf8'),
+).resume;
+const newSectionResume = (text) => {
+  const result = parseResume(`@@CONTACT@@\nName: Taylor Example\n${text}`);
+  assert.equal(result.ok, true, JSON.stringify(result.errors));
+  return result.resume;
+};
+
+test('volunteer and project PDF content keeps fixed section order, source entry order and safe links', async () => {
+  const resume = {
+    ...parsedExample,
+    volunteerExperience: expandedExample.volunteerExperience,
+    projects: expandedExample.projects,
+  };
+  const pages = await inspect(resume);
+  const all = pages.map((page) => page.text).join('');
+  let position = -1;
+  for (const text of [
+    'RELEVANT EXPERIENCE',
+    'VOLUNTEER EXPERIENCE',
+    ...resume.volunteerExperience.map((entry) => entry.organization),
+    'PROJECTS',
+    ...resume.projects.map((entry) => entry.name),
+    'EDUCATION',
+    'CERTIFICATIONS',
+    'SKILLS',
+  ]) {
+    const next = all.indexOf(compact(text), position + 1);
+    assert.ok(next > position, `Incorrect section/entry order: ${text}`);
+    position = next;
+  }
+  const links = pages.flatMap((page) => page.annotations.map((row) => row.url));
+  assert.ok(links.includes('https://example.com/resource-guide'));
+  for (const [heading, following] of [
+    ['VOLUNTEER EXPERIENCE', resume.volunteerExperience[0].organization],
+    ['PROJECTS', resume.projects[0].name],
+  ]) {
+    const page = pages.find((page) => page.text.includes(compact(heading)));
+    assert.ok(page.text.includes(compact(following)), `Orphaned ${heading}`);
+  }
+});
+
+for (const [label, source, primary, following] of [
+  [
+    'volunteer',
+    '@@VOLUNTEER_EXPERIENCE@@\n@@VOLUNTEER@@\nOrganization: Example Pantry\n- Welcomed community members.',
+    'Example Pantry',
+    'Welcomed community members.',
+  ],
+  [
+    'project description',
+    '@@PROJECTS@@\n@@PROJECT@@\nName: Resource Guide\nDescription: Collected useful resources.',
+    'Resource Guide',
+    'Collected useful resources.',
+  ],
+  [
+    'project bullets',
+    '@@PROJECTS@@\n@@PROJECT@@\nName: Resource Guide\n- Collected useful resources.',
+    'Resource Guide',
+    'Collected useful resources.',
+  ],
+]) {
+  test(`${label} alone omits absent sections and optional metadata rows without blank gaps`, async () => {
+    const resume = newSectionResume(source);
+    const pages = await inspect(resume);
+    assert.equal(pages.length, 1);
+    for (const heading of ['RELEVANT EXPERIENCE', 'EDUCATION', 'CERTIFICATIONS', 'SKILLS'])
+      assert.equal(pages[0].text.includes(compact(heading)), false);
+    const items = pages[0].items.filter((item) => item.str.trim());
+    const section = items.find((item) => ['VOLUNTEER', 'PROJECTS'].includes(item.str));
+    const headingItem = items.find(
+      (item) =>
+        item.transform[5] < section.transform[5] && item.str.startsWith(primary.split(' ')[0]),
+    );
+    const followingItem = items.find((item) => item.str.startsWith(following.split(' ')[0]));
+    assert.ok(headingItem && followingItem);
+    assert.ok(
+      headingItem.transform[5] - followingItem.transform[5] < 26,
+      'No blank role/date/location/link rows',
+    );
+  });
+}
+
+test('project link display remains literal and Unicode destinations are safely serialized', async () => {
+  const resume = newSectionResume(
+    '@@PROJECTS@@\n@@PROJECT@@\nName: Guide\nLink: example.com/é?q=yes#guide\nDescription: Collected useful resources.',
+  );
+  const pages = await inspect(resume);
+  assert.ok(pages[0].text.includes('example.com/é?q=yes#guide'));
+  assert.ok(
+    pages[0].annotations.some((row) => row.url === 'https://example.com/%C3%A9?q=yes#guide'),
+  );
+});
+
+for (const kind of ['volunteer', 'project-description', 'project-bullet']) {
+  test(`${kind} preserves complete multi-page content with its heading and header`, async () => {
+    const beginning = 'Beginning of long content. ';
+    const long =
+      beginning +
+      'Documented useful community resources and followed up with participants. '.repeat(170) +
+      'End of long content.';
+    const source =
+      kind === 'volunteer'
+        ? `@@VOLUNTEER_EXPERIENCE@@\n@@VOLUNTEER@@\nOrganization: Example Pantry\nRole: Coordinator\nDates: 2024\nLocation: Remote\n- ${long}`
+        : `@@PROJECTS@@\n@@PROJECT@@\nName: Resource Guide\nDates: 2024\nLink: https://example.com/guide\n${kind === 'project-description' ? 'Description:' : '-'} ${long}`;
+    const resume = newSectionResume(source);
+    const pages = await inspect(resume);
+    assert.ok(pages.length > 1);
+    assert.ok(pages[0].text.includes(kind === 'volunteer' ? 'VOLUNTEEREXPERIENCE' : 'PROJECTS'));
+    assert.ok(pages[0].text.includes(kind === 'volunteer' ? 'ExamplePantry' : 'ResourceGuide'));
+    assert.ok(pages[0].text.includes(compact(beginning)));
+    assert.ok(pages.at(-1).text.includes('Endoflongcontent.'));
+  });
+}
+
+test('oversized volunteer/project headers and unsupported displayed glyphs block export recoverably', async () => {
+  for (const source of [
+    `@@VOLUNTEER_EXPERIENCE@@\n@@VOLUNTEER@@\nOrganization: ${'Longword '.repeat(1000)}\n- Useful work.`,
+    `@@PROJECTS@@\n@@PROJECT@@\nName: ${'Longword '.repeat(1000)}\nDescription: Useful work.`,
+  ])
+    await assert.rejects(renderPdf(newSectionResume(source)), /too long to fit/);
+  for (const source of [
+    '@@VOLUNTEER_EXPERIENCE@@\n@@VOLUNTEER@@\nOrganization: Example Pantry\n- Unsupported 😺.',
+    '@@PROJECTS@@\n@@PROJECT@@\nName: Unsupported 😺\nDescription: Useful work.',
+  ])
+    await assert.rejects(renderPdf(newSectionResume(source)), /font cannot display/);
 });

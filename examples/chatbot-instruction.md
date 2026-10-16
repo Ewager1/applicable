@@ -22,14 +22,24 @@ If I supply a target company, include `@@TARGET_COMPANY@@` once followed by exac
    - Start **every** job with `@@JOB@@`.
    - Then include one each of `Employer:`, `Role:`, `Dates:`, `Location:`, all nonempty, above the bullets.
    - Add at least one `- text` bullet per job. Indent continued bullet lines by two spaces. Do not indent metadata.
-4. `@@EDUCATION@@`
+4. `@@VOLUNTEER_EXPERIENCE@@`
+   - Start **every** entry with `@@VOLUNTEER@@`.
+   - Include `Organization:` and at least one nonempty bullet. Optional single-line fields: `Role:`, `Dates:`, `Location:`.
+   - Omit inapplicable details or leave optional fields blank. Never invent employment fields for volunteer work. Use the same bullet/continuation rules as jobs.
+5. `@@PROJECTS@@`
+   - Start **every** entry with `@@PROJECT@@` and include `Name:`.
+   - Include a nonempty `Description:` and/or at least one nonempty bullet. Description may continue on lines indented by two spaces, before the bullets.
+   - Optional single-line fields: `Dates:` and `Link:`. Omit inapplicable values or leave them blank.
+   - A nonempty Link must be a usable HTTP(S) or dotted bare web address; do not use Markdown link syntax, unsafe schemes, spaces inside URLs or credentials. Keep literal link display text.
+   - Do not invent an employer or job title. A project name/link alone is not enough content.
+6. `@@EDUCATION@@`
    - Start **every** entry with `@@EDUCATION_ENTRY@@`.
    - Include one each of `Qualification:`, `Institution:`, `Dates:`, all nonempty.
-5. `@@CERTIFICATIONS@@`
+7. `@@CERTIFICATIONS@@`
    - Start **every** entry with `@@CERTIFICATION@@`.
    - Include one each of `Title:`, `Issuer:`, `Dates:`, all nonempty.
-6. `@@SKILLS@@`
+8. `@@SKILLS@@`
    - One `Category: skill, skill` row per category, with exactly one colon per row.
    - Category names cannot contain colons. Individual skill names cannot contain colons or commas. Keep repeated items and category/item order. Do not leave empty items between commas.
 
-Use metadata values on single lines; they may contain ordinary prose colons. Use the explicit entry markers even for a single job, education entry or certification. Do not add other sections, fields, Markdown formatting or nested code blocks. Keep wording, capitalization, punctuation and duplicates unchanged unless I explicitly request language revisions. If a supplied skill name conflicts with a delimiter or a fact required for an included entry is missing, ask me rather than silently dropping or rewriting it.
+Use metadata values on single lines; they may contain ordinary prose colons. Use the explicit entry markers even for a single job, volunteer entry, project, education entry or certification. Do not add other sections, fields, Markdown formatting or nested code blocks. Keep wording, capitalization, punctuation and duplicates unchanged unless I explicitly request language revisions. If a supplied skill name conflicts with a delimiter or a fact required for an included entry is missing, ask me rather than silently dropping or rewriting it.
