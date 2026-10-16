@@ -11,7 +11,7 @@
 ## Scope and implementation
 
 - Work on one issue at a time once the GitHub workflow is established. Complete issues in the plan sequence; finish merging and closing one before starting the next.
-- Keep PDF Builder focused on paste, submit, and PDF delivery. Getting Started provides concise job-search workflow guidance; keep navigation local and preserve the builder when switching views.
+- Present Job Finder, Resume Writer and Resume PDF Maker as independent tools. Keep Resume PDF Maker focused on paste, submit and PDF delivery; keep all tool panels mounted with local navigation, and provide workflow guidance through the header’s informational How it works link.
 - Preserve source wording and job order. Only section ordering is normalized.
 - Keep processing local. Do not add remote services, analytics, accounts, resume/company storage, or AI integration. The Job Finder setup only assembles a deterministic prompt locally for the user to copy into ChatGPT; it makes no AI calls. The sole storage exception is the five contact fields (Full Name, Email, LinkedIn, Website, Phone Number), saved locally in this browser with a versioned whitelist; no other user content may persist, including questionnaire answers and generated prompts.
 - Keep the strict TypeScript parser/contracts/PDF core independent of React. Use small typed React components and local state for the interface; preserve the generation/resource lifetime invariants in the [maintenance guide](docs/maintenance.md#data-flow-and-invariants). Additional frameworks remain outside scope. The [plan](docs/project-plan.md) records the approved migration sequence/history.

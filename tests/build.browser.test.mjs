@@ -160,7 +160,7 @@ test('visible chatbot workflow copies the complete literal instructions with key
   );
   await page.reload();
   await page
-    .getByRole('heading', { name: 'Turn chatbot text into a polished resume.', exact: true })
+    .getByRole('heading', { name: 'Turn your resume into a polished PDF.', exact: true })
     .waitFor();
   const copy = page.getByRole('button', { name: 'Copy chatbot instructions', exact: true });
   assert.equal(
@@ -666,23 +666,22 @@ test('contact edits invalidate pending work and revoke completed artifacts', asy
   }
 });
 
-test('local header tabs default to PDF Builder and support discovery and keyboard navigation', async (t) => {
+test('three local tools default to PDF Maker with informational discovery and keyboard navigation', async (t) => {
   const page = await openPage(t);
-  const builder = page.getByRole('tab', { name: 'PDF Builder', exact: true });
-  const guide = page.getByRole('tab', { name: 'Getting Started', exact: true });
+  const builder = page.getByRole('tab', { name: 'Resume PDF Maker', exact: true });
+  const finder = page.getByRole('tab', { name: 'Job Finder', exact: true });
+  const writer = page.getByRole('tab', { name: 'Resume Writer', exact: true });
+  assert.deepEqual(await page.getByRole('tab').allTextContents(), [
+    'Job Finder',
+    'Resume Writer',
+    'Resume PDF Maker',
+  ]);
   assert.equal(await builder.getAttribute('aria-selected'), 'true');
-  assert.equal(await guide.getAttribute('tabindex'), '-1');
-  assert.equal(await page.locator('#getting-started-panel').isVisible(), false);
-  await page.getByRole('button', { name: 'Explore Getting Started', exact: true }).click();
-  assert.equal(await guide.getAttribute('aria-selected'), 'true');
-  assert.equal(await guide.evaluate((element) => element === document.activeElement), true);
-  assert.equal(await builder.getAttribute('tabindex'), '-1');
-  assert.equal(await page.locator('#builder-panel').isVisible(), false);
-  assert.equal(
-    await page.getByRole('heading', { level: 1 }).textContent(),
-    'A simpler way to search for jobs',
-  );
-  const overview = page.getByRole('region', { name: 'Your job search, step by step' });
+  assert.equal(await finder.getAttribute('tabindex'), '-1');
+  assert.equal(await writer.getAttribute('tabindex'), '-1');
+  assert.equal(await page.locator('#job-finder-panel').isVisible(), false);
+  await page.getByRole('link', { name: 'How it works', exact: true }).click();
+  const overview = page.getByRole('region', { name: 'How it works', exact: true });
   assert.equal(await overview.getByRole('listitem').count(), 4);
   assert.deepEqual(await overview.getByRole('heading', { level: 3 }).allTextContents(), [
     'Find the right jobs',
@@ -690,29 +689,44 @@ test('local header tabs default to PDF Builder and support discovery and keyboar
     'Create your PDF',
     'Review and apply',
   ]);
-  const setup = page.getByRole('region', { name: 'Let’s get you set up', exact: true });
-  assert.deepEqual(await setup.getByRole('heading', { level: 3 }).allTextContents(), [
-    'Step 1: Create your Job Finder',
-    'Step 2: Create your Resume Builder',
-  ]);
   assert.equal(await overview.getByRole('form').count(), 0);
+  assert.match(
+    await overview.textContent(),
+    /does not automatically search for jobs or submit applications/,
+  );
+  assert.equal(await builder.getAttribute('aria-selected'), 'true');
+  await builder.press('ArrowRight');
+  assert.equal(await finder.getAttribute('aria-selected'), 'true');
+  assert.equal(await page.getByRole('form', { name: 'Job Finder setup' }).isVisible(), true);
+  assert.equal(await page.locator('#job-finder-panel .tool-steps li').count(), 5);
+  await finder.press('ArrowRight');
+  assert.equal(await writer.getAttribute('aria-selected'), 'true');
+  assert.equal(await page.locator('#resume-writer-panel .tool-steps li').count(), 5);
+  assert.match(
+    await page.locator('#resume-writer-panel').textContent(),
+    /setup prompt is not available yet/,
+  );
+  assert.equal(await page.getByRole('button', { name: 'Copy Prompt', exact: true }).count(), 0);
+  await page
+    .getByRole('button', { name: 'Open chatbot formatting instructions', exact: true })
+    .click();
+  assert.equal(await builder.getAttribute('aria-selected'), 'true');
+  assert.equal(await page.locator('.format-help').getAttribute('open'), '');
   assert.equal(
-    await setup
-      .getByRole('region', { name: 'Step 1: Create your Job Finder', exact: true })
-      .getByRole('form', { name: 'Job Finder setup' })
-      .isVisible(),
+    await page.locator('.format-help summary').evaluate((el) => el === document.activeElement),
     true,
   );
-  await guide.press('ArrowRight');
-  assert.equal(await builder.getAttribute('aria-selected'), 'true');
   await builder.press('ArrowLeft');
-  assert.equal(await guide.getAttribute('aria-selected'), 'true');
-  await guide.press('Home');
-  assert.equal(await builder.evaluate((element) => element === document.activeElement), true);
-  await builder.press('End');
-  assert.equal(await guide.evaluate((element) => element === document.activeElement), true);
-  await guide.press('Tab');
-  assert.equal(await page.evaluate(() => document.activeElement.id), 'getting-started-panel');
+  assert.equal(await writer.getAttribute('aria-selected'), 'true');
+  await writer.press('Home');
+  assert.equal(await finder.evaluate((el) => el === document.activeElement), true);
+  await finder.press('ArrowLeft');
+  assert.equal(await builder.evaluate((el) => el === document.activeElement), true);
+  await builder.press('Home');
+  await finder.press('End');
+  assert.equal(await builder.evaluate((el) => el === document.activeElement), true);
+  await builder.press('Tab');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'builder-panel');
   await page.reload();
   assert.equal(await builder.getAttribute('aria-selected'), 'true');
   assert.equal(
@@ -734,9 +748,10 @@ test('switching views preserves drafts, validation and expanded input across hid
   const errorText = await error.textContent();
   const height = await input.evaluate((element) => element.clientHeight);
   assert.ok(height > 300);
-  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
   await page.setViewportSize({ width: 375, height: 900 });
-  await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
+  await page.getByRole('tab', { name: 'Resume PDF Maker', exact: true }).click();
   assert.equal(await input.inputValue(), invalid);
   assert.equal(await company.inputValue(), 'Example Company');
   for (const [id, value] of Object.entries(exampleContact))
@@ -764,7 +779,7 @@ test('PDF generation continues while guidance is open and the same artifact surv
     const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
     await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
     await request;
-    await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+    await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
     const download = page.waitForEvent('download');
     release();
     await readPdf(await download);
@@ -772,14 +787,15 @@ test('PDF generation continues while guidance is open and the same artifact surv
     assert.ok(readyUrl.startsWith('blob:'));
     assert.equal(
       await page
-        .getByRole('tab', { name: 'Getting Started', exact: true })
+        .getByRole('tab', { name: 'Job Finder', exact: true })
         .getAttribute('aria-selected'),
       'true',
     );
-    await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
+    await page.getByRole('tab', { name: 'Resume PDF Maker', exact: true }).click();
     assert.equal(await page.locator('#result').isVisible(), true);
-    await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
-    await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
+    await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
+    await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+    await page.getByRole('tab', { name: 'Resume PDF Maker', exact: true }).click();
     assert.equal(await page.locator('#download').getAttribute('href'), readyUrl);
     assert.equal(downloads.length, 1);
     const repeat = page.waitForEvent('download');
@@ -793,9 +809,17 @@ test('PDF generation continues while guidance is open and the same artifact surv
 for (const width of [320, 375, 1280]) {
   test(`navigation and guidance fit ${width}px with touch or pointer activation`, async (t) => {
     const page = await openPage(t, { viewport: { width, height: 900 }, hasTouch: width < 600 });
-    const guide = page.getByRole('tab', { name: 'Getting Started', exact: true });
-    const builder = page.getByRole('tab', { name: 'PDF Builder', exact: true });
-    for (const tab of [guide, builder]) {
+    const guide = page.getByRole('tab', { name: 'Job Finder', exact: true });
+    const builder = page.getByRole('tab', { name: 'Resume PDF Maker', exact: true });
+    const intro = await page.locator('.homepage-intro').boundingBox();
+    const navigation = await page.getByRole('tablist').boundingBox();
+    assert.ok(intro.y + intro.height <= navigation.y);
+    assert.ok(navigation.y < 550, 'Compact introduction keeps tools near the top on mobile');
+    for (const tab of [
+      guide,
+      page.getByRole('tab', { name: 'Resume Writer', exact: true }),
+      builder,
+    ]) {
       if (width < 600) await tab.tap();
       else await tab.click();
       assert.equal(await tab.getAttribute('aria-selected'), 'true');
@@ -803,41 +827,29 @@ for (const width of [320, 375, 1280]) {
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         true,
       );
-      if (tab === guide) {
-        const overview = page.getByRole('region', { name: 'Your job search, step by step' });
-        const setup = page.getByRole('region', { name: 'Let’s get you set up', exact: true });
-        const cards = await overview.getByRole('listitem').all();
-        const cardBounds = await Promise.all(cards.map((card) => card.boundingBox()));
-        const overviewBounds = await overview.boundingBox();
-        const setupBounds = await setup.boundingBox();
-        assert.ok(setupBounds.y >= overviewBounds.y + overviewBounds.height);
-        for (const [index, card] of cards.entries()) {
-          assert.equal(await card.getByRole('heading', { level: 3 }).isVisible(), true);
-          assert.ok(cardBounds[index].x >= 0);
-          assert.ok(cardBounds[index].x + cardBounds[index].width <= width);
-          if (index > 0) {
-            if (width === 1280) {
-              assert.ok(Math.abs(cardBounds[index].y - cardBounds[0].y) < 1);
-              assert.ok(
-                cardBounds[index].x >= cardBounds[index - 1].x + cardBounds[index - 1].width,
-              );
-            } else {
-              assert.ok(
-                cardBounds[index].y >= cardBounds[index - 1].y + cardBounds[index - 1].height,
-              );
-            }
+      const overview = page.getByRole('region', { name: 'How it works', exact: true });
+      const cards = await overview.getByRole('listitem').all();
+      const cardBounds = await Promise.all(cards.map((card) => card.boundingBox()));
+      for (const [index, card] of cards.entries()) {
+        assert.equal(await card.getByRole('heading', { level: 3 }).isVisible(), true);
+        assert.ok(cardBounds[index].x >= 0);
+        assert.ok(cardBounds[index].x + cardBounds[index].width <= width);
+        if (index > 0) {
+          if (width === 1280) {
+            assert.ok(Math.abs(cardBounds[index].y - cardBounds[0].y) < 1);
+            assert.ok(cardBounds[index].x >= cardBounds[index - 1].x + cardBounds[index - 1].width);
+          } else {
+            assert.ok(
+              cardBounds[index].y >= cardBounds[index - 1].y + cardBounds[index - 1].height,
+            );
           }
-        }
-        for (const heading of await setup.getByRole('heading').all()) {
-          const headingBounds = await heading.boundingBox();
-          assert.ok(headingBounds.x >= 0 && headingBounds.x + headingBounds.width <= width);
         }
       }
       const bounds = await tab.boundingBox();
       assert.ok(bounds.height >= 44 && bounds.width >= 44);
       await mkdir('output/ui', { recursive: true });
       await page.screenshot({
-        path: `output/ui/getting-started-${width}-${await tab.getAttribute('id')}.png`,
+        path: `output/ui/three-tools-${width}-${await tab.getAttribute('id')}.png`,
         fullPage: true,
       });
     }
@@ -857,7 +869,7 @@ test('Job Finder copies latest optional answers in one action without preview an
       },
     });
   });
-  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
   const form = page.getByRole('form', { name: 'Job Finder setup' });
   const fields = form.locator('textarea');
   const output = page.getByLabel('Your Job Finder prompt', { exact: true });
@@ -948,8 +960,10 @@ test('Job Finder copies latest optional answers in one action without preview an
   assert.match(status, /new ChatGPT conversation and upload your existing resumes there/);
   assert.match(status, /Look for jobs/);
   assert.equal(await output.count(), 0);
-  await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
-  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  await page.getByRole('tab', { name: 'Resume PDF Maker', exact: true }).click();
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
+  assert.equal(await page.locator('#job-finder-copy-status').textContent(), status);
   assert.equal(await output.count(), 0);
   assert.equal(await fields.first().inputValue(), values[0]);
   assert.equal(await usOnly.isChecked(), false);
@@ -965,7 +979,7 @@ test('Job Finder copies latest optional answers in one action without preview an
   assert.ok(!updated.includes('Operations'));
   assert.equal(await output.count(), 0);
   await page.reload();
-  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
   for (const field of await fields.all()) assert.equal(await field.inputValue(), '');
   assert.equal(await usOnly.isChecked(), true);
   assert.equal(await recent.isChecked(), true);
@@ -982,7 +996,7 @@ test('Job Finder copies latest optional answers in one action without preview an
 
 test('Job Finder clipboard failure or absence focuses and selects manual output on mobile', async (t) => {
   const page = await openPage(t, { viewport: { width: 320, height: 900 }, hasTouch: true });
-  await page.getByRole('tab', { name: 'Getting Started', exact: true }).tap();
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).tap();
   await page.locator('#job-finder-roles').fill('Operations\nTraining');
   for (const mode of ['reject', 'absent']) {
     await page.evaluate(
@@ -1060,7 +1074,7 @@ test('pending Job Finder clipboard feedback is discarded after edits or newer co
       },
     }),
   );
-  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
   for (const outcome of ['finishJobFinderCopy', 'failJobFinderCopy']) {
     await page.getByRole('button', { name: 'Copy Prompt', exact: true }).click();
     await page.locator('#job-finder-roles').fill(outcome);
