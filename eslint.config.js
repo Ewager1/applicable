@@ -12,7 +12,7 @@ export default [
     rules: { eqeqeq: 'error', 'no-eval': 'error' },
   },
   {
-    files: ['app/**/*.js', 'proof/browser.mjs'],
+    files: ['src/**/*.js', 'proof/browser.mjs'],
     languageOptions: { globals: readonly(['window', 'document', 'fetch', 'URL', 'Blob', 'btoa', 'console', 'navigator']) },
   },
   {
@@ -20,7 +20,7 @@ export default [
     languageOptions: { globals: readonly(['process', 'Buffer', 'console', 'URL', 'fetch', 'setTimeout', 'clearTimeout', 'structuredClone']) },
   },
   {
-    files: ['app/**/*.ts', 'app/**/*.tsx'],
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
     languageOptions: { parser: tsParser, globals: readonly(['URL', 'fetch', 'btoa', 'Uint8Array']) },
     // TypeScript checks names and unused declarations, including type-only imports.
     rules: { 'no-undef': 'off', 'no-unused-vars': 'off', eqeqeq: 'error', 'no-eval': 'error' },

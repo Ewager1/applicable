@@ -1,6 +1,6 @@
 # Production PDF template
 
-A4 promotes the verified single-column template into `app/pdf/`. The synthetic proof and production adapter use this same document definition; there is no separate HTML approximation or second layout implementation. A5 connects the paste interface to this shared template and local font loader.
+A4 promotes the verified single-column template into `src/pdf/`. The synthetic proof and production adapter use this same document definition; there is no separate HTML approximation or second layout implementation. A5 connects the paste interface to this shared template and local font loader.
 
 ## Modules and use
 

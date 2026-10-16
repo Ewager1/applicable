@@ -1,19 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import pdfMake from 'pdfmake/build/pdfmake.js';
-import { createPdfBytes } from '../app/pdf/render.ts';
-import { measuredPageCount, firstMeasuredPage } from '../app/pdf/pdfmake-adapter.ts';
-import { fontFiles } from '../app/pdf/fonts.ts';
+import { createPdfBytes } from '../src/pdf/render.ts';
+import { measuredPageCount, firstMeasuredPage } from '../src/pdf/pdfmake-adapter.ts';
+import { fontFiles } from '../src/pdf/fonts.ts';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { renderPdf } from '../proof/pdf.mjs';
 import { parsedExample, stressFixture } from '../proof/production-fixtures.mjs';
-import { fontHashes, supportedRanges } from '../app/pdf/font-coverage.ts';
+import { fontHashes, supportedRanges } from '../src/pdf/font-coverage.ts';
 import { createRequire } from 'node:module';
-import { fonts } from '../app/pdf/fonts.ts';
-import { documentDefinition } from '../app/pdf/document.ts';
-import { createPagination } from '../app/pdf/pagination.ts';
+import { fonts } from '../src/pdf/fonts.ts';
+import { documentDefinition } from '../src/pdf/document.ts';
+import { createPagination } from '../src/pdf/pagination.ts';
 const require = createRequire(import.meta.url);
 const fontkit = createRequire(require.resolve('pdfmake/package.json'))('@foliojs-fork/fontkit');
 

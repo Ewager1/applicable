@@ -1,6 +1,6 @@
 import { fixture } from './fixtures.mjs';
-import { loadBrowserFonts } from '../app/pdf/fonts.ts';
-import { createPdfBytes } from '../app/pdf/render.ts';
+import { loadBrowserFonts } from '../src/pdf/fonts.ts';
+import { createPdfBytes } from '../src/pdf/render.ts';
 const button = document.querySelector('#generate');
 const status = document.querySelector('#status');
 const preview = document.querySelector('#preview');

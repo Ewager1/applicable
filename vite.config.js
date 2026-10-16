@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  root: 'app',
+  root: 'src',
   base: './',
   publicDir: false,
   server: { host: '127.0.0.1', port: 5173, strictPort: true },
