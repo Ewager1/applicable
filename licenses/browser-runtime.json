@@ -17,7 +17,7 @@
     "assets/fonts/SourceSans3-Bold.ttf": "9214b9d95e4231c609802815c2646c98174e2102d0d37f88978a7f8e71006e6a",
     "assets/fonts/SourceSans3-Regular.ttf": "4644c81b86ec9caaa76b634889968ed3c4f4f52f054855933acc7c2b21e53b0f",
     "assets/fonts/SourceSans3-Semibold.ttf": "a3f4f8dcf343a8f24dc61951de93f3ba1558b15cd250ba24af8a40e957081b7d",
-    "licenses/browser-runtime-NOTICES.txt": "64993719faffa356b97804b0fdbfc59e7bf9ba36b453781593ba6c2bb2b2fcc7",
+    "licenses/browser-runtime-NOTICES.txt": "46d1c2feb1d9a5b2d48dd412bbdd2ad08c3056bd1331d7d9ce5b5866348d34d9",
     "licenses/pdfmake-LICENSE.txt": "a0de409db922b4fba53e86db4c3d64f7808dc5ec6de7a9eb4c7943b8a2f40975",
     "licenses/react-LICENSE.txt": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
     "node_modules/pdfmake/build/pdfmake.js": "bfd0e78ae7fd12ecf4ab0b4aae4b5eb3f97865b0ed5932f1d9e947fc91f54930",
@@ -624,7 +624,8 @@
       ],
       "exactReferenceMatches": 281,
       "notices": [
-        "notice-153d958ab424a0b0"
+        "notice-153d958ab424a0b0",
+        "notice-58354d0add0fdb3a"
       ]
     },
     {

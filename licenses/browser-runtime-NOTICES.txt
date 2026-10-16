@@ -27,7 +27,7 @@ Runtime package license references:
 - webpack://pdfmake/./node_modules/call-bind-apply-helpers/: 1.0.2; notice-5e325595b4ea8cfe
 - webpack://pdfmake/./node_modules/call-bound/: 1.0.4; notice-5e325595b4ea8cfe
 - webpack://pdfmake/./node_modules/clone/: 1.0.4; notice-3fb0857ef0133928
-- webpack://pdfmake/./node_modules/core-js/: 3.19.0; notice-153d958ab424a0b0
+- webpack://pdfmake/./node_modules/core-js/: 3.19.0; notice-153d958ab424a0b0, notice-58354d0add0fdb3a
 - webpack://pdfmake/./node_modules/crypto-js/: 4.2.0; notice-df15cb64ddb4b92d
 - webpack://pdfmake/./node_modules/deep-equal/: 1.1.2; notice-4839125439c51ef7
 - webpack://pdfmake/./node_modules/define-data-property/: 1.1.4; notice-b41d08bc3624d8c4
@@ -3488,8 +3488,8 @@ Creative Commons may be contacted at creativecommons.org.
 
 
 ========================================================================
-notice-5ad50e52a1476d17
-Publication review pending: upstream snippet provenance
+notice-8070f248ed27ffff
+Upstream snippet provenance
 Source: https://api.stackexchange.com/2.3/answers/21409165;2173084;22747272?site=stackoverflow&filter=withbody (verified 2026-10-16)
 ------------------------------------------------------------------------
 The reviewed upstream pdfmake browser bundle includes the following references:
@@ -3509,9 +3509,37 @@ The reviewed upstream pdfmake browser bundle includes the following references:
   https://creativecommons.org/licenses/by-sa/4.0/
   Buffer references the factual discussion of engine argument limits.
 
-These attributions, license terms and upstream modification descriptions are
-retained conservatively. The upstream pdfmake/PDFKit MIT labels do not settle
-the licensing obligations of the two adapted snippets. Whether the references
-require additional permission or adaptation licensing remains unresolved.
-This draft packaging does not establish clearance to publish or redistribute
-the browser bundle. Applicable's original code remains under its MIT grant.
+These upstream references, reported content licenses and modification
+attributions are retained alongside the original package MIT declarations.
+This audit records their provenance without determining legal applicability
+or claiming that the uncertainty is resolved. Applicable's original code
+remains under its MIT grant.
+
+========================================================================
+notice-58354d0add0fdb3a
+es5-shim: supplemental reference for core-js split implementation
+Source: https://raw.githubusercontent.com/es-shims/es5-shim/v4.5.15/LICENSE
+Reference release only; the embedded core-js/modules/es.string.split.js credits
+es5-shim but does not identify the borrowed revision.
+------------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (C) 2009-2016 Kristopher Michael Kowal and contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
