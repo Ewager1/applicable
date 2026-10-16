@@ -14,6 +14,9 @@ These license texts were copied from the installed, lockfile-pinned packages. Li
 
 | Package | Version | Use | Retained license |
 | --- | --- | --- | --- |
+| React | 19.3.1 | Browser interface runtime | [MIT](licenses/react-LICENSE.txt) |
+| React DOM | 19.3.1 | Browser DOM mounting | [MIT](licenses/react-dom-LICENSE.txt) |
+| Scheduler (React DOM dependency) | 0.28.0 | React scheduling | [MIT](licenses/scheduler-LICENSE.txt) |
 | pdfmake | 0.2.20 | Local browser PDF generation | [MIT](licenses/pdfmake-LICENSE.txt) |
 | pdfjs-dist | 4.10.38 | Development/test PDF inspection | [Apache 2.0](licenses/pdfjs-dist-LICENSE.txt) |
 | Playwright | 1.62.1 | Development/test browser automation | [Apache 2.0](licenses/playwright-LICENSE.txt) and [NOTICE](licenses/playwright-NOTICE.txt) |
@@ -23,4 +26,4 @@ These license texts were copied from the installed, lockfile-pinned packages. Li
 
 The source distribution imports these npm packages rather than vendoring their executable source. `npm ci` installs their dependencies and original license/notice files; `package-lock.json` records exact versions, integrity values and package license identifiers. Transitive packages retain their respective licenses as well. If redistributing installed dependencies or a generated browser bundle, preserve the relevant downstream package notices in addition to these direct-package copies; Applicable's MIT license alone does not relicense the combined dependencies. The current distribution is repository source, not a published binary/build artifact.
 
-No browser executable is shipped with this source. Installed Chrome or separately downloaded Playwright Chromium is used only for developer checks and remains governed by its own terms/notices. No third-party application code or fonts were newly added for the final verification step.
+No browser executable is shipped with this source. Installed Chrome or separately downloaded Playwright Chromium is used only for developer checks and remains governed by its own terms/notices. React and React DOM retain their MIT notices above; no font assets were changed.

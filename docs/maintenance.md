@@ -8,10 +8,10 @@ Start with the assigned [GitHub issue](https://github.com/Ewager1/applicable/iss
 | --- | --- |
 | Accepted text, validation and source lines | [parse.ts](../app/resume/parse.ts), [input format](input-format.md), [synthetic example](../examples/resume.txt), [chatbot instruction](../examples/chatbot-instruction.md) |
 | Shared data/result/error shape | [types.ts](../app/resume/types.ts): canonical TypeScript `Resume`, nested entries, discriminated `ParseResult` and `ValidationError`; type-only exports |
-| Website wording and structure | [index.html](../app/index.html): visible chatbot steps before the paste form; the chatbot instruction is imported into the copy control, with a labeled/focused fallback when clipboard access fails |
+| Website wording and structure | [App.tsx](../app/ui/App.tsx), [ChatbotInstructions.tsx](../app/ui/ChatbotInstructions.tsx), [ResumeForm.tsx](../app/ui/ResumeForm.tsx), [Feedback.tsx](../app/ui/Feedback.tsx), [PdfResult.tsx](../app/ui/PdfResult.tsx): semantic page structure, chatbot steps, copy fallback, form, accessible feedback and result |
 | Website appearance | [styles.css](../app/styles.css): variables/base, page, form, help/errors, result, responsive rules |
 | Portable PDF filename | [download-filename.ts](../app/download-filename.ts): parsed professional title plus optional company, sanitized/bounded only for filenames; never modify the resume model |
-| Submission, recovery, download and preview | [main.js](../app/main.js): resume/company revision guards, busy state, warnings and Blob URL lifecycle |
+| Submission, recovery, download and preview | [useResumePdf.ts](../app/ui/useResumePdf.ts): typed generation states, resume/company revision guards, lazy local loads, recovery and Blob URL ownership; `PdfResult.tsx` delivers once after commit |
 | PDF typography, palette, dimensions and entry rows | [document.ts](../app/pdf/document.ts): fixed semantic styles and section order; [current template details](pdf-template.md) |
 | Header/content relationships | [pagination.ts](../app/pdf/pagination.ts) and explicit `keepWith` calls in `document.ts`; keep links target actual nodes, including intermediate content |
 | Oversized heading groups | [header-fit.ts](../app/pdf/header-fit.ts): same-engine, fresh-page measurement of those explicit keep-groups |
@@ -20,14 +20,14 @@ Start with the assigned [GitHub issue](https://github.com/Ewager1/applicable/iss
 | Local development agent/model metrics | [usage CLI](../scripts/agent-usage.mjs), [measurement guide](agent-usage.md); ignored `output/agent-usage/` reports, synthetic [tests](../tests/agent-usage.test.mjs) |
 | Build, browsers and CI | [package.json](../package.json), [Vite config](../vite.config.js), [browser runner](../tests/run-browser.mjs), [browser selection](../tests/browser-options.mjs), [CI workflow](../.github/workflows/checks.yml) |
 
-The app has a strict TypeScript parser/PDF core and native JavaScript/HTML/CSS interface with Vite, local pdfmake and bundled Source Sans 3. No backend, account, resume storage or application analytics is involved.
+The app has a strict TypeScript parser/PDF core and React/TypeScript interface retaining the HTML/CSS, built with Vite, local pdfmake and bundled Source Sans 3. No backend, account, resume storage or application analytics is involved.
 
 ## Data flow and invariants
 
-1. `main.js` takes the exact textarea source and calls the pure parser. A failed result contains ordered, human-readable errors and original one-based lines where available; a successful result contains the complete `Resume`, never partial data.
+1. `useResumePdf.ts` takes the exact textarea source and calls the pure parser. A failed result contains ordered, human-readable errors and original one-based lines where available; a successful result contains the complete `Resume`, never partial data.
 2. The model stores supplied job/bullet/category order and wording. Skills `items` remains a comma-separated string. PDF generation fixes only section order; it does not sort, rewrite or deduplicate content.
 3. Local fonts and the PDF engine load after validation. The renderer checks glyphs and measures heading keep-groups, then produces one byte buffer. Preview and download use the same Blob URL; native viewing has a download fallback.
-4. Every asynchronous boundary checks the captured source revision. Editing invalidates old output, stale pending work cannot download, failures preserve input, and repeated submissions do not queue exports. Preserve these guards when editing the coordinator.
+4. Every asynchronous boundary checks the captured source/company revision and active lifecycle. Editing invalidates old output, stale pending work cannot download, failures preserve input, and repeated submissions do not queue exports. Unmount cancels delivery and revokes URLs; React StrictMode replays cleanup safely. Preserve these guards when editing the hook.
 
 ## Choose verification by the change
 
@@ -41,12 +41,12 @@ Use the supported Node/npm version and browser setup in the [README](../README.m
 | PDF rendering, fonts, pagination or fit guard | `node --experimental-strip-types --test proof/render.test.mjs tests/production-pdf.test.mjs` |
 | Development dependency loading | `node --test tests/dev.browser.test.mjs` (owns an ephemeral server and isolated cache) |
 | Website, download/preview, errors or async state | `npm run build`, then `npm run test:browser` |
-| Strict core contracts | `npm run typecheck` |
+| Strict core and React interface contracts | `npm run typecheck` |
 | Static JavaScript/TypeScript checks | `npm run lint` |
 | Full code-change gate | `npm run check` |
 | Documentation-only changes | Review content, relative links, commands and `git diff --check`; do not manufacture runtime tests |
 
-`npm run test:browser` owns proof/preview servers on ports 4173/4174 plus the isolated development check. Leave those ports free and do not launch duplicate test servers. Local success does not establish remote CI success: review and latest-commit CI remain merge gates under [AGENTS.md](../AGENTS.md).
+`npm run test:browser` owns proof/preview servers on ports 4173/4174 plus isolated cold-cache development and React StrictMode lifecycle checks. Leave those ports free and do not launch duplicate test servers. Local success does not establish remote CI success: review and latest-commit CI remain merge gates under [AGENTS.md](../AGENTS.md).
 
 Run focused commands while developing; `npm run check` already includes typecheck, lint, unit/PDF tests, build and browser tests. The [engineering rules](../AGENTS.md#verification) define ownership and when to repeat checks. Manual PDF inspection applies when output could change; it is not required for developer tooling or documentation.
 
@@ -73,3 +73,9 @@ Before dependency installation, cache removal, server restart or reload, copy an
 The narrow [pdfmake adapter](../app/pdf/pdfmake-adapter.ts) owns runtime validation of the pinned engine's private page/position metadata. C5's fit guard performs one additional layout pass over independently cloned keep-groups using pdfmake **0.2.20 internal `_pdfMakePages` and `positions` metadata**. It requires a target's first line to fit with its heading/preceding details on a fresh page; later bullet lines may continue. Missing measurement metadata blocks export. The pass can repeat shared headers and measure a long first bullet in full, so very large input has extra CPU/memory cost. Engine upgrades require rechecking compatibility, large passing/failing boundaries, font errors, browser recovery and ordinary-layout equivalence. See [the guard's design and limits](pdf-template.md).
 
 Font coverage is finite, PDFs are selectable/searchable but not tagged accessibility PDFs, and native preview depends on browser settings. No universal layout guarantee is made for arbitrary documents. A failed fit check returns a warning and no partial artifact; do not truncate, shrink, rewrite or add a parser character cap to bypass it.
+
+## React interface lifecycle
+
+`main.tsx` mounts function components under React `StrictMode`. Source/company values use local state; the generation hook owns the synchronous busy guard, revision checks, successful-font cache and current object URL. Keep PDF/parsing/filename modules framework independent. Successful delivery uses the committed result link once per artifact, and manual downloads reuse that URL. Replacing output, editing, page departure and unmount release the old URL. Lifecycle tests mount/unmount the actual app through a test-only Vite entry; production code exposes no test globals.
+
+Font errors can be retried on the same page. A failed PDF-engine module import can remain cached by the browser for that page: copy the draft somewhere safe, fix the local asset/server problem, reload Applicable and paste the draft again. The warning explains that recovery; repeated same-page engine imports are not claimed to recover. No resume persistence is added.

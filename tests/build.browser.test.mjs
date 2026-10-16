@@ -330,3 +330,31 @@ test('interface stays within narrow and wide viewports, grows with input and kee
     await page.screenshot({ path: `output/ui/${name}-filled.png`, fullPage: true });
   }
 });
+
+
+test('PDF assets stay lazy and engine load failure preserves source for reload recovery', async t => {
+  const page = await openPage(t);
+  let fail = true;
+  const assets = [];
+  page.on('request', request => { if (/\/pdfmake-.*\.js|SourceSans3-.*\.ttf/.test(request.url())) assets.push(request.url()); });
+  await page.route(/\/pdfmake-.*\.js/, route => fail ? route.abort('failed') : route.continue());
+  await page.reload();
+  const input = page.getByLabel('Your resume', { exact: true });
+  await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
+  await page.locator('#error-summary').waitFor();
+  assert.deepEqual(assets, [], 'Initial load and invalid submission load no PDF engine or fonts');
+  await input.fill(source);
+  await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
+  await page.locator('#error-list').filter({ hasText: 'PDF creation could not be loaded' }).waitFor();
+  assert.equal(await input.inputValue(), source);
+  assert.equal(await input.getAttribute('aria-invalid'), null);
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'error-summary');
+  assert.equal(await page.locator('#result').isVisible(), false);
+  assert.equal(await page.locator('#download').getAttribute('href'), null);
+  fail = false;
+  // Browsers cache rejected dynamic module loads for this page. Preserve the
+  // draft externally before reloading, then restore it after fixing assets.
+  await page.reload();
+  await input.fill(source);
+  assert.ok((await readPdf(await submit(page))).text.includes('AlexMorgan'));
+});
