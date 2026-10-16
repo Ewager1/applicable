@@ -697,14 +697,8 @@ test('three local tools default to PDF Maker with personal introduction and keyb
   await builder.press('ArrowRight');
   assert.equal(await finder.getAttribute('aria-selected'), 'true');
   assert.equal(await page.getByRole('form', { name: 'Job Finder setup' }).isVisible(), true);
-  assert.equal(await page.locator('#job-finder-panel .tool-steps li').count(), 5);
   await finder.press('ArrowRight');
   assert.equal(await writer.getAttribute('aria-selected'), 'true');
-  assert.equal(await page.locator('#resume-writer-panel .tool-steps li').count(), 5);
-  assert.match(
-    await page.locator('#resume-writer-panel').textContent(),
-    /Standard Resume is the default/,
-  );
   assert.equal(await page.getByRole('button', { name: 'Copy Prompt', exact: true }).count(), 0);
   await page
     .getByRole('button', { name: 'Open chatbot formatting instructions', exact: true })
@@ -865,10 +859,7 @@ test('Job Finder copies latest optional answers in one action without preview an
       usOnly,
       'Limit results to positions based in the United States or remote jobs that accept U.S.-based applicants.',
     ],
-    [
-      recent,
-      'Prioritize newer openings. Some older, legitimate positions may appear less often, but strong matches should still be considered.',
-    ],
+    [recent, 'Prioritize newer jobs without excluding strong older matches.'],
   ]) {
     const help = await checkbox.getAttribute('aria-describedby');
     assert.equal(await page.locator(`#${help}`).textContent(), description);
@@ -883,9 +874,7 @@ test('Job Finder copies latest optional answers in one action without preview an
   assert.equal(await output.count(), 0);
   await copy.click();
   await page.waitForFunction(() =>
-    document
-      .querySelector('#job-finder-copy-status')
-      .textContent.startsWith('Prompt created and copied.'),
+    document.querySelector('#job-finder-copy-status').textContent.startsWith('Prompt copied.'),
   );
   const standard = await page.evaluate(() => window.copiedJobFinderPrompt);
   assert.ok(standard.includes('Ask me to upload one or more previous resumes here in ChatGPT'));
@@ -929,15 +918,12 @@ test('Job Finder copies latest optional answers in one action without preview an
   assert.equal(await output.count(), 0);
   await copy.click();
   await page.waitForFunction(() =>
-    document
-      .querySelector('#job-finder-copy-status')
-      .textContent.startsWith('Prompt created and copied.'),
+    document.querySelector('#job-finder-copy-status').textContent.startsWith('Prompt copied.'),
   );
   const populated = await page.evaluate(() => window.copiedJobFinderPrompt);
   for (const value of values) assert.ok(populated.includes(value.trim()));
   const status = await page.locator('#job-finder-copy-status').textContent();
-  assert.match(status, /new ChatGPT conversation and upload your existing resumes there/);
-  assert.match(status, /Look for jobs/);
+  assert.match(status, /new ChatGPT conversation and upload your resumes/);
   assert.equal(await output.count(), 0);
   await page.getByRole('tab', { name: 'Resume PDF Maker', exact: true }).click();
   await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
@@ -1033,10 +1019,7 @@ test('Job Finder clipboard failure or absence focuses and selects manual output 
   );
   await page.getByRole('button', { name: 'Copy Prompt', exact: true }).tap();
   assert.equal(await page.locator('#job-finder-prompt').count(), 0);
-  assert.match(
-    await page.locator('#job-finder-copy-status').textContent(),
-    /Prompt created and copied/,
-  );
+  assert.match(await page.locator('#job-finder-copy-status').textContent(), /Prompt copied/);
 });
 
 test('pending Job Finder clipboard feedback is discarded after edits or newer copy requests', async (t) => {
@@ -1081,12 +1064,10 @@ test('pending Job Finder clipboard feedback is discarded after edits or newer co
   await copy.click();
   await page.evaluate(() => window.finishJobFinderCopy());
   await page.waitForFunction(() =>
-    document
-      .querySelector('#job-finder-copy-status')
-      .textContent.startsWith('Prompt created and copied.'),
+    document.querySelector('#job-finder-copy-status').textContent.startsWith('Prompt copied.'),
   );
   const success = await page.locator('#job-finder-copy-status').textContent();
-  assert.match(success, /Prompt created and copied/);
+  assert.match(success, /Prompt copied/);
   await page.evaluate(async () => {
     window.failOlderJobFinderCopy();
     await new Promise(window.requestAnimationFrame);
@@ -1197,16 +1178,11 @@ test('Resume Writer background is optional, keyboard expandable and transient ac
       'Is there anything your Resume Writer should be careful not to overstate? (optional)',
     ],
   );
-  assert.match(
-    await background.textContent(),
-    /existing resumes will provide most of the information/,
-  );
-  assert.match(await background.textContent(), /All 12 questions are optional/);
   assert.match(await background.textContent(), /reasonably supported numbers/);
   assert.match(await background.textContent(), /estimates labeled as estimates/);
   assert.match(
-    await background.textContent(),
-    /Nothing is sent to ChatGPT until you paste it there/,
+    await page.locator('#resume-writer-panel').textContent(),
+    /shared with ChatGPT only when you\s+paste the prompt/,
   );
   const details = background.locator('details');
   const summary = details.locator('summary');
@@ -1251,10 +1227,7 @@ test('Resume Writer background is optional, keyboard expandable and transient ac
   assert.ok(copied.includes(longAnswer.trim()));
   assert.ok(copied.includes("I don't know"));
   assert.equal(await page.locator('#resume-writer-prompt').count(), 0);
-  assert.match(
-    await page.locator('#resume-writer-copy-status').textContent(),
-    /Setup prompt copied/,
-  );
+  assert.match(await page.locator('#resume-writer-copy-status').textContent(), /Prompt copied/);
   for (const tool of ['Job Finder', 'Resume PDF Maker', 'Resume Writer']) {
     await page.getByRole('tab', { name: tool, exact: true }).click();
   }
@@ -1344,10 +1317,7 @@ test('Resume Writer copies without answers and creates the latest setup prompt w
   );
   await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
   await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
-  assert.match(
-    await page.locator('#resume-writer-copy-status').textContent(),
-    /Setup prompt copied/,
-  );
+  assert.match(await page.locator('#resume-writer-copy-status').textContent(), /Prompt copied/);
   await mkdir('output/ui', { recursive: true });
   await page.screenshot({ path: 'output/ui/resume-writer-copy-desktop.png', fullPage: true });
   await page.reload();
@@ -1461,6 +1431,6 @@ test('Resume Writer ignores pending clipboard results after edits and newer copy
     window.writerCopies.at(-2).reject();
     await new Promise(window.requestAnimationFrame);
   });
-  assert.match(await status.textContent(), /Setup prompt copied/);
+  assert.match(await status.textContent(), /Prompt copied/);
   assert.equal(await output.count(), 0);
 });

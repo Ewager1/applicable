@@ -38,9 +38,7 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
     try {
       await navigator.clipboard.writeText(prompt);
       if (currentRevision === revision.current)
-        setStatus(
-          'Setup prompt copied. Paste it into a new ChatGPT conversation and upload one or more existing resumes there. Reuse that conversation for future jobs.',
-        );
+        setStatus('Prompt copied. Paste it into ChatGPT and upload your resumes.');
     } catch {
       if (currentRevision !== revision.current) return;
       setFallbackPrompt(prompt);
@@ -76,45 +74,32 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
   return (
     <section aria-labelledby="resume-writer-title">
       <div className="intro">
-        <p className="eyebrow">RESUME WRITER</p>
         <h2 id="resume-writer-title">A resume for every opportunity.</h2>
         <p>
-          Set up a ChatGPT conversation that understands your professional experience and helps
-          tailor your resume to individual job descriptions.
+          Set up ChatGPT to tailor resumes using your professional experience and individual job
+          descriptions.
         </p>
       </div>
       <section className="resume-writer-questionnaire" aria-labelledby="background-title">
         <h3 id="background-title">Help your Resume Writer get to know you</h3>
         <p>
-          Your existing resumes will provide most of the information ChatGPT needs. These optional
-          questions help it understand the work behind your job titles, including accomplishments,
-          responsibilities, and experiences that may not appear on a resume.
+          Your existing resumes provide most of what ChatGPT needs. These optional questions help
+          fill in important details about your experience and accomplishments.
         </p>
         <p>
-          Your answers can help ChatGPT write stronger professional summaries, tailor your
-          experience more accurately, and suggest more personal cover letters or application
-          responses.
-        </p>
-        <p>
-          Short answers are fine. You can skip anything you aren’t sure about, and “I don’t know” is
-          a perfectly acceptable answer. All 12 questions are optional.
-        </p>
-        <p>
-          You don’t need to remember everything today. Your Resume Writer can ask follow-up
-          questions and continue learning about your experience as you use it.
-        </p>
-        <p>
-          Answers and your setup prompt stay on this page while you switch tools and reset on
-          reload. Copy Setup Prompt includes any answers you provide; skipping every question is
-          fine. Nothing is sent to ChatGPT until you paste it there.
+          Short answers are fine. Skip anything you're unsure about. ChatGPT can ask follow-up
+          questions as you work together.
         </p>
         {renderQuestions(mainQuestions)}
         <details>
           <summary>Tell us a little more</summary>
-          <p>These six extra questions are optional too. Skip any you like.</p>
           {renderQuestions(additionalQuestions)}
         </details>
       </section>
+      <p className="tool-guidance">
+        Answers stay in this browser page until reload. They are shared with ChatGPT only when you
+        paste the prompt.
+      </p>
       <button className="resume-writer-copy" type="button" onClick={() => void copy()}>
         Copy Setup Prompt
       </button>
@@ -138,31 +123,16 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
           />
         </div>
       )}
-      <ol className="tool-steps">
-        <li>Copy your setup prompt, with or without optional answers.</li>
-        <li>Paste it into a new, separate ChatGPT conversation.</li>
-        <li>
-          Upload one or more existing resumes to ChatGPT and answer its short clarification
-          questions.
-        </li>
-        <li>
-          Share a job description whenever you are ready to tailor a resume. Review every result for
-          accuracy.
-        </li>
-        <li>Reuse the same conversation for future jobs and ask for either resume format.</li>
-      </ol>
       <p className="tool-guidance">
-        Standard Resume is the default: conventional headings and bullets you can use on their own.
-        Ask for Applicable Format when you want structured text to paste into Resume PDF Maker.
-        ChatGPT can also help with cover letters and application responses when you ask.
+        Copy your setup prompt, paste it into a new ChatGPT conversation, and upload your existing
+        resumes. Once you're ready, share a job description to create a tailored resume.
+      </p>
+      <p className="tool-guidance">
+        You can request a standard resume or one formatted for Applicable's Resume PDF Maker.
       </p>
       <button className="secondary" type="button" onClick={onFormatHelp}>
         Open chatbot formatting instructions
       </button>
-      <p className="tool-guidance">
-        Reuse and refine this conversation over time. You can use Resume Writer independently of Job
-        Finder.
-      </p>
     </section>
   );
 }
