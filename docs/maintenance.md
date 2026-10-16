@@ -1,6 +1,6 @@
 # Maintenance guide
 
-Start with the [input contract](input-format.md), [project specification](project-spec.md) and the assigned [GitHub issue](https://github.com/Ewager1/applicable/issues). [The project board](https://github.com/users/Ewager1/projects/6) carries current work status. The [development plan](project-plan.md) records scope and sequence; dated verification records describe their tested commits, not a fresh check of the current checkout.
+Start with the assigned [GitHub issue](https://github.com/Ewager1/applicable/issues) and the relevant edit points below. Consult the [input contract](input-format.md) or [specification](project-spec.md) only for the behavior being changed. [The project board](https://github.com/users/Ewager1/projects/6) carries current work status. The [development plan](project-plan.md) records scope and sequence; dated verification records describe their tested commits, not a fresh check of the current checkout.
 
 ## Find the right edit point
 
@@ -47,13 +47,14 @@ Use the supported Node/npm version and browser setup in the [README](../README.m
 
 `npm run test:browser` owns proof/preview servers on ports 4173/4174 plus the isolated development check. Leave those ports free and do not launch duplicate test servers. Local success does not establish remote CI success: review and latest-commit CI remain merge gates under [AGENTS.md](../AGENTS.md).
 
+Run focused commands while developing; `npm run check` already includes lint, unit/PDF tests, build and browser tests. The [engineering rules](../AGENTS.md#verification) define ownership and when to repeat checks. Manual PDF inspection applies when output could change; it is not required for developer tooling or documentation.
+
 ## Fonts, samples and visual baselines
 
 For an intentional font change, retain its authoritative version/source and license, update the static URL descriptors and distinct real weight mappings, then run:
 
 ```sh
 npm run fonts:coverage
-npm test
 npm run proof:generate
 npm run check
 ```

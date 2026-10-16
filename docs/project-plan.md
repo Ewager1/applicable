@@ -10,18 +10,7 @@ Follow `AGENTS.md` for branch, authorization, verification, and pull request rul
 
 Create issues in this order: A1, A2, A3, A4, A5, A6. Record their assigned GitHub numbers and links here after creation. This is also the execution order, even where technical dependencies would allow overlap.
 
-For each issue:
-
-1. Confirm acceptance criteria are clear; ask the user early about material ambiguity.
-2. Create an issue-specific branch from the latest main.
-3. Implement the issue and write or update meaningful tests for its behavior.
-4. Run applicable checks and inspect the final diff; visually inspect PDF changes.
-5. Open a PR linked to the issue and wait for applicable CI checks on its latest commit.
-6. Self-merge clear, low-risk work only after the gates in `AGENTS.md` pass. Stop for unresolved concerns.
-7. Verify the merge, issue closure, and project status; safely delete the merged issue branch locally and remotely.
-8. Continue to the next issue only after completing that lifecycle.
-
-The user has authorized this routine lifecycle. Documentation-only work uses content and link review instead of artificial tests. Repository setup is recorded below.
+Execution follows the canonical [engineering/merge gates](../AGENTS.md#git-and-github), [delegation workflow](agent-workflow.md) and [verification commands](maintenance.md#choose-verification-by-the-change). This plan records scope and sequence rather than duplicating those procedures.
 
 
 ## Phase 1: Verify the PDF approach
@@ -165,4 +154,4 @@ The six focused issues below run sequentially, each with its own branch, checks,
 
 After the cleanup sequence, [D1 #31](https://github.com/Ewager1/applicable/issues/31) covers public-facing copy and [D2 #32](https://github.com/Ewager1/applicable/issues/32) covers optional company-based filenames. These are separate work items, not capabilities delivered by the cleanup documentation. D1 defines the visible chatbot-to-paste workflow, accurate browser-local privacy copy and accessible prompt copying; its issue records review/verification status. D2 defines title-based download names and an optional interface-only company, with portable sanitization and the same stale-output guards as resume edits. Its issue records verification/review status. Publishing remains separate from this preparation.
 
-The subsequent workflow work is **agent/model usage tracking only**, not application analytics. Future TypeScript/React migration **planning issues** are to be created after that work; migration implementation has not been authorized. No hosting or release/deployment is implied. Use GitHub for execution status and the individual issues for acceptance details.
+The subsequent workflow work is **agent/model usage tracking only**, not application analytics. The approved migration executes after [workflow cleanup #42](https://github.com/Ewager1/applicable/issues/42): [F1 #39](https://github.com/Ewager1/applicable/issues/39) strict TypeScript core, [F2 #40](https://github.com/Ewager1/applicable/issues/40) React interface, then [F3 #41](https://github.com/Ewager1/applicable/issues/41) contributor handoff. Each issue completes its lifecycle before the next starts; GitHub records delivery status. No hosting or release/deployment is implied. Use GitHub for execution status and the individual issues for acceptance details.

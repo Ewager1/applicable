@@ -1,6 +1,6 @@
 # Applicable: Agent Workflow
 
-Status: Initial pilot. Follow this workflow for the current project; it does not enable a scheduled or unattended worker loop or replace the merge gates in `AGENTS.md`.
+This document owns delegation and handoffs. [AGENTS.md](../AGENTS.md) owns mandatory engineering/merge gates; [maintenance](maintenance.md#choose-verification-by-the-change) owns check commands. Current work status belongs in GitHub. This workflow does not enable a scheduled worker loop.
 
 ## Recommendation
 
@@ -17,11 +17,11 @@ The roles do not require different models. Keep the configured model unless the 
 ## Per-issue flow
 
 1. Chat selects the next issue and gives Codex its acceptance criteria, relevant file paths, branch ownership, expected checks, and stop conditions. Start a labeled [local usage baseline](agent-usage.md) for the selected root chat before work; if unavailable, record that measurement as unknown. On a domain change, begin with fresh concise context: issue contract, relevant paths, decisions, interfaces and risks.
-2. One implementer owns source/tests and returns a concise handoff: changed behavior/files, exact commit and PR identity, checks actually run, interfaces changed or preserved, unresolved risks, and task/review/rework accounting. Include the metric window and local report path; do not paste real session records into the PR.
-3. For substantive code, Chat dispatches one independent testing/review pass against that exact commit. The reviewer receives the issue, specification sections, diff reference, and test results.
+2. One implementer owns source/tests, runs focused development checks and the final local suite required by AGENTS.md, then returns a concise handoff: changed behavior/files, exact commit and PR identity, checks actually run, interfaces changed or preserved, unresolved risks, and task/review/rework accounting. Include the metric window and local report path; do not paste real session records into the PR.
+3. For substantive code, Chat dispatches one independent testing/review pass against that exact commit. The reviewer receives the issue, relevant specification sections, exact diff reference and existing test results. Review gaps and use targeted probes; do not rerun the full suite merely to duplicate evidence. The coordinator verifies source identity and checks rather than repeating the implementation work.
 4. Codex fixes actionable findings. Recheck only affected behavior and required checks; request one focused follow-up review if needed.
-5. One designated integration owner performs the authorized merge after all gates pass. Default: Chat. Codex may be explicitly designated instead; never have both attempt the merge.
-6. Finish the usage window after the bounded work/review, supplying measured task, actionable-finding, rework-pass and accepted-outcome counts where available. Preserve the baseline; identify partial/unknown metrics and do not invent historical attribution. Verify merge success, close the issue, set its project status to Done, and safely delete the merged branch. Then start the next issue.
+5. One designated integration owner follows the [merge/closure/cleanup gates](../AGENTS.md#git-and-github). Default: Chat. Codex may be explicitly designated instead; never have both attempt integration.
+6. Finish the usage window after the bounded work/review, supplying measured task, actionable-finding, rework-pass and accepted-outcome counts where available. Preserve the baseline; identify partial/unknown metrics and do not invent historical attribution. Record the verified integration outcome after following those gates, then start the next issue.
 
 Minor documentation changes can use coordinator review. Significant requirement or authorization changes still deserve independent review. Do not create a reviewer merely to approve punctuation.
 

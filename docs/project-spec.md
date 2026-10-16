@@ -1,6 +1,6 @@
 # Applicable: Project Specification
 
-This document records the application contract. Use [GitHub issues](https://github.com/Ewager1/applicable/issues) and [the project board](https://github.com/users/Ewager1/projects/6) for current delivery status, and [the maintenance guide](maintenance.md) for edit points and verification. Distribution is public source under MIT; no release, deployment or framework migration is implied.
+This document records the application contract. Use [GitHub issues](https://github.com/Ewager1/applicable/issues) and [the project board](https://github.com/users/Ewager1/projects/6) for current delivery status, and [the maintenance guide](maintenance.md) for edit points and verification. Distribution is public source under MIT; release/deployment remains separately authorized. The approved migration sequence is recorded in the development plan.
 
 ## Purpose
 
@@ -91,9 +91,9 @@ Prefer displaying the same generated PDF bytes that are offered for download, af
 
 ## Architecture direction
 
-Start with native HTML/CSS and small JavaScript modules. A UI framework is not required by this workflow. Keep parsing, validation, PDF rendering, and interface handling separate enough to test without introducing a general template engine.
+Keep parsing, validation, PDF rendering and interface handling separate enough to test without introducing a general template engine. The user approved strict TypeScript for the core followed by a small React/TypeScript interface; follow the sequential migration issues linked in the [development plan](project-plan.md).
 
-The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. The current implementation is plain JavaScript with shared editor-visible JSDoc contracts, not TypeScript or React. Future migration planning is tracked separately from delivered functionality.
+The rendering investigation selected pinned pdfmake with local fonts, native download and same-bytes preview. Vite supplies the development server and static build; Node serves/builds the local app, while resume processing runs in the browser. The current implementation is plain JavaScript with shared editor-visible JSDoc contracts, not TypeScript or React. The approved migration is not delivered until its issues are implemented and merged.
 
 ## Privacy and examples
 
@@ -101,9 +101,7 @@ Use synthetic resumes in committed samples, tests, screenshots, and documentatio
 
 ## Delivery workflow
 
-Create project issues from the development plan in sequential order, then complete one issue at a time on a dedicated branch. Codex is authorized to commit, push, open PRs, and self-merge clear, low-risk changes after writing appropriate tests, passing applicable checks on the latest PR commit, and reviewing the diff. Documentation-only work requires content and link review. PDF changes also require visual verification.
-
-Stop early for material ambiguity, significant architecture or scope changes, or unresolved verification concerns. After a successful merge, verify issue closure and project status, safely delete the merged issue branch locally and remotely, and only then start the next issue. `AGENTS.md` defines the detailed gates.
+Follow [AGENTS.md](../AGENTS.md#git-and-github) for engineering/merge gates, [agent workflow](agent-workflow.md) for delegation and [the development plan](project-plan.md) for scope/sequence. GitHub issues and the project board own current status.
 
 ## Definition of done
 
