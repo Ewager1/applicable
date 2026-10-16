@@ -95,7 +95,7 @@ Manual clean-source testing covered macOS; the application checks also run in Li
 
 ## License
 
-Applicable's original code is [MIT licensed](LICENSE), copyright 2026 Ewager1. Fonts and dependencies retain their separate licenses; see [third-party notices](THIRD_PARTY_NOTICES.md), including the notice-packaging requirements before redistributing or hosting a standalone production build.
+Applicable's original code is [MIT licensed](LICENSE), copyright 2026 Ewager1. Fonts and dependencies retain their separate licenses; see [third-party notices](THIRD_PARTY_NOTICES.md), including the reviewed runtime inventory and unresolved upstream snippet licensing concern. **Publishing the standalone browser build is on hold pending clarification.** Keep the generated `LICENSE.txt` and `THIRD_PARTY_NOTICES.txt` with the complete `dist/` directory when redistributing or hosting a production build.
 
 ## Project tracking
 
