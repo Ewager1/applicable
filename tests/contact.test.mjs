@@ -1,24 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assembleResume, emptyContact } from '../src/resume/contact.ts';
-import { loadContact, saveContact, contactStorageKey } from '../src/resume/contact-storage.ts';
+import { contactDetails } from '../src/resume/contact.ts';
+import { removeLegacyContact } from '../src/resume/contact-storage.ts';
 
 test('literal fields preserve display, order, optional blanks, and safe links', () => {
   const fields = {
-    fullName: ' Alex  Morgan ',
     email: 'alex@example.com',
-    linkedIn: 'linkedin.com/in/example',
+    linkedin: 'linkedin.com/in/example',
     website: 'https://example.com/漢',
-    phoneNumber: '+1 (555) 010-0142',
+    phone: '+1 (555) 010-0142',
   };
-  const result = assembleResume({ title: 'Engineer' }, fields);
-  assert.equal(result.name, fields.fullName);
+  const result = contactDetails(fields);
   assert.deepEqual(
-    result.contact.map((row) => row.text),
-    [fields.email, fields.linkedIn, fields.website, fields.phoneNumber],
+    result.map((row) => row.text),
+    [fields.email, fields.linkedin, fields.website, fields.phone],
   );
   assert.deepEqual(
-    result.contact.map((row) => row.link),
+    result.map((row) => row.link),
     [
       'mailto:alex@example.com',
       'https://linkedin.com/in/example',
@@ -26,10 +24,7 @@ test('literal fields preserve display, order, optional blanks, and safe links', 
       undefined,
     ],
   );
-  assert.deepEqual(
-    assembleResume({}, { ...emptyContact, fullName: 'Name', email: '  ' }).contact,
-    [],
-  );
+  assert.deepEqual(contactDetails({ email: '  ' }), []);
   for (const value of [
     'javascript:alert(1)',
     'data:text/html,hello',
@@ -39,36 +34,8 @@ test('literal fields preserve display, order, optional blanks, and safe links', 
     '[example](https://example.com)',
     'available on request',
   ]) {
-    assert.deepEqual(assembleResume({}, { ...emptyContact, website: value }).contact, [
-      { text: value },
-    ]);
+    assert.deepEqual(contactDetails({ website: value }), [{ text: value }]);
   }
-});
-
-test('storage round trips a strict whitelist and cleared values', () => {
-  const saved = new Map();
-  const storage = {
-    getItem: (key) => saved.get(key) ?? null,
-    setItem: (key, value) => saved.set(key, value),
-  };
-  assert.deepEqual(loadContact(storage), { fields: emptyContact, warning: '' });
-  const fields = {
-    ...emptyContact,
-    fullName: 'Synthetic Name',
-    email: 'name@example.com',
-    resume: 'MUST NOT SAVE',
-    company: 'MUST NOT SAVE',
-  };
-  assert.equal(saveContact(storage, fields), '');
-  assert.deepEqual(JSON.parse(saved.get(contactStorageKey)), {
-    version: 1,
-    fields: { ...emptyContact, fullName: fields.fullName, email: fields.email },
-  });
-  assert.equal(loadContact(storage).fields.email, fields.email);
-  saveContact(storage, emptyContact);
-  assert.deepEqual(loadContact(storage).fields, emptyContact);
-  saved.set(contactStorageKey, JSON.stringify({ version: 1, fields }));
-  assert.deepEqual(Object.keys(loadContact(storage).fields), Object.keys(emptyContact));
 });
 
 test('web links preserve scheme, host, credential and URL serialization boundaries', () => {
@@ -99,8 +66,8 @@ test('web links preserve scheme, host, credential and URL serialization boundari
     ['https://@example.com', 'https://example.com/'],
   ];
   for (const [value, expectedLink] of cases) {
-    for (const field of ['website', 'linkedIn']) {
-      const [detail] = assembleResume({}, { ...emptyContact, [field]: value }).contact;
+    for (const field of ['website', 'linkedin']) {
+      const [detail] = contactDetails({ [field]: value });
       assert.equal(detail.text, value);
       assert.equal(detail.link, expectedLink, `${field}: ${JSON.stringify(value)}`);
     }
@@ -126,61 +93,37 @@ test('email links preserve explicit mailto and bare-address validation behavior'
     ['person\u007f@example.com', undefined],
   ];
   for (const [value, expectedLink] of cases) {
-    const [detail] = assembleResume({}, { ...emptyContact, email: value }).contact;
+    const [detail] = contactDetails({ email: value });
     assert.equal(detail.text, value);
     assert.equal(detail.link, expectedLink, JSON.stringify(value));
   }
 });
 
-test('unknown, corrupt, wrong-version and blocked storage warn without throwing', () => {
-  for (const value of [
-    '{',
-    'null',
-    '[]',
-    '{}',
-    'false',
-    '12',
-    '"saved contact"',
-    JSON.stringify({ version: 2, fields: emptyContact }),
-    JSON.stringify({ version: 1 }),
-    JSON.stringify({ version: 1, fields: null }),
-    JSON.stringify({ version: 1, fields: false }),
-    JSON.stringify({ version: 1, fields: 'contact' }),
-    JSON.stringify({ version: 1, fields: [] }),
-    JSON.stringify({ version: 1, fields: { ...emptyContact, email: 12 } }),
-    JSON.stringify({ version: 1, fields: {} }),
-  ]) {
-    const result = loadContact({ getItem: () => value });
-    assert.deepEqual(result.fields, emptyContact);
-    assert.ok(result.warning);
-  }
-  const blocked = {
+test('legacy contact cleanup removes only its key, never reads or writes values, and tolerates failure', () => {
+  const saved = new Map([
+    ['applicable.contact.v1', 'synthetic legacy data'],
+    ['unrelated', 'keep'],
+  ]);
+  const calls = [];
+  removeLegacyContact({
+    removeItem(key) {
+      calls.push(key);
+      saved.delete(key);
+    },
     getItem() {
-      throw new Error('blocked');
+      assert.fail('Cleanup must never read saved values');
     },
     setItem() {
-      throw new Error('quota');
+      assert.fail('Cleanup must never save values');
     },
-  };
-  assert.ok(loadContact(blocked).warning);
-  assert.ok(saveContact(blocked, emptyContact));
-});
-
-test('current contact fields override contact properties on a structurally compatible body', () => {
-  const body = {
-    title: 'Engineer',
-    name: 'Old Name',
-    contact: [{ text: 'old@example.com', link: 'mailto:old@example.com' }],
-  };
-  const result = assembleResume(body, {
-    ...emptyContact,
-    fullName: 'Current Name',
-    email: 'current@example.com',
   });
-  assert.equal(result.name, 'Current Name');
-  assert.deepEqual(result.contact, [
-    { text: 'current@example.com', link: 'mailto:current@example.com' },
-  ]);
-  assert.equal(result.title, 'Engineer');
-  assert.deepEqual(assembleResume(body, { ...emptyContact, fullName: 'Current Name' }).contact, []);
+  assert.deepEqual(calls, ['applicable.contact.v1']);
+  assert.deepEqual([...saved], [['unrelated', 'keep']]);
+  assert.doesNotThrow(() =>
+    removeLegacyContact({
+      removeItem() {
+        throw new Error('blocked');
+      },
+    }),
+  );
 });

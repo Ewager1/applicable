@@ -4,12 +4,13 @@ import { chromium } from 'playwright';
 import { browserOptions } from './browser-options.mjs';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { parsedExample, exampleContact } from '../proof/production-fixtures.mjs';
+import { parsedExample } from '../proof/production-fixtures.mjs';
 const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
 const chatbotInstructions = await readFile(
   new URL('../examples/chatbot-instruction.md', import.meta.url),
   'utf8',
 );
+const withCompany = (text, company) => `${text}\n@@TARGET_COMPANY@@\n${company}`;
 const compact = (text) => text.replace(/\s/g, '');
 let browser;
 before(async () => {
@@ -42,8 +43,6 @@ async function openPage(t, { pdfViewer, ...options } = {}) {
       Object.defineProperty(navigator, 'pdfViewerEnabled', { get: () => false }),
     );
   await page.goto('http://127.0.0.1:4174/');
-  for (const [id, value] of Object.entries(exampleContact))
-    await page.locator(`#${id}`).fill(value);
   return page;
 }
 async function submit(page) {
@@ -83,11 +82,9 @@ async function artifactUrls(page) {
 test('optional company names automatic and repeat downloads without entering PDF content', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
-  const company = page.getByLabel('Company you’re applying to', { exact: false });
   await input.fill(source);
-  await company.fill('   ');
   const blank = await readPdf(await submit(page));
-  await company.fill('  Société / West: Team?  ');
+  await input.fill(withCompany(source, '  Société / West: Team?  '));
   assert.equal(await page.locator('#result').isVisible(), false);
   assert.equal(await page.locator('#download').getAttribute('download'), null);
   const filename = 'Full-Stack Software Engineer at Société West Team Resume.pdf';
@@ -100,18 +97,21 @@ test('optional company names automatic and repeat downloads without entering PDF
   assert.deepEqual(repeated.bytes, named.bytes);
   assert.deepEqual(Buffer.from((await artifactUrls(page)).bytes), named.bytes);
   const longCompany = 'Company '.repeat(90);
-  await company.fill(longCompany);
+  await input.fill(withCompany(source, longCompany));
   const longDownload = await submit(page);
   assert.ok(Buffer.byteLength(longDownload.suggestedFilename(), 'utf8') <= 180);
   assert.ok(longDownload.suggestedFilename().endsWith(' Resume.pdf'));
-  await input.fill(source.replace('Full-Stack Software Engineer', 'Lead: Platform / Engineer'));
-  await company.fill('Corrected');
+  const correctedSource = withCompany(
+    source.replace('Full-Stack Software Engineer', 'Lead: Platform / Engineer'),
+    'Corrected',
+  );
+  await input.fill(correctedSource);
   const corrected = await readPdf(
     await submit(page),
     'Lead Platform Engineer at Corrected Resume.pdf',
   );
   assert.ok(corrected.text.includes('Lead:Platform/Engineer'));
-  assert.equal(await company.inputValue(), 'Corrected');
+  assert.equal(await input.inputValue(), correctedSource);
 });
 
 test('company edits during generation discard obsolete names and allow corrected submission', async (t) => {
@@ -124,22 +124,20 @@ test('company edits during generation discard obsolete names and allow corrected
     await held;
     await route.continue();
   });
-  const company = page.getByLabel('Company you’re applying to', { exact: false });
   const input = page.getByLabel('Your resume', { exact: true });
   const downloads = [];
   page.on('download', (download) => downloads.push(download));
   try {
-    await input.fill(source);
-    await company.fill('Old Company');
+    await input.fill(withCompany(source, 'Old Company'));
     const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
     await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
     await request;
-    await company.fill('Current Company');
+    await input.fill(withCompany(source, 'Current Company'));
     release();
     await page.waitForFunction(() => !document.querySelector('#create-pdf').disabled);
     assert.equal(downloads.length, 0);
     assert.equal(await page.locator('#result').isVisible(), false);
-    assert.equal(await input.inputValue(), source);
+    assert.equal(await input.inputValue(), withCompany(source, 'Current Company'));
     await readPdf(await submit(page), 'Full-Stack Software Engineer at Current Company Resume.pdf');
     assert.equal(downloads.length, 1);
   } finally {
@@ -516,111 +514,109 @@ test('PDF assets stay lazy and engine load failure preserves source for reload r
   assert.ok((await readPdf(await submit(page))).text.includes('AlexMorgan'));
 });
 
-test('Full Name is the only required contact field; old pasted contacts require migration', async (t) => {
+test('paste-only metadata requires Name, permits optional contact blanks and retains invalid input', async (t) => {
   const page = await openPage(t);
-  for (const id of Object.keys(exampleContact)) await page.locator(`#${id}`).fill('');
-  await page.locator('#fullName').fill('   ');
-  await page.locator('#resume').fill(source);
-  await page.locator('#create-pdf').click();
-  await page.locator('#error-list').filter({ hasText: 'Enter your Full Name' }).waitFor();
-  assert.equal(await page.locator('#fullName').getAttribute('aria-invalid'), 'true');
-  assert.equal(await page.locator('#resume').inputValue(), source);
-  assert.equal(await page.locator('#resume').getAttribute('aria-invalid'), null);
-  await page.locator('#fullName').fill('Taylor  Example');
-  const pdf = await readPdf(await submit(page));
-  assert.ok(pdf.text.includes('TaylorExample'));
-  assert.equal(pdf.annotations.length, 0);
-  const oldSource = '@@CONTACT@@\nName: Another Person\nContact: old@example.com\n' + source;
-  await page.locator('#resume').fill(oldSource);
-  await page.locator('#create-pdf').click();
-  await page
-    .locator('#error-list')
-    .filter({ hasText: 'Move contact details into the fields above' })
-    .waitFor();
-  assert.equal(await page.locator('#resume').inputValue(), oldSource);
-});
-
-test('missing name and invalid resume show both errors in order and retain source line details', async (t) => {
-  const page = await openPage(t);
-  const invalidSource = 'Unrecognized resume line';
-  const nameError = 'Enter your Full Name in the contact fields above before creating a PDF.';
-  const sourceError =
-    'Line 1: Put this content under a section marker, such as @@PROFESSIONAL_TITLE@@. Copy the complete resume using the chatbot code block’s Copy button; plain headings are not recognized.';
-  await page.locator('#fullName').fill('   ');
-  await page.locator('#resume').fill(invalidSource);
+  assert.equal(
+    await page.locator('#fullName, #email, #linkedIn, #website, #phoneNumber, #company').count(),
+    0,
+  );
+  const invalid = '@@CONTACT@@\nName: \n@@SKILLS@@\nLanguages:';
+  await page.locator('#resume').fill(invalid);
   await page.locator('#create-pdf').click();
   await page.locator('#error-summary').waitFor();
   assert.deepEqual(await page.locator('#error-list li').allTextContents(), [
-    nameError,
-    sourceError,
+    'Line 1: Add name for Contact.',
+    'Line 4: Add a skill category and at least one skill, with no empty items between commas.',
   ]);
-  assert.equal(await page.locator('#fullName').getAttribute('aria-invalid'), 'true');
   assert.equal(await page.locator('#resume').getAttribute('aria-invalid'), 'true');
-  assert.equal(await page.locator('#resume').inputValue(), invalidSource);
-  await page.locator('#fullName').fill('Taylor Example');
+  assert.equal(await page.locator('#resume').inputValue(), invalid);
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'error-summary');
+  const corrected =
+    '@@CONTACT@@\nName: Taylor  Example\nEmail:\nPhone:\nLinkedIn:\nWebsite:\n@@SUMMARY@@\nResolved customer questions.';
+  await page.locator('#resume').fill(corrected);
+  const pdf = await readPdf(await submit(page), 'Resume.pdf');
+  assert.ok(pdf.text.includes('TaylorExample'));
+  assert.equal(pdf.annotations.length, 0);
+  await page.locator('#resume').fill('@@SUMMARY@@\nOlder body-only input.');
   await page.locator('#create-pdf').click();
-  await page.waitForFunction(() => document.querySelectorAll('#error-list li').length === 1);
-  assert.deepEqual(await page.locator('#error-list li').allTextContents(), [sourceError]);
-  assert.equal(await page.locator('#fullName').getAttribute('aria-invalid'), null);
-  assert.equal(await page.locator('#resume').getAttribute('aria-invalid'), 'true');
+  await page.locator('#error-list').filter({ hasText: 'Add @@CONTACT@@ with Name:' }).waitFor();
+  assert.equal(await page.locator('#resume').inputValue(), '@@SUMMARY@@\nOlder body-only input.');
 });
 
-test('only contact fields persist across reload; clearing every field persists', async (t) => {
+test('startup deletes only legacy contacts once, never reads them, and saves no pasted metadata', async (t) => {
   const page = await openPage(t);
-  await page.locator('#resume').fill(source);
-  await page.locator('#company').fill('Synthetic Company');
+  await page.addInitScript((appOrigin) => {
+    if (window !== window.top || window.location.origin !== appOrigin) return;
+    window.localStorage.setItem(
+      'applicable.contact.v1',
+      JSON.stringify({
+        version: 1,
+        fields: { fullName: 'Stale Candidate', email: 'stale@example.com' },
+      }),
+    );
+    window.localStorage.setItem('unrelated-test-key', 'keep');
+    window.storageCalls = [];
+    const remove = window.Storage.prototype.removeItem;
+    const get = window.Storage.prototype.getItem;
+    const set = window.Storage.prototype.setItem;
+    window.Storage.prototype.removeItem = function (key) {
+      window.storageCalls.push(['remove', key]);
+      return remove.call(this, key);
+    };
+    window.Storage.prototype.getItem = function (key) {
+      window.storageCalls.push(['get', key]);
+      if (key === 'applicable.contact.v1') throw new Error('Must never hydrate');
+      return get.call(this, key);
+    };
+    window.Storage.prototype.setItem = function (key, value) {
+      window.storageCalls.push(['set', key]);
+      return set.call(this, key, value);
+    };
+  }, new URL(page.url()).origin);
   await page.reload();
-  for (const [id, value] of Object.entries(exampleContact))
-    assert.equal(await page.locator(`#${id}`).inputValue(), value);
+  assert.deepEqual(await page.evaluate(() => window.storageCalls), [
+    ['remove', 'applicable.contact.v1'],
+  ]);
+  assert.deepEqual(await page.evaluate(() => ({ ...window.localStorage })), {
+    'unrelated-test-key': 'keep',
+  });
   assert.equal(await page.locator('#resume').inputValue(), '');
-  assert.equal(await page.locator('#company').inputValue(), '');
-  assert.deepEqual(
-    await page.evaluate(() =>
-      Object.keys(JSON.parse(window.localStorage.getItem('applicable.contact.v1')).fields),
-    ),
-    Object.keys(exampleContact),
-  );
-  for (const id of Object.keys(exampleContact)) await page.locator(`#${id}`).fill('');
+  await page.locator('#resume').fill(source);
+  const pdf = await readPdf(await submit(page));
+  assert.ok(pdf.text.includes('AlexMorgan'));
+  assert.equal(pdf.text.includes('StaleCandidate'), false);
+  assert.deepEqual(await page.evaluate(() => window.storageCalls), [
+    ['remove', 'applicable.contact.v1'],
+  ]);
   await page.reload();
-  for (const id of Object.keys(exampleContact))
-    assert.equal(await page.locator(`#${id}`).inputValue(), '');
-  await page.locator('#fullName').focus();
-  for (const id of ['email', 'linkedIn', 'website', 'phoneNumber', 'company']) {
-    await page.keyboard.press('Tab');
-    assert.equal(await page.evaluate(() => document.activeElement.id), id);
-  }
+  assert.equal(await page.locator('#resume').inputValue(), '');
+  assert.deepEqual(await page.evaluate(() => ({ ...window.localStorage })), {
+    'unrelated-test-key': 'keep',
+  });
 });
 
-for (const kind of ['blocked', 'corrupt']) {
-  test(`${kind} contact storage warns and permits correction/export`, async (t) => {
+for (const kind of ['access', 'remove']) {
+  test(`blocked storage ${kind} does not block pasted resume export`, async (t) => {
     const page = await openPage(t);
-    if (kind === 'blocked') {
-      await page.addInitScript((appOrigin) => {
-        // Deny storage in the app, without injecting failures into native PDF preview frames.
+    await page.addInitScript(
+      ({ appOrigin, kind }) => {
         if (window !== window.top || window.location.origin !== appOrigin) return;
-        Object.defineProperty(window, 'localStorage', {
-          get() {
+        if (kind === 'access')
+          Object.defineProperty(window, 'localStorage', {
+            get() {
+              throw new Error('blocked');
+            },
+          });
+        else
+          window.Storage.prototype.removeItem = function () {
             throw new Error('blocked');
-          },
-        });
-      }, new URL(page.url()).origin);
-    } else {
-      await page.evaluate(() => window.localStorage.setItem('applicable.contact.v1', '{broken'));
-    }
+          };
+      },
+      { appOrigin: new URL(page.url()).origin, kind },
+    );
     await page.reload();
-    await page.locator('.storage-warning').waitFor();
-    assert.equal(await page.locator('#fullName').inputValue(), '');
-    await page.locator('#fullName').fill('Synthetic Candidate');
-    if (kind === 'blocked')
-      assert.match(await page.locator('.storage-warning').textContent(), /could not be saved/);
-    else
-      assert.equal(
-        await page.locator('.storage-warning').count(),
-        0,
-        'Successful save clears the warning',
-      );
     await page.locator('#resume').fill(source);
-    assert.ok((await readPdf(await submit(page))).text.includes('SyntheticCandidate'));
+    assert.ok((await readPdf(await submit(page))).text.includes('AlexMorgan'));
   });
 }
 
@@ -641,14 +637,17 @@ test('contact edits invalidate pending work and revoke completed artifacts', asy
     const request = page.waitForRequest(/SourceSans3-Regular-.*\.ttf/);
     await page.locator('#create-pdf').click();
     await request;
-    await page.locator('#fullName').fill('Updated Candidate');
+    const updated = source.replace('Name: Alex Morgan', 'Name: Updated Candidate');
+    await page.locator('#resume').fill(updated);
     release();
     await page.waitForFunction(() => !document.querySelector('#create-pdf').disabled);
     assert.equal(downloads.length, 0);
     assert.equal(await page.locator('#result').isVisible(), false);
     assert.ok((await readPdf(await submit(page))).text.includes('UpdatedCandidate'));
     const url = (await artifactUrls(page)).download;
-    await page.locator('#email').fill('available on request');
+    await page
+      .locator('#resume')
+      .fill(updated.replace('Email: alex@example.com', 'Email: available on request'));
     assert.equal(await page.locator('#result').isVisible(), false);
     assert.equal(
       await page.evaluate(async (url) => {
@@ -744,13 +743,11 @@ test('three local tools default to PDF Maker with informational discovery and ke
 test('switching views preserves drafts, validation and expanded input across hidden resizes', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
-  const company = page.locator('#company');
   const invalid = source.replace(
     /@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/,
     '@@EDUCATION@@\n\n',
   );
   await input.fill(invalid);
-  await company.fill('Example Company');
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
   const error = page.locator('#error-summary');
   await error.waitFor();
@@ -762,9 +759,6 @@ test('switching views preserves drafts, validation and expanded input across hid
   await page.setViewportSize({ width: 375, height: 900 });
   await page.getByRole('tab', { name: 'Resume PDF Maker', exact: true }).click();
   assert.equal(await input.inputValue(), invalid);
-  assert.equal(await company.inputValue(), 'Example Company');
-  for (const [id, value] of Object.entries(exampleContact))
-    assert.equal(await page.locator(`#${id}`).inputValue(), value);
   assert.equal(await error.textContent(), errorText);
   assert.equal(await error.isVisible(), true);
   assert.equal(await input.getAttribute('aria-invalid'), 'true');
@@ -998,7 +992,7 @@ test('Job Finder copies latest optional answers in one action without preview an
     session: { ...window.sessionStorage },
   }));
   assert.deepEqual(Object.keys(storage.session), []);
-  assert.deepEqual(Object.keys(storage.local), ['applicable.contact.v1']);
+  assert.deepEqual(Object.keys(storage.local), []);
   assert.equal(JSON.stringify(storage).includes('Updated role'), false);
   assert.equal(JSON.stringify(storage).includes('Changing industries'), false);
 });
@@ -1137,7 +1131,7 @@ test('optional sections export sparse content and use the existing title-free fi
     assert.equal(pdf.text.includes(heading), false);
   assert.equal(await input.inputValue(), sparse);
   assert.deepEqual(Buffer.from((await artifactUrls(page)).bytes), pdf.bytes);
-  await page.getByLabel('Company you’re applying to', { exact: false }).fill('Example Team');
+  await input.fill(withCompany(sparse, 'Example Team'));
   const named = await readPdf(await submit(page), 'Untitled at Example Team Resume.pdf');
   assert.equal(named.text, pdf.text);
 });

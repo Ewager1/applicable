@@ -26,13 +26,6 @@ export interface SkillCategory {
   category: string;
   items: string;
 }
-export interface ContactFields {
-  fullName: string;
-  email: string;
-  linkedIn: string;
-  website: string;
-  phoneNumber: string;
-}
 export interface Resume extends ResumeBody {
   name: string;
   contact: ContactDetail[];
@@ -52,4 +45,4 @@ export interface ValidationError {
   line: number | null;
 }
 export type ParseResult =
-  { ok: true; resume: ResumeBody } | { ok: false; errors: ValidationError[] };
+  { ok: true; resume: Resume; targetCompany: string } | { ok: false; errors: ValidationError[] };

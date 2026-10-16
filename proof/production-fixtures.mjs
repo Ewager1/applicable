@@ -1,15 +1,7 @@
 import { readFile } from 'node:fs/promises';
-import { assembleResume } from '../src/resume/contact.ts';
 import { parseResume } from '../src/resume/parse.ts';
 const source = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
-export const exampleContact = {
-  fullName: 'Alex Morgan',
-  email: 'alex@example.com',
-  linkedIn: 'https://linkedin.com/in/example-alex',
-  website: 'example.com/alex',
-  phoneNumber: '555-010-0142',
-};
-export const parsedExample = assembleResume(parseResume(source).resume, exampleContact);
+export const parsedExample = parseResume(source).resume;
 export function stressFixture(kind) {
   const resume = structuredClone(parsedExample);
   resume.jobs = [resume.jobs[0]];

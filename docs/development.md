@@ -4,7 +4,7 @@ For routine changes, start with [the maintenance guide](maintenance.md). This do
 
 ## Structure
 
-- `src/index.html`, `src/main.tsx`, `src/styles.css`: HTML shell, React StrictMode entry and existing CSS. `src/ui/` contains typed function components for chatbot instructions, resume/company form, accessible feedback and PDF result, plus the focused `useResumePdf.ts` resource/async hook.
+- `src/index.html`, `src/main.tsx`, `src/styles.css`: HTML shell, React StrictMode entry and existing CSS. `src/ui/` contains typed function components for chatbot instructions, pasted-resume form, accessible feedback and PDF result, plus the focused `useResumePdf.ts` resource/async hook.
 - `src/resume/parse.ts`: pure canonical-format parser and structural validation; returns a complete resume or human-language errors. `types.ts` supplies the single canonical TypeScript contracts.
 - `examples/`: synthetic canonical resume and reusable chatbot instruction.
 - `src/pdf/`: shared production document definition, supported-font coverage, browser font loader and byte-generation adapter.
@@ -59,7 +59,7 @@ Local checks do not establish that GitHub Actions has passed. The remote workflo
 
 ## Interface state and recovery
 
-`src/ui/useResumePdf.ts` owns a single pending submission using an explicit idle/generating/error/ready union and synchronous refs for revision, busy slot and current object URL. Every input event advances a revision, clears warnings and removes/revokes any generated Blob URL. A submission captures the current source/company revision; after each asynchronous boundary it checks the revision and mounted lifecycle before creating an artifact. Editing while fonts or generation are pending therefore cannot deliver an old resume. The form exposes busy state, disables duplicate submissions, and restores the button in `finally`.
+`src/ui/useResumePdf.ts` owns a single pending submission using an explicit idle/generating/error/ready union and synchronous refs for revision, busy slot and current object URL. Every input event advances a revision, clears warnings and removes/revokes any generated Blob URL. A submission captures the current source revision; after each asynchronous boundary it checks the revision and mounted lifecycle before creating an artifact. Editing while fonts or generation are pending therefore cannot deliver an old resume. The form exposes busy state, disables duplicate submissions, and restores the button in `finally`.
 
 Fonts load lazily and only successful data is cached. Missing/corrupt font errors discard that cache, so the same source can be retried without a page reload. User source is never replaced or stored. Errors use text content, a focusable alert summary and the original line numbers. A live status region announces progress; Cmd/Ctrl + Enter is available in the labeled input.
 

@@ -5,6 +5,8 @@ import { parseResume } from '../src/resume/parse.ts';
 
 const source = await readFile(new URL('./fixtures/legacy-resume.txt', import.meta.url), 'utf8');
 const blocks = source.trim().split(/\n(?=# )/);
+const contactBlock = blocks[0];
+const bodyBlocks = blocks.slice(1);
 const blockName = (block) => block.split('\n')[0].slice(2);
 const replaceBlock = (name, replacement) =>
   blocks.map((block) => (blockName(block) === name ? replacement : block)).join('\n');
@@ -29,6 +31,16 @@ test('legacy example preserves normalized resume data, links, and entry metadata
   const result = parseResume(source);
   assert.equal(result.ok, true, JSON.stringify(result.errors));
   assert.deepEqual(result.resume, {
+    name: 'Alex Morgan',
+    contact: [
+      { text: 'alex@example.com', link: 'mailto:alex@example.com' },
+      {
+        text: 'https://linkedin.com/in/example-alex',
+        link: 'https://linkedin.com/in/example-alex',
+      },
+      { text: 'example.com/alex', link: 'https://example.com/alex' },
+      { text: '555-010-0142' },
+    ],
     title: 'Full-Stack Software Engineer',
     summary:
       'Product-focused engineer building reliable web applications and accessible interfaces. Experienced with integrations, automated tests, and clear technical communication.',
@@ -85,6 +97,8 @@ test('shuffled sections normalize presentation groups while reversed jobs stay r
   );
   assert.equal(result.ok, true, JSON.stringify(result.errors));
   assert.deepEqual(Object.keys(result.resume), [
+    'name',
+    'contact',
     'title',
     'summary',
     'jobs',
@@ -98,7 +112,7 @@ test('shuffled sections normalize presentation groups while reversed jobs stay r
   );
 });
 
-for (const name of blocks.map(blockName)) {
+for (const name of bodyBlocks.map(blockName)) {
   test(`omitted ${name} is accepted with an empty canonical value`, () => {
     const result = parseResume(blocks.filter((block) => blockName(block) !== name).join('\n'));
     assert.equal(result.ok, true, JSON.stringify(result.errors));
@@ -509,28 +523,23 @@ test('unmarked resumes and missing entry controls get concise errors without hea
   assert.equal(preamble.errors.length, 1);
 });
 
-for (const heading of ['@@CONTACT@@', '# Contact', ' # CONTACT ']) {
-  test(`old contact section requires explicit migration: ${heading}`, () => {
-    const result = rejected(
-      `${heading}\nName: Alex Morgan\nContact: private example\n${source}`,
-      'Move contact details into the fields above',
-    );
-    assert.equal(result.errors[0].line, 1);
-  });
-}
-
-for (const name of blocks.map(blockName)) {
+for (const name of bodyBlocks.map(blockName)) {
   test(`only ${name} supplies the minimum meaningful body`, () => {
     const block = blocks.find((value) => blockName(value) === name);
-    const result = parseResume(block);
+    const result = parseResume(`${contactBlock}\n${block}`);
     assert.equal(result.ok, true, JSON.stringify(result.errors));
   });
 }
 test('a few meaningful sections work without title, summary, jobs, education or certifications', () => {
-  const result = parseResume('@@SKILLS@@\nEngineering: Automated testing, Git');
+  const result = parseResume(
+    '@@CONTACT@@\nName: Synthetic Name\n@@SKILLS@@\nEngineering: Automated testing, Git',
+  );
   assert.deepEqual(result, {
     ok: true,
+    targetCompany: '',
     resume: {
+      name: 'Synthetic Name',
+      contact: [],
       title: '',
       summary: '',
       jobs: [],
@@ -542,4 +551,100 @@ test('a few meaningful sections work without title, summary, jobs, education or 
   rejected('@@SUMMARY@@\nUseful summary.\n@@EDUCATION@@', 'Add content under Education');
   rejected('@@EDUCATION@@\n@@EDUCATION_ENTRY@@\nQualification: Diploma', 'Add institution');
   rejected('```text\n\n```', 'at least one nonempty body section');
+});
+
+const bodyOnly = bodyBlocks.join('\n');
+test('pasted contact metadata supplies the name and preserves optional display/order and safe links', () => {
+  const result = parseResume(`@@CONTACT@@
+ Website: https://example.com/é
+ NAME: Taylor  Example
+ Phone:
+ LinkedIn: available on request
+ Email: taylor@example.com
+@@SUMMARY@@
+Useful supplied experience.`);
+  assert.equal(result.ok, true, JSON.stringify(result.errors));
+  assert.equal(result.resume.name, 'Taylor  Example');
+  assert.deepEqual(result.resume.contact, [
+    { text: 'taylor@example.com', link: 'mailto:taylor@example.com' },
+    { text: 'available on request' },
+    { text: 'https://example.com/é', link: 'https://example.com/%C3%A9' },
+  ]);
+  assert.equal(result.targetCompany, '');
+});
+
+test('metadata and body sections reorder with legacy, mixed, whitespace and case tolerance', () => {
+  const result = parseResume(
+    `  @@target_company@@  \r\nSociété: Example Team\r\n${bodyOnly}\r\n # CONTACT \r\n nAmE : Alex Morgan\r\n`,
+  );
+  assert.equal(result.ok, true, JSON.stringify(result.errors));
+  assert.equal(result.resume.name, 'Alex Morgan');
+  assert.equal(result.targetCompany, 'Société: Example Team');
+  assert.deepEqual(result.resume.jobs, parseResume(source).resume.jobs);
+  assert.equal(
+    Object.hasOwn(result.resume, 'targetCompany'),
+    false,
+    'Filename metadata stays outside the PDF model',
+  );
+  const legacy = parseResume(`# Target Company\nExample Company\n${source}`);
+  assert.equal(legacy.ok, true);
+  assert.equal(legacy.targetCompany, 'Example Company');
+});
+
+test('older body-only input receives contact migration guidance without using external values', () => {
+  const result = rejected(bodyOnly, 'Add @@CONTACT@@ with Name:');
+  assert.equal(result.errors[0].line, null);
+  rejected(`@@CONTACT@@\nEmail: person@example.com\n${bodyOnly}`, 'Add name for Contact');
+  rejected(`@@CONTACT@@\nName:  \n${bodyOnly}`, 'Add name for Contact');
+  rejected(`@@CONTACT@@\n${bodyOnly}`, 'Add name for Contact');
+});
+
+test('contact alone and contact plus target company never count as meaningful body content', () => {
+  for (const input of [
+    '@@CONTACT@@\nName: Taylor Example',
+    '@@CONTACT@@\nName: Taylor Example\n@@TARGET_COMPANY@@\nExample Company',
+  ])
+    rejected(input, 'at least one nonempty body section');
+});
+
+test('unknown, duplicate and malformed contact values report source lines without partial data', () => {
+  for (const line of [
+    'Contact: person@example.com',
+    'Location: Somewhere',
+    'Name Taylor Example',
+    '## Job',
+  ]) {
+    const result = rejected(
+      `@@CONTACT@@\nName: Taylor Example\n${line}\n@@SUMMARY@@\nUseful experience.`,
+      'Unrecognized content in Contact',
+    );
+    assert.ok(result.errors.some((error) => error.line === 3));
+  }
+  const duplicate = rejected(
+    `@@CONTACT@@\nName: Taylor Example\nNAME: Other Name\n@@SUMMARY@@\nUseful experience.`,
+    'name appears more than once',
+  );
+  assert.equal(duplicate.errors[0].line, 3);
+  rejected(`${source}\n@@CONTACT@@\nName: Other Name`, 'Contact appears more than once');
+  rejected(`${source}\n@@CONTACT@\nName: Other Name`, 'recognized @@MARKER@@');
+  rejected(
+    source.replace('Email: alex@example.com', 'Email: alex@example.com\nEmail:'),
+    'email appears more than once',
+  );
+});
+
+test('included target company must contain one plain line and cannot repeat', () => {
+  for (const value of ['', '  \t', 'Example Company\nSecond line', '## Extra heading']) {
+    rejected(
+      `${source}\n@@TARGET_COMPANY@@\n${value}`,
+      value.trim()
+        ? 'Use one plain-text line under Target Company'
+        : 'Add content under Target Company',
+    );
+  }
+  rejected(
+    `${source}\n@@TARGET_COMPANY@@\nOne\n# Target Company\nTwo`,
+    'Target Company appears more than once',
+  );
+  rejected(`${source}\n@@TARGET_COMPANY@\nOne`, 'recognized @@MARKER@@');
 });

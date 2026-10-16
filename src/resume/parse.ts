@@ -1,4 +1,5 @@
 import type { ParseResult, ValidationError } from './types.ts';
+import { contactDetails } from './contact.ts';
 
 interface SourceLine {
   text: string;
@@ -19,11 +20,15 @@ const sectionTitles = new Map([
   ['certifications', 'Certifications'],
   ['skills', 'Skills'],
 ]);
+const bodySectionKeys = [...sectionTitles.keys()];
+sectionTitles.set('contact', 'Contact');
+sectionTitles.set('target company', 'Target Company');
 const normalizeLabel = (text: string) => text.trim().replace(/\s+/g, ' ').toLowerCase();
 const bulletPattern = /^(?:-|\*|•)(?:[ \t]+(.*)|$)/;
 const reservedControlPattern = /^(?:#{1,6}(?:\s|$)|```|~~~)/;
 const symbolMarkers = new Map([
   ['@@CONTACT@@', '# Contact'],
+  ['@@TARGET_COMPANY@@', '# Target Company'],
   ['@@PROFESSIONAL_TITLE@@', '# Professional Title'],
   ['@@SUMMARY@@', '# Summary'],
   ['@@RELEVANT_EXPERIENCE@@', '# Relevant Experience'],
@@ -114,13 +119,8 @@ export function parseResume(source: unknown): ParseResult {
     if (heading) {
       const key = normalizeLabel(heading[1] ?? '');
       currentBlock = { lines: [], line, title: sectionTitles.get(key) };
-      if (key === 'contact') {
-        report(
-          'Move contact details into the fields above and remove the Contact section from your pasted resume. Your pasted text has been preserved.',
-          line,
-        );
-      } else if (!sectionTitles.has(key)) {
-        report('Unknown section. Use one of the six section markers in the resume format.', line);
+      if (!sectionTitles.has(key)) {
+        report('Unknown section. Use the documented body or metadata section markers.', line);
       } else if (sectionBlocks.has(key)) {
         report(
           `${currentBlock.title} appears more than once. Combine its content under one marker.`,
@@ -155,6 +155,8 @@ export function parseResume(source: unknown): ParseResult {
     };
   }
 
+  if (!bodySectionKeys.some((key) => sectionBlocks.has(key)))
+    report('Include at least one nonempty body section using the resume format markers.');
   const readSectionLines = (key: string): SourceLine[] => {
     const block = sectionBlocks.get(key);
     if (!block) return [];
@@ -188,6 +190,7 @@ export function parseResume(source: unknown): ParseResult {
     allowed: readonly string[],
     context: string,
     startLine: number,
+    required: readonly string[] = allowed,
   ) => {
     const values: Record<string, string> = {};
     for (const item of lines) {
@@ -205,7 +208,7 @@ export function parseResume(source: unknown): ParseResult {
         values[value.key] = value.value;
       }
     }
-    reportMissingFields(values, allowed, context, startLine);
+    reportMissingFields(values, required, context, startLine);
     return values;
   };
   const readEntries = (lines: SourceLine[], marker: string, context: string) => {
@@ -229,6 +232,34 @@ export function parseResume(source: unknown): ParseResult {
     }
     return parsedEntries;
   };
+
+  const contactBlock = sectionBlocks.get('contact');
+  let name = '';
+  let contact: ReturnType<typeof contactDetails> = [];
+  if (!contactBlock) {
+    report(
+      'Add @@CONTACT@@ with Name: your full name to the pasted resume. Contact details now belong in the resume text.',
+    );
+  } else {
+    const fields = readFields(
+      contactBlock.lines.filter((item) => item.text.trim()),
+      ['name', 'email', 'phone', 'linkedin', 'website'],
+      'Contact',
+      contactBlock.line,
+      ['name'],
+    );
+    name = fields.name ?? '';
+    contact = contactDetails(fields);
+  }
+  const companyLines = readSectionLines('target company');
+  let targetCompany = '';
+  if (companyLines.length) {
+    if (companyLines.length !== 1 || reservedControlPattern.test(companyLines[0].text.trim())) {
+      report('Use one plain-text line under Target Company.', companyLines[0].line);
+    } else {
+      targetCompany = companyLines[0].text.trim();
+    }
+  }
 
   let title = '';
   if (titleLines.length) {
@@ -345,5 +376,9 @@ export function parseResume(source: unknown): ParseResult {
   }
 
   if (errors.length) return { ok: false, errors };
-  return { ok: true, resume: { title, summary, jobs, education, certifications, skills } };
+  return {
+    ok: true,
+    resume: { name, contact, title, summary, jobs, education, certifications, skills },
+    targetCompany,
+  };
 }

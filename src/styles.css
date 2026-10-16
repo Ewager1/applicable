@@ -120,8 +120,7 @@ label {
   font-weight: 650;
 }
 
-#resume-help,
-#company-help {
+#resume-help {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.6;
@@ -169,28 +168,10 @@ button span,
   outline-offset: 4px;
 }
 
-.company-field {
-  margin-bottom: 24px;
-  max-width: 480px;
-}
-
 .optional {
   color: var(--muted);
   font-size: 12px;
   font-weight: 400;
-}
-
-input[type='text'] {
-  width: 100%;
-  margin-top: 9px;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid #cddad2;
-  border-radius: 7px;
-  background: #fcfdfb;
-  color: #243e34;
-  font: inherit;
-  font-size: 16px;
 }
 
 textarea {
@@ -215,7 +196,6 @@ textarea::placeholder {
   color: #7c8c81;
 }
 
-input[aria-invalid='true'],
 textarea[aria-invalid='true'] {
   border-color: #af593f;
 }
@@ -422,38 +402,6 @@ iframe {
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;
-  }
-}
-
-.contact-fields {
-  margin: 0 0 24px;
-  padding: 0 0 24px;
-  border: 0;
-  border-bottom: 1px solid var(--border);
-  min-width: 0;
-}
-.contact-fields legend {
-  padding: 0;
-  font-weight: 650;
-  font-size: 18px;
-}
-#contact-help,
-.storage-warning {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-}
-.storage-warning {
-  color: #773b2d;
-}
-.contact-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-@media (max-width: 600px) {
-  .contact-grid {
-    grid-template-columns: 1fr;
   }
 }
 
