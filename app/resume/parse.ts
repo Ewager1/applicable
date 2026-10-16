@@ -1,10 +1,10 @@
-import type { ContactDetail, ParseResult, ValidationError } from './types.ts';
+import type { ParseResult, ValidationError } from './types.ts';
 
 interface SourceLine { text: string; line: number }
 interface EntryBlock { lines: SourceLine[]; line: number }
 interface SectionBlock extends EntryBlock { title?: string }
 const sectionTitles = new Map([
-  ['contact', 'Contact'], ['professional title', 'Professional Title'],
+  ['professional title', 'Professional Title'],
   ['summary', 'Summary'], ['relevant experience', 'Relevant Experience'],
   ['education', 'Education'], ['certifications', 'Certifications'], ['skills', 'Skills'],
 ]);
@@ -72,8 +72,10 @@ export function parseResume(source: unknown): ParseResult {
     if (heading) {
       const key = normalizeLabel(heading[1] ?? '');
       currentBlock = { lines: [], line, title: sectionTitles.get(key) };
-      if (!sectionTitles.has(key)) {
-        report('Unknown section. Use one of the seven section markers in the resume format.', line);
+      if (key === 'contact') {
+        report('Move contact details into the fields above and remove the Contact section from your pasted resume. Your pasted text has been preserved.', line);
+      } else if (!sectionTitles.has(key)) {
+        report('Unknown section. Use one of the six section markers in the resume format.', line);
       } else if (sectionBlocks.has(key)) {
         report(`${currentBlock.title} appears more than once. Combine its content under one marker.`, line);
       } else {
@@ -85,11 +87,11 @@ export function parseResume(source: unknown): ParseResult {
       preambleLine = line;
     }
   }
-  if (preambleLine !== undefined) report('Put this content under a section marker, such as @@CONTACT@@. Copy the complete resume using the chatbot code block’s Copy button; plain headings are not recognized.', preambleLine);
+  if (preambleLine !== undefined) report('Put this content under a section marker, such as @@PROFESSIONAL_TITLE@@. Copy the complete resume using the chatbot code block’s Copy button; plain headings are not recognized.', preambleLine);
   if (!sectionBlocks.size) {
     return {
       ok: false,
-      errors: errors.length ? errors : [{ message: 'Paste a complete resume with its @@CONTACT@@ and other required markers.', line: nonblank[0]?.line ?? null }],
+      errors: errors.length ? errors : [{ message: 'Paste a complete resume with all six required body markers.', line: nonblank[0]?.line ?? null }],
     };
   }
 
@@ -103,7 +105,6 @@ export function parseResume(source: unknown): ParseResult {
     if (!lines.length) report(`Add content under ${block.title}.`, block.line);
     return lines;
   };
-  const contactLines = readSectionLines('contact');
   const titleLines = readSectionLines('professional title');
   const summaryLines = readSectionLines('summary');
   const jobLines = readSectionLines('relevant experience');
@@ -154,40 +155,6 @@ export function parseResume(source: unknown): ParseResult {
     }
     return parsedEntries;
   };
-
-  let name = '';
-  let sawName = false;
-  const contact: ContactDetail[] = [];
-  for (const item of contactLines) {
-    const value = parseField(item);
-    if (value?.key === 'name') {
-      if (sawName) {
-        report('Name appears more than once. Keep one Name field.', item.line);
-      } else {
-        name = value.value;
-        sawName = true;
-      }
-    } else if (value?.key === 'contact') {
-      if (!value.value) {
-        report('Add a value after Contact:.', item.line);
-        continue;
-      }
-      if (value.value.startsWith('[')) {
-        const link = value.value.match(/^\[([^[\]]+)\]\((\S+)\)$/);
-        if (!link || !link[1].trim() || !/^(?:https?:\/\/|mailto:)\S+$/i.test(link[2])) {
-          report('Use a complete contact link: [display text](https://address) or [display text](mailto:address).', item.line);
-        } else {
-          contact.push({ text: link[1], link: link[2] });
-        }
-      } else {
-        contact.push({ text: value.value });
-      }
-    } else {
-      report('Use Name: or Contact: for contact information.', item.line);
-    }
-  }
-  if (contactLines.length && !name.trim()) report('Add your name after Name: in Contact.', sectionBlocks.get('contact')?.line ?? null);
-  if (contactLines.length && !contact.length) report('Add at least one contact detail after Contact:.', sectionBlocks.get('contact')?.line ?? null);
 
   let title = '';
   if (titleLines.length) {
@@ -262,5 +229,5 @@ export function parseResume(source: unknown): ParseResult {
   }
 
   if (errors.length) return { ok: false, errors };
-  return { ok: true, resume: { name, contact, title, summary, jobs, education, certifications, skills } };
+  return { ok: true, resume: { title, summary, jobs, education, certifications, skills } };
 }

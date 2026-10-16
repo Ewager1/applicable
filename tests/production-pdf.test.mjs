@@ -62,7 +62,7 @@ test('parsed example renders every field in production order and preserves exact
     position = next;
   }
   const links = new Set(pages.flatMap(page => page.annotations.filter(annotation => annotation.subtype === 'Link').map(annotation => annotation.url)));
-  assert.deepEqual([...links].sort(), ['https://example.com/alex', 'mailto:alex@example.com'].sort());
+  assert.deepEqual([...links].sort(), ['https://example.com/alex', 'https://linkedin.com/in/example-alex', 'mailto:alex@example.com'].sort());
   const items = pages.flatMap(page => page.items);
   const qualification = items.find(item => item.str.includes('Bachelor'));
   const institution = items.find(item => item.str.includes('Example') && item.transform[5] < qualification.transform[5]);
@@ -230,7 +230,7 @@ test('rendered hierarchy and shared dates use real semantic weights, sizes and p
     };
     check('CandidateName', 'Bold', 20, [31, 78, 95]);
     check('ProfessionalTitle', 'Semibold', 11.5, [32, 37, 43]);
-    check('Portland,', 'Regular', 9.5, [75, 85, 99]);
+    check('alex@example.com', 'Regular', 9.5, [75, 85, 99]);
     check('Measured', 'Regular', 9.75, [32, 37, 43]);
     check('Languages:', 'Semibold', 9.75, [32, 37, 43]);
     for (const job of resume.jobs) {
@@ -280,7 +280,7 @@ test('unsupported displayed characters fail recoverably; Unicode link destinatio
     assert.ok(resume.summary.endsWith(character), 'Source model remains available for correction');
   }
   const resume = structuredClone(parsedExample);
-  resume.contact[3].link = 'https://example.com/漢';
+  resume.contact[2].link = 'https://example.com/漢';
   const pages = await inspect(resume);
   assert.ok(pages.flatMap(page => page.annotations).some(annotation => annotation.unsafeUrl === 'https://example.com/漢' || annotation.url === 'https://example.com/%E6%BC%A2'));
 });
@@ -360,4 +360,17 @@ test('pinned layout boundary rejects malformed pages and impossible positions', 
     assert.equal(firstMeasuredPage({ positions }, 2), undefined);
   }
   assert.equal(firstMeasuredPage({ positions: [{ pageNumber: 2 }] }, 2), 2);
+});
+
+test('name-only PDF omits the contact row and displays the complete body', async () => {
+  const resume = structuredClone(parsedExample);
+  resume.contact = [];
+  const definition = documentDefinition(resume);
+  assert.equal(definition.content.some(node => node.style === 'contact'), false);
+  const pages = await inspect(resume);
+  assert.equal(pages.flatMap(page => page.annotations).length, 0);
+  const items = pages[0].items;
+  const name = items.find(item => item.str.includes('Alex'));
+  const title = items.find(item => item.str === 'Full-');
+  assert.ok(name.transform[5] - title.transform[5] < 35, 'No empty contact-row spacing');
 });

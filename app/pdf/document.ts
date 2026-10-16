@@ -96,11 +96,11 @@ export function documentDefinition(resume: Resume): ResumeDocument {
   const experienceHeading = sectionHeading('RELEVANT EXPERIENCE');
   const content: LayoutNode[] = [
     { text: resume.name, style: 'name', margin: [0, 0, 0, 3] },
-    {
+    ...(contact.length ? [{
       text: contact.flatMap((item, index) => index ? [{ text: ' • ' }, item] : [item]),
       style: 'contact',
-      margin: [0, 0, 0, 10],
-    },
+      margin: [0, 0, 0, 10] as Margins,
+    }] : []),
     { text: resume.title, style: 'title', margin: [0, 0, 0, 10] },
     { text: resume.summary },
     experienceHeading,

@@ -1,10 +1,3 @@
-@@CONTACT@@
-Name: Alex Morgan
-Contact: Portland, OR
-Contact: 555-010-0142
-Contact: [alex@example.com](mailto:alex@example.com)
-Contact: [example.com/alex](https://example.com/alex)
-
 @@PROFESSIONAL_TITLE@@
 Full-Stack Software Engineer
 

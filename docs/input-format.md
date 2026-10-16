@@ -6,12 +6,11 @@ Applicable accepts a complete resume in this documented plain-text format. It do
 
 See the complete [synthetic example](../examples/resume.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
 
-## Seven required sections
+## Six required body sections
 
 Include each of these literal section markers exactly once, on its own line, in any order. These symbols survive copying rendered Markdown instead of relying on Markdown heading syntax:
 
 ```text
-@@CONTACT@@
 @@PROFESSIONAL_TITLE@@
 @@SUMMARY@@
 @@RELEVANT_EXPERIENCE@@
@@ -28,27 +27,20 @@ Only standalone controls are structural. Unknown or malformed standalone marker-
 
 ### Legacy compatibility
 
-Existing `# Contact`, `# Professional Title`, `# Summary`, `# Relevant Experience`, `# Education`, `# Certifications`, `# Skills` section controls still work. The old entry controls are `## Job`, `## Education`, `## Certification`. They retain case/whitespace tolerance and require whitespace after `#`/`##`. You may safely mix recognized old and new controls on separate lines; repeating one section using another spelling still counts as a duplicate. Prefer the symbol format for new resumes. The section `@@EDUCATION@@` and entry `@@EDUCATION_ENTRY@@` are deliberately distinct.
+Existing `# Professional Title`, `# Summary`, `# Relevant Experience`, `# Education`, `# Certifications`, `# Skills` section controls still work. The old entry controls are `## Job`, `## Education`, `## Certification`. They retain case/whitespace tolerance and require whitespace after `#`/`##`. You may safely mix recognized old and new controls on separate lines; repeating one section using another spelling still counts as a duplicate. Prefer the symbol format for new resumes. The section `@@EDUCATION@@` and entry `@@EDUCATION_ENTRY@@` are deliberately distinct.
 
 
-The result always presents contact → professional title → summary → experience → education → certifications → skills. It preserves the input order of jobs, bullets, education entries, certifications, contact rows, skill categories and skill items. Jobs are never sorted by date or relevance.
+The result always presents contact → professional title → summary → experience → education → certifications → skills. It preserves the input order of jobs, bullets, education entries, certifications, skill categories and skill items. Jobs are never sorted by date or relevance.
 
 Missing or blank sections block export. A marker by itself is empty. All requirements below are structural/nonempty checks, without judging the resume's writing, date formats, phone formats or email correctness. No missing fact is inferred.
 
-## Contact
+## Contact fields and migration
 
-Use one `Name:` and at least one repeatable `Contact:` row. Other contact labels are not accepted. Use as many contact rows as needed, in the desired order:
+Enter Full Name, Email, LinkedIn, Website and Phone Number in the app, separately from this body text. Only Full Name is mandatory; all other fields may be blank. Display text remains literal. Usable email/web destinations become safe clickable links; phone remains text. Blank details and an empty contact row are omitted. There is no location field.
 
-```text
-@@CONTACT@@
-Name: Alex Morgan
-Contact: Portland, OR
-Contact: 555-010-0142
-Contact: [alex@example.com](mailto:alex@example.com)
-Contact: [example.com/alex](https://example.com/alex)
-```
+The five contact fields are saved in localStorage for this browser and origin. Clearing a field saves its empty value; clearing site data removes the saved fields. Resume text and company are never saved. Blocked storage or invalid saved data produces a nonblocking warning; editing and PDF creation remain available.
 
-A plain contact value is displayed literally. To preserve a clickable destination, use one complete Markdown link as the entire value: `[display text](destination)`. Destinations must start with `http://`, `https://` or `mailto:` and contain no whitespace. Display text cannot contain square brackets. Other Markdown syntax is not interpreted. A value starting with `[` must be a complete valid link; it cannot silently become plain text after a link error. Plain contact values may include colons. The original link destination and display text are retained; no URL shortening or inferred email links occur.
+An old `@@CONTACT@@` or `# Contact` section blocks export with migration guidance: move its details into the fields and remove the section. The entire pasted source remains available. There is no automatic import, fallback or silent discard.
 
 ## Professional title and summary
 
@@ -124,25 +116,23 @@ Each row must have **exactly one colon** separating a nonempty category from a n
 
 ## Errors and content preservation
 
-Unknown/duplicate sections, unknown field labels, duplicate single-value fields, wrong entry markers, extra content outside sections and malformed lines block the entire result. Duplicate contact rows and skill categories are permitted because their order/content is meaningful; the single Name and entry metadata fields cannot repeat. Every nonempty line must belong to the documented format. Unrecognized structure blocks the entire result, even when related warnings are condensed. Only the explicitly accepted outer fence is omitted as a wrapper. There is no partial-success mode.
+Unknown/duplicate sections, unknown field labels, duplicate single-value fields, wrong entry markers, extra content outside sections and malformed lines block the entire result. Repeated skill categories are permitted because their order/content is meaningful; entry metadata fields cannot repeat. Every nonempty line must belong to the documented format. Unrecognized structure blocks the entire result, even when related warnings are condensed. Only the explicitly accepted outer fence is omitted as a wrapper. There is no partial-success mode.
 
-Errors use human-language messages, such as “Education is missing. Add @@EDUCATION@@.” or “Add your name after Name: in Contact.” Each error includes the original 1-based line number where a location exists, or `null` for an absent section. The interface displays these messages while leaving the user's input intact and does not export when the parser returns failure. Unmarked preambles and missing entry markers produce concise guidance rather than one repeated warning per line.
+Errors use human-language messages, such as “Education is missing. Add @@EDUCATION@@.” Each error includes the original 1-based line number where a location exists, or `null` for an absent section. The interface displays these messages while leaving the user's input intact and does not export when the parser returns failure. Unmarked preambles and missing entry markers produce concise guidance rather than one repeated warning per line.
 
 ## Parser interface and data shape
 
 `parseResume(source)` in `app/resume/parse.ts` is pure and uses no browser API, storage, dependencies or network requests. It returns either:
 
 ```js
-{ ok: true, resume: { name, contact, title, summary, jobs, education, certifications, skills } }
+{ ok: true, resume: { title, summary, jobs, education, certifications, skills } }
 { ok: false, errors: [{ message, line }] }
 ```
 
-The successful `resume` has this shape:
+The successful `resume` is a `ResumeBody` with this shape. `assembleResume(body, fields)` combines it with current contact fields into the canonical `Resume` for PDF rendering:
 
 ```js
 {
-  name: 'Alex Morgan',
-  contact: [{ text: 'Portland, OR' }, { text: 'alex@example.com', link: 'mailto:alex@example.com' }],
   title: 'Full-Stack Software Engineer',
   summary: 'Summary paragraphs.',
   jobs: [{ employer: 'Example Studio', role: 'Software Engineer', dates: '2023 - Present', location: 'Remote', bullets: ['Built accessible interfaces.'] }],

@@ -8,27 +8,23 @@ Format my complete resume for Applicable using only the facts and wording I supp
 
 Return the finished resume inside **one fenced `text` code block**, so I can use the chat interface's **Copy** button. Do not add commentary before or after that block. Keep the literal `@@...@@` markers below, each on its own line. Do not turn them into Markdown headings, bold labels or ordinary unmarked titles. The markers do not appear in the PDF.
 
-Include every section below once, with its required nonempty content. Sections may arrive in any order; Applicable always displays them in the listed order:
+Leave out my name and personal contact details; I enter those in Applicable’s contact fields. Include every body section below once, with its required nonempty content. Sections may arrive in any order; Applicable always displays them in the listed order:
 
-1. `@@CONTACT@@`
-   - One `Name: value` line.
-   - At least one repeatable `Contact: value` line for location, phone, email or website, in the desired display order.
-   - For a clickable email or website, make the entire Contact value `[display text](mailto:address)` or `[display text](https://address)`. Plain values are allowed too.
-2. `@@PROFESSIONAL_TITLE@@`
+1. `@@PROFESSIONAL_TITLE@@`
    - Exactly one plain-text line containing my professional title.
-3. `@@SUMMARY@@`
+2. `@@SUMMARY@@`
    - Plain-text paragraphs. Wrapped lines and blank lines between paragraphs are allowed. Do not add subheadings.
-4. `@@RELEVANT_EXPERIENCE@@`
+3. `@@RELEVANT_EXPERIENCE@@`
    - Start **every** job with `@@JOB@@`.
    - Then include one each of `Employer:`, `Role:`, `Dates:`, `Location:`, all nonempty, above the bullets.
    - Add at least one `- text` bullet per job. Indent continued bullet lines by two spaces. Do not indent metadata.
-5. `@@EDUCATION@@`
+4. `@@EDUCATION@@`
    - Start **every** entry with `@@EDUCATION_ENTRY@@`.
    - Include one each of `Qualification:`, `Institution:`, `Dates:`, all nonempty.
-6. `@@CERTIFICATIONS@@`
+5. `@@CERTIFICATIONS@@`
    - Start **every** entry with `@@CERTIFICATION@@`.
    - Include one each of `Title:`, `Issuer:`, `Dates:`, all nonempty.
-7. `@@SKILLS@@`
+6. `@@SKILLS@@`
    - One `Category: skill, skill` row per category, with exactly one colon per row.
    - Category names cannot contain colons. Individual skill names cannot contain colons or commas. Keep repeated items and category/item order. Do not leave empty items between commas.
 

@@ -21,8 +21,6 @@ test('legacy example preserves normalized resume data, links, and entry metadata
   const result = parseResume(source);
   assert.equal(result.ok, true, JSON.stringify(result.errors));
   assert.deepEqual(result.resume, {
-    name: 'Alex Morgan',
-    contact: [{ text: 'Portland, OR' }, { text: '555-010-0142' }, { text: 'alex@example.com', link: 'mailto:alex@example.com' }, { text: 'example.com/alex', link: 'https://example.com/alex' }],
     title: 'Full-Stack Software Engineer',
     summary: 'Product-focused engineer building reliable web applications and accessible interfaces. Experienced with integrations, automated tests, and clear technical communication.',
     jobs: [
@@ -41,7 +39,7 @@ test('shuffled sections normalize presentation groups while reversed jobs stay r
   const jobs = experience.split(/\n(?=## Job)/).slice(1).reverse();
   const result = parseResume(reordered.replace(experience, `# Relevant Experience\n${jobs.join('\n')}`));
   assert.equal(result.ok, true, JSON.stringify(result.errors));
-  assert.deepEqual(Object.keys(result.resume), ['name', 'contact', 'title', 'summary', 'jobs', 'education', 'certifications', 'skills']);
+  assert.deepEqual(Object.keys(result.resume), ['title', 'summary', 'jobs', 'education', 'certifications', 'skills']);
   assert.deepEqual(result.resume.jobs.map(job => job.employer), ['Example Systems', 'Example Studio']);
 });
 
@@ -58,12 +56,7 @@ test('empty and non-string input return usable errors', () => {
   for (const input of ['', ' \n\t ', null, undefined]) rejected(input, 'Paste a complete resume');
 });
 
-test('missing/blank name and contact values cannot count as contact information', () => {
-  rejected(source.replace('Name: Alex Morgan\n', ''), 'Add your name');
-  rejected(source.replace('Name: Alex Morgan', 'Name:   '), 'Add your name');
-  rejected(replaceBlock('Contact', '# Contact\nName: Alex Morgan'), 'Add at least one contact detail');
-  rejected(replaceBlock('Contact', '# Contact\nName: Alex Morgan\nContact:  '), 'Add a value after Contact:');
-});
+
 
 test('Unicode, colons in prose/metadata, duplicates and paragraph breaks preserve wording', () => {
   const input = source
@@ -82,7 +75,7 @@ test('Unicode, colons in prose/metadata, duplicates and paragraph breaks preserv
 });
 
 test('labels accept case, outer spaces and CRLF without changing values', () => {
-  const result = parseResume(`\uFEFF\n${source}`.replace('# Contact', '  # CONTACT  ').replace('Name: Alex Morgan', '  nAmE : Alex Morgan  ').replace('## Job', '## JOB').replace(/\n/g, '\r\n'));
+  const result = parseResume(`\uFEFF\n${source}`.replace('# Professional Title', '  # PROFESSIONAL  TITLE  ').replace('## Job', '## JOB').replace(/\n/g, '\r\n'));
   assert.equal(result.ok, true, JSON.stringify(result.errors));
   assert.deepEqual(result.resume, parseResume(source).resume);
 });
@@ -120,7 +113,6 @@ test('malformed/duplicate metadata and unsupported entry boundaries block export
   rejected(source.replace('## Job\n', ''), 'Start each job with @@JOB@@');
   rejected(source.replace('## Education', '## University'), 'Start each education entry');
   rejected(source.replace('## Certification', '## Certificate'), 'Start each certification entry');
-  rejected(source.replace('Name: Alex Morgan', 'Name: Alex Morgan\nName: Alex Morgan'), 'Name appears more than once');
 });
 
 test('bullet continuations accept mixed horizontal indentation but reject a single space', () => {
@@ -150,14 +142,7 @@ test('empty/malformed skill rows, unsupported colons, and headings are rejected'
   rejected(replaceBlock('Skills', '# Skills\n## Languages: JavaScript'), 'without extra headings');
 });
 
-test('contact links preserve destinations without inventing or executing markup', () => {
-  for (const link of ['[Email](javascript:alert(1))', '[Email](file:///tmp/a)', '[Email](mailto:)', '[Email](https://some where)', '[broken](https://example.com', '[](https://example.com)']) {
-    rejected(source.replace('[alex@example.com](mailto:alex@example.com)', link), 'Use a complete contact link');
-  }
-  const result = parseResume(source.replace('Contact: Portland, OR', 'Contact: email: available upon request'));
-  assert.equal(result.ok, true);
-  assert.equal(result.resume.contact[0].text, 'email: available upon request');
-});
+
 
 test('title extra lines, extra summary headings and code fences produce errors', () => {
   rejected(source.replace('Full-Stack Software Engineer', 'Full-Stack Software Engineer\nAnother line'), 'Use one plain-text line');
@@ -172,7 +157,7 @@ test('failures report the original source line without exposing a partial resume
 });
 
 const symbolSource = await readFile(new URL('../examples/resume.txt', import.meta.url), 'utf8');
-const symbolSections = ['CONTACT', 'PROFESSIONAL_TITLE', 'SUMMARY', 'RELEVANT_EXPERIENCE', 'EDUCATION', 'CERTIFICATIONS', 'SKILLS'];
+const symbolSections = ['PROFESSIONAL_TITLE', 'SUMMARY', 'RELEVANT_EXPERIENCE', 'EDUCATION', 'CERTIFICATIONS', 'SKILLS'];
 const symbolBlocks = symbolSource.trim().split(/\n(?=@@(?:CONTACT|PROFESSIONAL_TITLE|SUMMARY|RELEVANT_EXPERIENCE|EDUCATION|CERTIFICATIONS|SKILLS)@@)/);
 
 test('preferred symbol markers produce exactly the complete legacy model', () => {
@@ -193,7 +178,7 @@ test('symbol sections can reorder and repeat entries without sorting jobs or oth
 });
 
 test('safe mixed symbol and legacy controls retain case/whitespace and line-ending tolerance', () => {
-  const mixed = symbolSource.replace('@@CONTACT@@', ' # CONTACT ').replace('@@PROFESSIONAL_TITLE@@', '# professional  title')
+  const mixed = symbolSource.replace('@@PROFESSIONAL_TITLE@@', '# professional  title')
     .replace('@@JOB@@', '## JOB').replace('@@EDUCATION@@', '# Education').replace('@@CERTIFICATION@@', '## Certification')
     .replace('@@SUMMARY@@', '  @@summary@@  ').replace(/\n/g, '\r\n');
   assert.deepEqual(parseResume(mixed), parseResume(source));
@@ -214,7 +199,6 @@ for (const marker of symbolSections) {
 }
 
 test('symbol format keeps required fields and rejects malformed or wrong entry boundaries', () => {
-  rejected(symbolSource.replace('Name: Alex Morgan', 'Name:  '), 'Add your name');
   rejected(symbolSource.replace('Issuer: Example Learning Institute', 'Issuer:  '), 'Add issuer');
   rejected(symbolSource.replace('Languages: JavaScript, TypeScript, Python, SQL', 'Languages:'), 'Add a skill category');
   rejected(symbolSource.replace('@@EDUCATION_ENTRY@@', '@@JOB@@'), 'Start each education entry with @@EDUCATION_ENTRY@@');
@@ -231,13 +215,11 @@ test('unknown/malformed/start-of-line symbol controls never silently become pros
 });
 
 test('inline symbol-looking content remains literal in values, summary, bullets and skills', () => {
-  const input = symbolSource.replace('Name: Alex Morgan', 'Name: Alex @@ Morgan')
-    .replace('Product-focused engineer', 'Explained @@PLACEHOLDER@@ tokens. Product-focused engineer')
+  const input = symbolSource.replace('Product-focused engineer', 'Explained @@PLACEHOLDER@@ tokens. Product-focused engineer')
     .replace('- Improved release reliability with focused automated checks.', '- Explained @@JOB@@ tokens without changing them.')
     .replace('Languages: JavaScript, TypeScript, Python, SQL', 'Languages: JavaScript, @@EXAMPLE@@, JavaScript');
   const result = parseResume(input);
   assert.equal(result.ok, true, JSON.stringify(result.errors));
-  assert.equal(result.resume.name, 'Alex @@ Morgan');
   assert.ok(result.resume.summary.startsWith('Explained @@PLACEHOLDER@@ tokens.'));
   assert.equal(result.resume.jobs[0].bullets[1], 'Explained @@JOB@@ tokens without changing them.');
   assert.equal(result.resume.skills[0].items, 'JavaScript, @@EXAMPLE@@, JavaScript');
@@ -280,3 +262,10 @@ test('unmarked resumes and missing entry controls get concise errors without hea
   const preamble = rejected('A name\nA contact detail\nMore commentary\n' + symbolSource, 'section marker');
   assert.equal(preamble.errors.length, 1);
 });
+
+for (const heading of ['@@CONTACT@@', '# Contact', ' # CONTACT ']) {
+  test(`old contact section requires explicit migration: ${heading}`, () => {
+    const result = rejected(`${heading}\nName: Alex Morgan\nContact: private example\n${source}`, 'Move contact details into the fields above');
+    assert.equal(result.errors[0].line, 1);
+  });
+}

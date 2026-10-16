@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { resumeFilename } from '../download-filename.ts';
+import { assembleResume } from '../resume/contact.ts';
 import { parseResume } from '../resume/parse.ts';
-import type { ValidationError } from '../resume/types.ts';
+import type { ContactFields, ValidationError } from '../resume/types.ts';
 import { loadBrowserFonts } from '../pdf/fonts.ts';
 import { createPdfBytes } from '../pdf/render.ts';
 
@@ -9,7 +10,7 @@ export interface PdfArtifact { url: string; filename: string }
 export type GenerationState =
   | { phase: 'idle' }
   | { phase: 'generating' }
-  | { phase: 'error'; errors: ValidationError[]; invalidInput: boolean }
+  | { phase: 'error'; errors: ValidationError[]; invalidInput: boolean; invalidName?: boolean }
   | { phase: 'ready'; artifact: PdfArtifact };
 
 /** Own pending work and its Blob URL; edits and lifecycle cleanup invalidate both. */
@@ -53,13 +54,14 @@ export function useResumePdf() {
     };
   }, []);
 
-  async function generate(source: string, company: string) {
+  async function generate(source: string, company: string, contact: ContactFields) {
     if (busy.current || !active.current) return;
     const submissionRevision = ++revision.current;
     revokeArtifact();
     const parsed = parseResume(source);
-    if (!parsed.ok) {
-      setState({ phase: 'error', errors: parsed.errors, invalidInput: true });
+    if (!parsed.ok || !contact.fullName.trim()) {
+      const errors = [...(!contact.fullName.trim() ? [{ message: 'Enter your Full Name in the contact fields above before creating a PDF.', line: null }] : []), ...(!parsed.ok ? parsed.errors : [])];
+      setState({ phase: 'error', errors, invalidInput: !parsed.ok, invalidName: !contact.fullName.trim() });
       setStatus('Check the details above, then create your PDF again.');
       return;
     }
@@ -80,7 +82,7 @@ export function useResumePdf() {
         throw new Error('PDF creation could not be loaded. Copy your resume somewhere safe, reload Applicable, then paste it back and try again.');
       }
       if (!isCurrent()) return;
-      const bytes = await createPdfBytes(parsed.resume, pdfMake, loadedFonts);
+      const bytes = await createPdfBytes(assembleResume(parsed.resume, contact), pdfMake, loadedFonts);
       if (!isCurrent()) return;
       const url = URL.createObjectURL(new Blob([bytes.slice().buffer], { type: 'application/pdf' }));
       currentUrl.current = url;
