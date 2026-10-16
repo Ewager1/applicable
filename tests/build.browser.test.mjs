@@ -80,6 +80,155 @@ async function artifactUrls(page) {
   });
 }
 
+test('editor clipboard reads only on activation and protects existing text', async (t) => {
+  const page = await openPage(t);
+  await page.evaluate((text) => {
+    window.clipboardReads = 0;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        readText: async () => {
+          window.clipboardReads++;
+          return text;
+        },
+      },
+    });
+  }, source);
+  const input = page.getByLabel('Resume text', { exact: true });
+  const paste = page.getByRole('button', { name: 'Paste from clipboard', exact: true });
+  assert.equal(await page.evaluate(() => window.clipboardReads), 0);
+  await paste.focus();
+  await paste.press('Enter');
+  await page.waitForFunction((text) => document.querySelector('#resume').value === text, source);
+  assert.equal(await page.evaluate(() => window.clipboardReads), 1);
+  assert.equal(await input.evaluate((el) => el === document.activeElement), true);
+  assert.equal(await paste.count(), 0);
+  assert.equal(await page.getByRole('button', { name: 'Try an example', exact: true }).count(), 0);
+  await input.fill('   ');
+  assert.equal(await paste.count(), 0, 'Whitespace remains protected user work');
+  assert.equal(await page.evaluate(() => window.clipboardReads), 1);
+});
+
+test('mobile example is reversible until edited and generates the canonical resume PDF', async (t) => {
+  const page = await openPage(t, { viewport: { width: 320, height: 900 } });
+  const example = page.getByRole('button', { name: 'Try an example', exact: true });
+  const remove = page.getByRole('button', { name: 'Remove example', exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
+  const downloads = [];
+  page.on('download', (download) => downloads.push(download));
+  await example.focus();
+  await example.press('Enter');
+  assert.equal(await input.inputValue(), source);
+  assert.equal(await input.evaluate((el) => el === document.activeElement), true);
+  assert.equal(downloads.length, 0, 'Loading an example does not submit it');
+  const download = page.waitForEvent('download');
+  await input.press('Control+Enter');
+  const pdf = await readPdf(await download);
+  assert.ok(pdf.text.includes(compact(parsedExample.name)));
+  assert.equal(downloads.length, 1);
+  await remove.focus();
+  await remove.press('Enter');
+  assert.equal(await input.inputValue(), '');
+  assert.equal(await input.evaluate((el) => el === document.activeElement), true);
+  assert.equal(await page.locator('#result').isVisible(), false);
+  assert.equal(await page.locator('#preview').getAttribute('src'), null);
+  await example.click();
+  await input.fill(source + '\nMy edit');
+  assert.equal(await remove.count(), 0, 'Example removal cannot discard edited work');
+  assert.equal(await example.count(), 0);
+  assert.equal(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    true,
+  );
+});
+
+for (const mode of ['unavailable', 'denied', 'empty']) {
+  test(`editor ${mode} clipboard access offers manual recovery without losing text`, async (t) => {
+    const page = await openPage(t, { viewport: { width: 320, height: 900 } });
+    await page.evaluate((mode) => {
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value:
+          mode === 'unavailable'
+            ? undefined
+            : {
+                readText: async () => {
+                  if (mode === 'denied') throw new Error('Denied');
+                  return ' \n\t ';
+                },
+              },
+      });
+    }, mode);
+    const input = page.getByLabel('Resume text', { exact: true });
+    await page.getByRole('button', { name: 'Paste from clipboard', exact: true }).click();
+    const status = page.locator('.editor-clipboard-status');
+    await page.waitForFunction(
+      () => document.querySelector('.editor-clipboard-status').textContent.length > 0,
+    );
+    assert.match(
+      await status.textContent(),
+      mode === 'empty' ? /clipboard has no text/ : /Paste directly into Resume text/,
+    );
+    assert.equal(await input.inputValue(), '');
+    assert.equal(await input.evaluate((el) => el === document.activeElement), true);
+    assert.equal(await status.getAttribute('role'), 'status');
+    await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
+    await page.locator('#error-summary').waitFor();
+    assert.equal(await page.locator('#result').isVisible(), false);
+    await input.fill(source);
+    assert.equal(await status.textContent(), '');
+    assert.equal(await input.inputValue(), source);
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      true,
+    );
+  });
+}
+
+test('pending editor clipboard reads cannot overwrite edits, examples, newer requests or hidden views', async (t) => {
+  const page = await openPage(t);
+  await page.evaluate(() => {
+    window.pendingReads = [];
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        readText: () =>
+          new Promise((resolve, reject) => window.pendingReads.push({ resolve, reject })),
+      },
+    });
+  });
+  const input = page.getByLabel('Resume text', { exact: true });
+  const paste = page.getByRole('button', { name: 'Paste from clipboard', exact: true });
+  await paste.click();
+  await paste.click();
+  await page.evaluate(() => window.pendingReads[0].resolve('Old request'));
+  assert.equal(await input.inputValue(), '');
+  await page.evaluate(() => window.pendingReads[1].resolve('Current request'));
+  await page.waitForFunction(() => document.querySelector('#resume').value === 'Current request');
+  await input.fill('');
+  await paste.click();
+  await input.fill('My draft');
+  await page.evaluate(() => window.pendingReads[2].resolve('Stale replacement'));
+  assert.equal(await input.inputValue(), 'My draft');
+  await input.fill('');
+  await paste.click();
+  await page.getByRole('button', { name: 'Try an example', exact: true }).click();
+  await page.evaluate(() => window.pendingReads[3].resolve('Stale replacement'));
+  assert.equal(await input.inputValue(), source);
+  await page.getByRole('button', { name: 'Remove example', exact: true }).click();
+  await paste.click();
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
+  await page.evaluate(() => window.pendingReads[4].resolve('Hidden replacement'));
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'job-finder-tab');
+  await page.getByRole('tab', { name: 'Resume PDF Maker', exact: true }).click();
+  assert.equal(await input.inputValue(), '');
+  await paste.click();
+  await input.fill('Edited after request');
+  await page.evaluate(() => window.pendingReads[5].reject(new Error('Late denial')));
+  assert.equal(await input.inputValue(), 'Edited after request');
+  assert.equal(await page.locator('.editor-clipboard-status').textContent(), '');
+});
+
 for (const width of [320, 1280]) {
   test(`PDF workspace shows empty, generated and invalidated states at ${width}px`, async (t) => {
     const page = await openPage(t, { viewport: { width, height: 900 } });

@@ -91,6 +91,21 @@ test('StrictMode cancels unmounted work, delivers once after remount and revokes
     });
     try {
       await page.goto(origin);
+      await page.evaluate(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+          value: {
+            readText: () =>
+              new Promise((resolve) => {
+                window.resolveEditorPaste = resolve;
+              }),
+          },
+        });
+      });
+      await page.getByRole('button', { name: 'Paste from clipboard', exact: true }).click();
+      await page.evaluate(() => window.unmountApp());
+      await page.evaluate(() => window.resolveEditorPaste('Unmounted replacement'));
+      await page.evaluate(() => window.mountApp());
+      assert.equal(await page.getByLabel('Resume text', { exact: true }).inputValue(), '');
       await page.getByLabel('Resume text', { exact: true }).fill(source);
       const requested = page.waitForRequest(/SourceSans3-Regular\.ttf/);
       await page.getByRole('button', { name: 'Create PDF', exact: true }).click();

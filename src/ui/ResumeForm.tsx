@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import exampleResume from '../../examples/resume.txt?raw';
 import type { GenerationState } from './useResumePdf.ts';
 import { ErrorSummary } from './Feedback.tsx';
 
@@ -12,7 +13,43 @@ interface Props {
 export function ResumeForm({ visible, source, state, onSourceChange, onSubmit }: Props) {
   const input = useRef<HTMLTextAreaElement>(null);
   const form = useRef<HTMLFormElement>(null);
+  const clipboardRevision = useRef(0);
+  const [clipboardStatus, setClipboardStatus] = useState('');
+  const [exampleLoaded, setExampleLoaded] = useState(false);
   const generating = state.phase === 'generating';
+  function updateSource(value: string, isExample = false) {
+    clipboardRevision.current += 1;
+    setClipboardStatus('');
+    setExampleLoaded(isExample);
+    onSourceChange(value);
+  }
+  async function pasteFromClipboard() {
+    clipboardRevision.current += 1;
+    const request = clipboardRevision.current;
+    setClipboardStatus('');
+    let text: string;
+    try {
+      if (typeof navigator.clipboard?.readText !== 'function') {
+        setClipboardStatus('Clipboard access is unavailable. Paste directly into Resume text.');
+        input.current?.focus();
+        return;
+      }
+      text = await navigator.clipboard.readText();
+    } catch {
+      if (request !== clipboardRevision.current) return;
+      setClipboardStatus('Couldn’t read the clipboard. Paste directly into Resume text.');
+      input.current?.focus();
+      return;
+    }
+    // Edits, example actions, newer reads, hiding and unmounting cancel pending replacement.
+    if (request !== clipboardRevision.current) return;
+    if (!text.trim()) {
+      setClipboardStatus('The clipboard has no text. Paste your resume or try an example.');
+    } else {
+      updateSource(text);
+    }
+    input.current?.focus();
+  }
   const errors = state.phase === 'error' ? state.errors : undefined;
   useLayoutEffect(() => {
     function resize() {
@@ -22,7 +59,11 @@ export function ResumeForm({ visible, source, state, onSourceChange, onSubmit }:
     }
     resize();
     window.addEventListener('resize', resize);
-    return () => window.removeEventListener('resize', resize);
+    return () => {
+      window.removeEventListener('resize', resize);
+      // A hidden, changed or unmounted editor must not receive a delayed clipboard read.
+      clipboardRevision.current += 1;
+    };
   }, [source, visible]);
   return (
     <form
@@ -43,6 +84,51 @@ export function ResumeForm({ visible, source, state, onSourceChange, onSubmit }:
           </p>
         </div>
       </div>
+      {source === '' && (
+        <div className="editor-starting-actions">
+          <button
+            className="secondary"
+            type="button"
+            disabled={generating}
+            onClick={() => void pasteFromClipboard()}
+          >
+            Paste from clipboard
+          </button>
+          <button
+            className="secondary"
+            type="button"
+            disabled={generating}
+            onClick={() => {
+              updateSource(exampleResume, true);
+              input.current?.focus();
+            }}
+          >
+            Try an example
+          </button>
+        </div>
+      )}
+      {exampleLoaded && source === exampleResume && (
+        <div className="editor-starting-actions">
+          <button
+            className="secondary"
+            type="button"
+            onClick={() => {
+              updateSource('');
+              input.current?.focus();
+            }}
+          >
+            Remove example
+          </button>
+        </div>
+      )}
+      <p
+        className="editor-clipboard-status status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {clipboardStatus}
+      </p>
       <ErrorSummary errors={errors} />
       <textarea
         ref={input}
@@ -52,9 +138,9 @@ export function ResumeForm({ visible, source, state, onSourceChange, onSubmit }:
         aria-invalid={state.phase === 'error' && state.invalidInput ? true : undefined}
         aria-describedby={errors ? 'resume-help error-summary' : 'resume-help'}
         spellCheck={false}
-        placeholder="Paste the complete resume text from your chatbot here…"
+        placeholder="Paste your Applicable-formatted resume to get started."
         value={source}
-        onChange={(event) => onSourceChange(event.target.value)}
+        onChange={(event) => updateSource(event.target.value)}
         onKeyDown={(event) => {
           if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
             event.preventDefault();
