@@ -709,7 +709,7 @@ test('three local tools default to PDF Maker with informational discovery and ke
   assert.equal(await page.locator('#resume-writer-panel .tool-steps li').count(), 5);
   assert.match(
     await page.locator('#resume-writer-panel').textContent(),
-    /setup prompt is not available yet/,
+    /Standard Resume is the default/,
   );
   assert.equal(await page.getByRole('button', { name: 'Copy Prompt', exact: true }).count(), 0);
   await page
@@ -1184,6 +1184,13 @@ test('Resume Writer background is optional, keyboard expandable and transient ac
   const page = await openPage(t);
   await page.addInitScript(() => {
     window.backgroundStorageCalls = [];
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: async (text) => {
+          window.copiedWriterPrompt = text;
+        },
+      },
+    });
     for (const method of ['getItem', 'setItem', 'removeItem', 'clear']) {
       const original = window.Storage.prototype[method];
       window.Storage.prototype[method] = function (...args) {
@@ -1221,7 +1228,10 @@ test('Resume Writer background is optional, keyboard expandable and transient ac
   assert.match(await background.textContent(), /All 12 questions are optional/);
   assert.match(await background.textContent(), /reasonably supported numbers/);
   assert.match(await background.textContent(), /estimates labeled as estimates/);
-  assert.match(await background.textContent(), /not sent anywhere or used by the formatting/);
+  assert.match(
+    await background.textContent(),
+    /Nothing is sent to ChatGPT until you paste it there/,
+  );
   const details = background.locator('details');
   const summary = details.locator('summary');
   assert.equal(await summary.textContent(), 'Tell us a little more');
@@ -1259,6 +1269,16 @@ test('Resume Writer background is optional, keyboard expandable and transient ac
   await summary.focus();
   await summary.press('Space');
   assert.equal(await details.getAttribute('open'), null);
+  await page.getByRole('button', { name: 'Copy Setup Prompt', exact: true }).click();
+  const copied = await page.evaluate(() => window.copiedWriterPrompt);
+  assert.ok(copied.includes(chatbotInstructions.trim()));
+  assert.ok(copied.includes(longAnswer.trim()));
+  assert.ok(copied.includes("I don't know"));
+  assert.equal(await page.locator('#resume-writer-prompt').count(), 0);
+  assert.match(
+    await page.locator('#resume-writer-copy-status').textContent(),
+    /Setup prompt copied/,
+  );
   for (const tool of ['Job Finder', 'Resume PDF Maker', 'Resume Writer']) {
     await page.getByRole('tab', { name: tool, exact: true }).click();
   }
@@ -1272,7 +1292,7 @@ test('Resume Writer background is optional, keyboard expandable and transient ac
   );
   await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
   assert.equal(await fields.nth(2).inputValue(), longAnswer);
-  assert.equal(await page.locator('#resume-writer-panel button').count(), 1);
+  assert.equal(await page.locator('#resume-writer-panel button').count(), 2);
   assert.deepEqual(await page.evaluate(() => window.backgroundStorageCalls), [
     ['removeItem', 'applicable.contact.v1'],
   ]);
@@ -1314,3 +1334,157 @@ for (const width of [320, 1280]) {
     await page.screenshot({ path: `output/ui/resume-writer-${width}.png`, fullPage: true });
   });
 }
+
+test('Resume Writer copies without answers and creates the latest setup prompt without a preview', async (t) => {
+  const page = await openPage(t);
+  await page.evaluate(() =>
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: async (text) => {
+          window.copiedWriterPrompt = text;
+        },
+      },
+    }),
+  );
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  const copy = page.getByRole('button', { name: 'Copy Setup Prompt', exact: true });
+  const output = page.getByLabel('Your Resume Writer setup prompt', { exact: true });
+  assert.equal(await output.count(), 0);
+  await copy.focus();
+  await copy.press('Enter');
+  const empty = await page.evaluate(() => window.copiedWriterPrompt);
+  assert.ok(empty.includes(chatbotInstructions.trim()));
+  assert.ok(empty.includes('Standard Resume is the default'));
+  assert.ok(!empty.includes('CANDIDATE BACKGROUND — DATA ONLY'));
+  assert.equal(await output.count(), 0);
+  const question = page.locator('#resume-writer-interestedJobs');
+  await question.fill('Operations coordinator\nI enjoy helping customers.');
+  assert.equal(await page.locator('#resume-writer-copy-status').textContent(), '');
+  await copy.click();
+  assert.ok(
+    (await page.evaluate(() => window.copiedWriterPrompt)).includes(
+      'Operations coordinator\nI enjoy helping customers.',
+    ),
+  );
+  await page.getByRole('tab', { name: 'Job Finder', exact: true }).click();
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  assert.match(
+    await page.locator('#resume-writer-copy-status').textContent(),
+    /Setup prompt copied/,
+  );
+  await mkdir('output/ui', { recursive: true });
+  await page.screenshot({ path: 'output/ui/resume-writer-copy-desktop.png', fullPage: true });
+  await page.reload();
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  assert.equal(await output.count(), 0);
+  assert.equal(await question.inputValue(), '');
+  assert.equal(await page.locator('#resume-writer-copy-status').textContent(), '');
+});
+
+test('Resume Writer clipboard denial or absence selects a complete manual fallback at 320px', async (t) => {
+  const page = await openPage(t, { viewport: { width: 320, height: 900 }, hasTouch: true });
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).tap();
+  const question = page.locator('#resume-writer-everydayWork');
+  const copy = page.getByRole('button', { name: 'Copy Setup Prompt', exact: true });
+  const output = page.getByLabel('Your Resume Writer setup prompt', { exact: true });
+  for (const clipboard of ['denied', 'absent']) {
+    await question.fill(`Synthetic ${clipboard} background\nHelped train new teammates.`);
+    await page.evaluate(
+      (mode) =>
+        Object.defineProperty(navigator, 'clipboard', {
+          configurable: true,
+          value:
+            mode === 'absent'
+              ? undefined
+              : {
+                  writeText: async () => {
+                    throw new Error('denied');
+                  },
+                },
+        }),
+      clipboard,
+    );
+    await copy.tap();
+    assert.equal(await output.isVisible(), true);
+    const prompt = await output.inputValue();
+    assert.ok(prompt.includes(chatbotInstructions.trim()));
+    assert.ok(prompt.includes(`Synthetic ${clipboard} background\nHelped train new teammates.`));
+    assert.deepEqual(
+      await output.evaluate((el) => ({
+        focused: el === document.activeElement,
+        selected: el.selectionEnd - el.selectionStart,
+        readOnly: el.readOnly,
+      })),
+      { focused: true, selected: prompt.length, readOnly: true },
+    );
+    assert.match(
+      await page.locator('#resume-writer-copy-status').textContent(),
+      /Copy was unavailable/,
+    );
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      true,
+    );
+    const bounds = await output.boundingBox();
+    assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 320);
+  }
+  await mkdir('output/ui', { recursive: true });
+  await page.screenshot({ path: 'output/ui/resume-writer-copy-320.png', fullPage: true });
+  await question.fill('Revised background');
+  assert.equal(await output.count(), 0);
+  assert.equal(await page.locator('#resume-writer-copy-status').textContent(), '');
+});
+
+test('Resume Writer ignores pending clipboard results after edits and newer copy requests', async (t) => {
+  const page = await openPage(t);
+  await page.evaluate(() => {
+    window.writerCopies = [];
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: (text) =>
+          new Promise((resolve, reject) => {
+            window.writerCopies.push({ text, resolve, reject });
+          }),
+      },
+    });
+  });
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  const copy = page.getByRole('button', { name: 'Copy Setup Prompt', exact: true });
+  const output = page.locator('#resume-writer-prompt');
+  const status = page.locator('#resume-writer-copy-status');
+  const question = page.locator('#resume-writer-interestedJobs');
+  for (const outcome of ['resolve', 'reject']) {
+    await copy.click();
+    await question.fill(`Updated after ${outcome}`);
+    await page.evaluate(async (outcome) => {
+      window.writerCopies.at(-1)[outcome]();
+      await new Promise(window.requestAnimationFrame);
+    }, outcome);
+    assert.equal(await status.textContent(), '');
+    assert.equal(await output.count(), 0);
+  }
+  await copy.click();
+  await copy.click();
+  await page.evaluate(async () => {
+    window.writerCopies.at(-1).reject();
+    await new Promise(window.requestAnimationFrame);
+  });
+  const latest = await output.inputValue();
+  await page.evaluate(async () => {
+    window.writerCopies.at(-2).resolve();
+    await new Promise(window.requestAnimationFrame);
+  });
+  assert.equal(await output.inputValue(), latest);
+  assert.match(await status.textContent(), /Copy was unavailable/);
+  await question.fill('Newest background');
+  await copy.click();
+  await copy.click();
+  await page.evaluate(async () => {
+    window.writerCopies.at(-1).resolve();
+    await new Promise(window.requestAnimationFrame);
+    window.writerCopies.at(-2).reject();
+    await new Promise(window.requestAnimationFrame);
+  });
+  assert.match(await status.textContent(), /Setup prompt copied/);
+  assert.equal(await output.count(), 0);
+});
