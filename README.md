@@ -60,7 +60,7 @@ GitHub Actions is configured to run the same checks on pull requests to `main` a
 
 ## Using Applicable
 
-Resume PDF Maker opens by default. Switch between the three tabs with a click or tap, or use Left/Right arrows, Home and End while a tab has keyboard focus. Your answers, pasted text, validation and current PDF survive tool switches; reloading clears them. The introduction includes an expandable personal story.
+Resume PDF Maker opens by default. Switch between the three tabs with a click or tap, or use Left/Right arrows, Home and End while a tab has keyboard focus. Your answers, pasted text, validation and current PDF survive tool switches; reloading clears them. The tagline leads into one workspace connecting the tabs with the selected tool.
 
 ### Job Finder
 

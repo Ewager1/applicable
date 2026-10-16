@@ -41,112 +41,98 @@ export function App() {
           Applicable<span aria-hidden="true">.</span>
         </a>
       </header>
-      <section className="homepage-intro" aria-labelledby="home-title">
-        <h1 id="home-title">Job searching takes enough time already.</h1>
-        <p>
-          I built Applicable to help you find better opportunities, tailor your resume, and create
-          professional PDFs.
-        </p>
-        <p>
-          <strong>Use one tool or all three in conjunction.</strong>
-        </p>
-        <details>
-          <summary>Why I built Applicable</summary>
-          <p>
-            After spending months looking for work, I kept running into the same problems. Finding
-            legitimate jobs that actually matched my experience took time. Tailoring my resume for
-            each opportunity took even more time. Then I still had to format everything before I
-            could apply. I built Applicable to make that process easier.
+      <h1 className="tagline">Find better jobs. Apply faster.</h1>
+      <div className="workspace">
+        <div className="view-tabs" role="tablist" aria-label="Applicable views">
+          {views.map(({ id, label }, index) => (
+            <button
+              key={id}
+              ref={(element) => {
+                tabs.current[id] = element;
+              }}
+              id={`${id}-tab`}
+              type="button"
+              role="tab"
+              aria-selected={view === id}
+              aria-controls={`${id}-panel`}
+              tabIndex={view === id ? 0 : -1}
+              onClick={() => setView(id)}
+              onKeyDown={(event) => {
+                let next;
+                if (event.key === 'ArrowRight') next = views[(index + 1) % views.length];
+                if (event.key === 'ArrowLeft')
+                  next = views[(index + views.length - 1) % views.length];
+                if (event.key === 'Home') next = views[0];
+                if (event.key === 'End') next = views[views.length - 1];
+                if (next) {
+                  event.preventDefault();
+                  selectView(next.id);
+                }
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div
+          ref={builderPanel}
+          id="builder-panel"
+          role="tabpanel"
+          aria-labelledby="builder-tab"
+          hidden={view !== 'builder'}
+          tabIndex={0}
+        >
+          <section className="intro" aria-labelledby="page-title">
+            <h2 id="page-title">Turn your resume into a polished PDF.</h2>
+            <p>Paste your resume in Applicable Format to create a PDF.</p>
+          </section>
+          <ChatbotInstructions />
+          <ResumeForm
+            visible={view === 'builder'}
+            source={source}
+            state={state}
+            onSourceChange={(value) => {
+              invalidate('Resume updated. Create a PDF when you’re ready.');
+              setSource(value);
+            }}
+            onSubmit={() => void generate(source)}
+          />
+          <Status message={status} />
+          <PdfResult artifact={state.phase === 'ready' ? state.artifact : undefined} />
+        </div>
+        <div
+          id="job-finder-panel"
+          role="tabpanel"
+          aria-labelledby="job-finder-tab"
+          hidden={view !== 'job-finder'}
+          tabIndex={0}
+        >
+          <section className="intro" aria-labelledby="job-finder-title">
+            <h2 id="job-finder-title">Find jobs that fit you.</h2>
+            <p>
+              Create a personalized ChatGPT job search based on your experience and preferences.
+            </p>
+          </section>
+          <p className="tool-guidance">
+            Answer the optional questions below, then copy your prompt into a new ChatGPT
+            conversation. Upload your existing resumes there to get started.
           </p>
-        </details>
-      </section>
-      <div className="view-tabs" role="tablist" aria-label="Applicable views">
-        {views.map(({ id, label }, index) => (
-          <button
-            key={id}
-            ref={(element) => {
-              tabs.current[id] = element;
+          <JobFinderSetup />
+        </div>
+        <div
+          id="resume-writer-panel"
+          role="tabpanel"
+          aria-labelledby="resume-writer-tab"
+          hidden={view !== 'resume-writer'}
+          tabIndex={0}
+        >
+          <ResumeWriter
+            onFormatHelp={() => {
+              formatHelpRequested.current = true;
+              selectView('builder');
             }}
-            id={`${id}-tab`}
-            type="button"
-            role="tab"
-            aria-selected={view === id}
-            aria-controls={`${id}-panel`}
-            tabIndex={view === id ? 0 : -1}
-            onClick={() => setView(id)}
-            onKeyDown={(event) => {
-              let next;
-              if (event.key === 'ArrowRight') next = views[(index + 1) % views.length];
-              if (event.key === 'ArrowLeft')
-                next = views[(index + views.length - 1) % views.length];
-              if (event.key === 'Home') next = views[0];
-              if (event.key === 'End') next = views[views.length - 1];
-              if (next) {
-                event.preventDefault();
-                selectView(next.id);
-              }
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <div
-        ref={builderPanel}
-        id="builder-panel"
-        role="tabpanel"
-        aria-labelledby="builder-tab"
-        hidden={view !== 'builder'}
-        tabIndex={0}
-      >
-        <section className="intro" aria-labelledby="page-title">
-          <h2 id="page-title">Turn your resume into a polished PDF.</h2>
-          <p>Paste your resume in Applicable Format to create a PDF.</p>
-        </section>
-        <ChatbotInstructions />
-        <ResumeForm
-          visible={view === 'builder'}
-          source={source}
-          state={state}
-          onSourceChange={(value) => {
-            invalidate('Resume updated. Create a PDF when you’re ready.');
-            setSource(value);
-          }}
-          onSubmit={() => void generate(source)}
-        />
-        <Status message={status} />
-        <PdfResult artifact={state.phase === 'ready' ? state.artifact : undefined} />
-      </div>
-      <div
-        id="job-finder-panel"
-        role="tabpanel"
-        aria-labelledby="job-finder-tab"
-        hidden={view !== 'job-finder'}
-        tabIndex={0}
-      >
-        <section className="intro" aria-labelledby="job-finder-title">
-          <h2 id="job-finder-title">Find jobs that fit you.</h2>
-          <p>Create a personalized ChatGPT job search based on your experience and preferences.</p>
-        </section>
-        <p className="tool-guidance">
-          Answer the optional questions below, then copy your prompt into a new ChatGPT
-          conversation. Upload your existing resumes there to get started.
-        </p>
-        <JobFinderSetup />
-      </div>
-      <div
-        id="resume-writer-panel"
-        role="tabpanel"
-        aria-labelledby="resume-writer-tab"
-        hidden={view !== 'resume-writer'}
-        tabIndex={0}
-      >
-        <ResumeWriter
-          onFormatHelp={() => {
-            formatHelpRequested.current = true;
-            selectView('builder');
-          }}
-        />
+          />
+        </div>
       </div>
       <footer>
         Resume text, contact details and target company stay on this page and are not saved or

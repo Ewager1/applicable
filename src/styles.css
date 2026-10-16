@@ -12,7 +12,6 @@
   --border: #e6def0;
   /* Interactive boundaries need more contrast than decorative dividers. */
   --control-border: #8c809d;
-  --form-shadow: 0 6px 24px #241b3508;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text-primary);
   background: var(--page-background);
@@ -60,15 +59,25 @@ main {
 }
 
 .intro {
-  padding: 48px 0 30px;
+  padding: 0 0 24px;
 }
 
-h1 {
-  font-size: clamp(38px, 5.5vw, 58px);
+.tagline {
+  font-size: clamp(31px, 4vw, 34px);
   font-weight: 650;
-  letter-spacing: -2.2px;
-  line-height: 1.08;
-  margin: 0 0 20px;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin: 24px 0;
+}
+
+.workspace {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.workspace > [role='tabpanel'] {
+  padding: 24px;
 }
 
 .intro > p:last-child {
@@ -89,11 +98,7 @@ footer {
 
 /* Form controls and shared action rows */
 form {
-  padding: 24px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--form-shadow);
+  padding: 0;
 }
 
 .form-top,
@@ -238,6 +243,8 @@ code {
 }
 
 .secondary {
+  max-width: 100%;
+  white-space: normal;
   background: var(--surface);
   color: var(--accent);
   border: 1px solid var(--control-border);
@@ -295,10 +302,8 @@ pre {
 /* PDF result and download */
 .result {
   margin-top: 26px;
-  padding: 26px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
 }
 
 .result h2 {
@@ -343,18 +348,8 @@ iframe {
     padding: 0 18px;
   }
 
-  .intro {
-    padding: 34px 0 26px;
-  }
-
-  h1 {
-    letter-spacing: -1.6px;
-  }
-
-  form,
-  .result {
-    padding: 18px;
-    border-radius: 11px;
+  .workspace > [role='tabpanel'] {
+    padding: 18px 14px;
   }
 
   .form-top {
@@ -423,9 +418,9 @@ iframe {
 .job-finder-settings {
   min-width: 0;
   margin: 0 0 24px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 16px 0 0;
+  border: 0;
+  border-top: 1px solid var(--border);
 }
 
 .job-finder-setting + .job-finder-setting {
@@ -456,15 +451,31 @@ iframe {
 
 .view-tabs {
   display: flex;
-  flex-basis: 100%;
-  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 14px 14px 0 0;
+  background: var(--page-background);
 }
 
 .view-tabs button {
   flex: 1;
+  min-width: 0;
   color: var(--muted);
   background: transparent;
-  border: 1px solid var(--control-border);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+}
+
+.view-tabs button:first-child {
+  border-top-left-radius: 13px;
+}
+
+.view-tabs button:last-child {
+  border-top-right-radius: 13px;
+}
+
+.view-tabs button:focus-visible {
+  outline-offset: -5px;
 }
 
 .view-tabs button:hover {
@@ -473,38 +484,18 @@ iframe {
 
 .view-tabs button[aria-selected='true'] {
   color: var(--accent-hover);
-  background: var(--accent-soft);
-  border-color: var(--accent);
+  background: var(--surface);
+  border-bottom-color: var(--accent);
 }
 
 .view-tabs button[aria-selected='true']:hover {
   background: var(--accent-soft-hover);
 }
 
-.homepage-intro {
-  padding: 24px 0;
-}
-.homepage-intro h1 {
-  font-size: clamp(31px, 4vw, 34px);
-  letter-spacing: -1px;
-  margin-bottom: 12px;
-}
-.homepage-intro p,
 .tool-guidance {
   color: var(--muted);
   font-size: 14px;
   line-height: 1.65;
-}
-.homepage-intro p {
-  margin: 8px 0;
-}
-.homepage-intro details {
-  max-width: 720px;
-}
-.homepage-intro summary {
-  min-height: 44px;
-  display: list-item;
-  padding: 12px 0;
 }
 .intro h2 {
   font-size: clamp(30px, 5vw, 46px);
@@ -513,10 +504,6 @@ iframe {
   margin: 0 0 18px;
 }
 @media (max-width: 600px) {
-  .view-tabs {
-    gap: 6px;
-  }
-
   .view-tabs button {
     padding: 10px 5px;
     white-space: normal;
