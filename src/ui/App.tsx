@@ -42,38 +42,38 @@ export function App() {
         </a>
         <p className="tagline">Find better jobs. Apply faster.</p>
       </header>
+      <div className="view-tabs" role="tablist" aria-label="Applicable views">
+        {views.map(({ id, label }, index) => (
+          <button
+            key={id}
+            ref={(element) => {
+              tabs.current[id] = element;
+            }}
+            id={`${id}-tab`}
+            type="button"
+            role="tab"
+            aria-selected={view === id}
+            aria-controls={`${id}-panel`}
+            tabIndex={view === id ? 0 : -1}
+            onClick={() => setView(id)}
+            onKeyDown={(event) => {
+              let next;
+              if (event.key === 'ArrowRight') next = views[(index + 1) % views.length];
+              if (event.key === 'ArrowLeft')
+                next = views[(index + views.length - 1) % views.length];
+              if (event.key === 'Home') next = views[0];
+              if (event.key === 'End') next = views[views.length - 1];
+              if (next) {
+                event.preventDefault();
+                selectView(next.id);
+              }
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="workspace">
-        <div className="view-tabs" role="tablist" aria-label="Applicable views">
-          {views.map(({ id, label }, index) => (
-            <button
-              key={id}
-              ref={(element) => {
-                tabs.current[id] = element;
-              }}
-              id={`${id}-tab`}
-              type="button"
-              role="tab"
-              aria-selected={view === id}
-              aria-controls={`${id}-panel`}
-              tabIndex={view === id ? 0 : -1}
-              onClick={() => setView(id)}
-              onKeyDown={(event) => {
-                let next;
-                if (event.key === 'ArrowRight') next = views[(index + 1) % views.length];
-                if (event.key === 'ArrowLeft')
-                  next = views[(index + views.length - 1) % views.length];
-                if (event.key === 'Home') next = views[0];
-                if (event.key === 'End') next = views[views.length - 1];
-                if (next) {
-                  event.preventDefault();
-                  selectView(next.id);
-                }
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
         <div
           ref={builderPanel}
           id="builder-panel"

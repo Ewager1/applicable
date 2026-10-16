@@ -881,7 +881,7 @@ test('contact edits invalidate pending work and revoke completed artifacts', asy
   }
 });
 
-test('three local tools default to PDF Maker in one workspace with keyboard navigation', async (t) => {
+test('three detached tool tabs default to PDF Maker and retain keyboard navigation', async (t) => {
   const page = await openPage(t);
   const builder = page.getByRole('tab', { name: 'Resume PDF Maker', exact: true });
   const finder = page.getByRole('tab', { name: 'Job Finder', exact: true });
@@ -900,6 +900,11 @@ test('three local tools default to PDF Maker in one workspace with keyboard navi
     'Turn your resume into a polished PDF.',
   );
   assert.equal(await page.locator('.workspace > [role="tabpanel"]').count(), 3);
+  assert.equal(
+    await page.getByRole('tablist').evaluate((el) => el.closest('.workspace') === null),
+    true,
+  );
+  assert.equal(await page.locator('.view-tabs + .workspace').count(), 1);
   await builder.press('ArrowRight');
   assert.equal(await finder.getAttribute('aria-selected'), 'true');
   assert.equal(
@@ -1011,7 +1016,7 @@ test('PDF generation continues while guidance is open and the same artifact surv
   }
 });
 
-for (const width of [320, 375, 1280]) {
+for (const width of [320, 375, 768, 1280]) {
   test(`navigation and guidance fit ${width}px with touch or pointer activation`, async (t) => {
     const page = await openPage(t, { viewport: { width, height: 900 }, hasTouch: width < 600 });
     const guide = page.getByRole('tab', { name: 'Job Finder', exact: true });
@@ -1020,6 +1025,13 @@ for (const width of [320, 375, 1280]) {
     const navigation = await page.getByRole('tablist').boundingBox();
     assert.ok(intro.y + intro.height <= navigation.y);
     assert.ok(navigation.y < 350, 'Compact branding keeps tools near the top on mobile');
+    const workspace = await page.locator('.workspace').boundingBox();
+    assert.ok(
+      navigation.y + navigation.height < workspace.y,
+      'Navigation is separated from the working surface',
+    );
+    assert.ok(Math.abs(navigation.x - workspace.x) < 1, 'Navigation aligns with the workspace');
+    assert.ok(Math.abs(navigation.width - workspace.width) < 1);
     for (const tab of [
       guide,
       page.getByRole('tab', { name: 'Resume Writer', exact: true }),
