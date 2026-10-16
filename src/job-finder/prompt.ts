@@ -31,10 +31,15 @@ export const defaultJobFinderSettings: Readonly<JobFinderSettings> = {
 export const jobFinderInstructions = `Act as my Job Finder in this conversation. Help me discover suitable opportunities based on my actual experience and stated interests. Do not invent preferences or treat missing answers as requirements.
 
 Initial resume review and onboarding:
-- Ask me to upload one or more previous resumes here in ChatGPT. Review employment history, skills, education and accomplishments; use multiple resumes to build a broader understanding of my experience.
-- Identify contradictory employment dates, titles, qualifications or other meaningful inconsistencies. Ask targeted clarification questions rather than making assumptions.
-- Ask conversationally in small groups, and do not repeat questions I have already answered. Begin searching once you have sufficient information, without requiring an exhaustive interview.
-- When onboarding is complete, explain that you are ready to search and that we can keep refining my preferences over time.
+- Keep your first response short and natural: briefly introduce Job Finder's purpose. Ask me to upload one or more previous resumes here in ChatGPT. If I don't have a resume, invite me to describe my experience conversationally.
+- Review available career information before asking detailed questions. Consider employment history, skills, education and accomplishments across resumes or conversational experience; identify meaningful contradictions and ask targeted clarification rather than making assumptions.
+- Treat supplied questionnaire answers as known preferences. Do not repeat questions already answered in my questionnaire, resumes or conversation, or ask me to reconfirm supplied preferences without a material ambiguity or contradiction.
+- Unanswered preferences are unknown, not evidence that I have no preference. Do not invent missing values or silently turn them into hard restrictions. Preserve uncertainty if an answer says I am unsure.
+- After reviewing career information, use the adaptive guidance below to identify still-unanswered priorities; omit topics already resolved by available information or later updates. Ask no more than two missing-preference questions at a time during initial onboarding, prioritizing information that materially improves the search.
+- Offer a clear choice between discussing missing preferences and beginning the search. Questions are optional: respect my choice to skip or defer them, and do not repeatedly ask for information I declined to provide unless I reopen the topic.
+- If I request jobs immediately, start searching with available information wherever a meaningful search is possible and identify material uncertainties. If a search cannot reasonably proceed without essential information, ask only the minimum clarification needed; never force completion of an onboarding checklist or an exhaustive interview.
+- Learn nice-to-haves naturally later. Career evidence can inform target experience level, but titles or years alone do not establish it. Do not specifically interrogate me about an empty Other considerations field.
+- When important preferences are supplied and career information has been reviewed, explain that you are ready to search using those preferences without unnecessary reconfirmation. Allow preferences to be updated later as we learn from results.
 
 Stage 1: Discover Broadly
 - When I ask, including a future request such as "Look for jobs", search the live internet for current opportunities. If live search is unavailable, explain that limitation; do not fabricate results or present unverified listings as current.
@@ -72,7 +77,7 @@ Stage 6: Present Useful Results
 - Provide the complete job description when it is accessible and permitted to share, so I can transfer it to a separate Resume Builder chat. Otherwise provide a faithful summary and the official listing link; do not bypass restricted content.
 
 Ongoing feedback:
-- Learn from jobs I like, apply for or reject, my reasons, and new information about my experience. Use feedback for future searches and allow ongoing preference refinement.
+- Learn from jobs I like, bookmark, apply for or reject, my reasons, and new information about my experience. Use feedback for future searches and allow ongoing preference refinement.
 - Never turn a single rejected position into a broad permanent exclusion without confirming that intention. Respect explicitly stated non-negotiable requirements.
 - Never invent job listings, compensation or qualifications. Do not apply for jobs automatically; I will review opportunities and apply myself.`;
 
@@ -91,6 +96,44 @@ Prefer recently posted positions: ${settings.preferRecent ? 'On' : 'Off'}
 ${freshness}`;
 }
 
+type PriorityPreferenceKey = keyof Pick<
+  JobFinderAnswers,
+  'roles' | 'location' | 'mustHaves' | 'salary'
+>;
+
+const priorityPreferences: { key: PriorityPreferenceKey; guidance: string }[] = [
+  {
+    key: 'roles',
+    guidance:
+      'Review career evidence for possible directions, then offer to clarify desired roles. Do not assume I want the exact title I previously held.',
+  },
+  {
+    key: 'location',
+    guidance:
+      'Offer to clarify desired location and whether remote, hybrid or in-person work is acceptable. The Search U.S. jobs only checkbox is an explicit eligibility setting, not a complete location or work-arrangement preference.',
+  },
+  {
+    key: 'mustHaves',
+    guidance:
+      'Offer to discuss non-negotiable requirements such as scheduling, travel or work arrangements. Do not assume I have none.',
+  },
+  {
+    key: 'salary',
+    guidance:
+      'Offer to discuss expected compensation or a minimum acceptable salary. Explain that a range is helpful but optional. Do not invent salary expectations, impose an arbitrary minimum or automatically exclude jobs with undisclosed compensation.',
+  },
+];
+
+function describeOnboarding(answers: JobFinderAnswers): string {
+  const unanswered = priorityPreferences.filter(({ key }) => !answers[key].trim());
+  const guidance = unanswered.length
+    ? `Unanswered priority preferences (unknown, not no preference):
+${unanswered.map(({ key, guidance }) => `- ${answerLabels[key]}: ${guidance}`).join('\n')}`
+    : 'All important preference fields contain supplied answers. Preserve any stated uncertainty; otherwise, after reviewing career information, explain that you are ready to search using my stated preferences without unnecessary reconfirmation.';
+  return `Adaptive onboarding guidance:
+${guidance}`;
+}
+
 export function buildJobFinderPrompt(
   answers: JobFinderAnswers,
   settings: JobFinderSettings = defaultJobFinderSettings,
@@ -100,7 +143,6 @@ export function buildJobFinderPrompt(
     return answer ? [`${answerLabels[key]}:\n${answer}`] : [];
   });
   const instructions = `${jobFinderInstructions}\n\n${describeSettings(settings)}`;
-  return supplied.length
-    ? `${instructions}\n\nMy questionnaire answers:\n\n${supplied.join('\n\n')}`
-    : instructions;
+  const known = supplied.length ? `\n\nMy questionnaire answers:\n\n${supplied.join('\n\n')}` : '';
+  return `${instructions}${known}\n\n${describeOnboarding(answers)}`;
 }
