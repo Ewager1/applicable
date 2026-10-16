@@ -21,8 +21,8 @@ export function ChatbotInstructions() {
     }
   }
   return (
-    <details className="format-help" open>
-      <summary>Start with your chatbot</summary>
+    <details className="format-help">
+      <summary>Need help formatting your resume?</summary>
       <div className="help-content">
         <ol>
           <li>

@@ -8,6 +8,38 @@ import {
   type ResumeWriterAnswers,
 } from '../resume-writer/questions.ts';
 
+// Presentation examples stay separate from the shared prompt questionnaire contract.
+const fieldGuidance: Record<keyof ResumeWriterAnswers, { placeholder: string; help?: string }> = {
+  interestedJobs: { placeholder: 'For example, customer support or office coordination.' },
+  everydayWork: {
+    placeholder: 'For example, repaired equipment and explained repairs to customers.',
+  },
+  accomplishments: {
+    placeholder: 'For example, improved a process, trained coworkers, or helped launch a project.',
+  },
+  measurableResults: {
+    placeholder: 'For example, saved time, fewer errors, or happier customers.',
+    help: 'Only include reasonably supported numbers, and keep estimates labeled as estimates. No numbers is fine too.',
+  },
+  unexplainedSkills: {
+    placeholder: 'For example, tracking deliveries or translating instructions.',
+  },
+  avoidOverstatement: {
+    placeholder: "For example, helped with a website but didn't lead it.",
+    help: 'Distinguish helping from leading, and note limited or outdated qualifications.',
+  },
+  helpingOthers: { placeholder: 'For example, wrote instructions for new coworkers.' },
+  collaboration: {
+    placeholder: 'For example, worked with reception staff to fix scheduling issues.',
+  },
+  leadership: { placeholder: 'For example, guided new teammates or handled shift handoffs.' },
+  familiarCommunities: { placeholder: 'For example, local small businesses or older adults.' },
+  otherExperience: {
+    placeholder: 'For example, volunteering, a school project, or freelance work.',
+  },
+  additionalContext: { placeholder: 'For example, returning to work after caregiving.' },
+};
+
 export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
   const [answers, setAnswers] = useState<ResumeWriterAnswers>(emptyResumeWriterAnswers);
 
@@ -51,16 +83,19 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
   }
 
   function renderQuestions(questions: typeof mainQuestions) {
-    return questions.map(({ key, label, example }) => (
+    return questions.map(({ key, label }) => (
       <div className="resume-writer-field" key={key}>
         <label htmlFor={`resume-writer-${key}`}>
           {label} <span className="optional">(optional)</span>
         </label>
-        <p id={`resume-writer-${key}-example`}>Example: {example}</p>
+        {fieldGuidance[key].help && (
+          <p id={`resume-writer-${key}-help`}>{fieldGuidance[key].help}</p>
+        )}
         <textarea
           id={`resume-writer-${key}`}
           rows={3}
-          aria-describedby={`resume-writer-${key}-example`}
+          placeholder={fieldGuidance[key].placeholder}
+          aria-describedby={fieldGuidance[key].help ? `resume-writer-${key}-help` : undefined}
           value={answers[key]}
           onChange={(event) => {
             clearCopyFeedback();

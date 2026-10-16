@@ -198,8 +198,13 @@ textarea[aria-invalid='true'] {
 /* Format help and validation feedback */
 .format-help {
   border-top: 1px solid var(--border);
-  margin: 0 0 24px;
-  padding-top: 16px;
+  margin: 0 0 18px;
+  padding-top: 12px;
+}
+
+.format-help > summary {
+  min-height: 44px;
+  padding: 10px 0;
 }
 
 summary {
@@ -403,7 +408,6 @@ iframe {
   margin-bottom: 24px;
 }
 
-.job-finder-field p,
 .job-finder-output p {
   margin: 7px 0 10px;
   font-size: 13px;
@@ -532,6 +536,15 @@ iframe {
 .resume-writer-field p {
   margin: 7px 0 10px;
   font-size: 13px;
+}
+
+.job-finder-field textarea,
+.resume-writer-field textarea {
+  margin-top: 10px;
+}
+
+.resume-writer-field p + textarea {
+  margin-top: 0;
 }
 
 .resume-writer-questionnaire textarea {
