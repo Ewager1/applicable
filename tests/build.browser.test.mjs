@@ -80,9 +80,63 @@ async function artifactUrls(page) {
   });
 }
 
+for (const width of [320, 1280]) {
+  test(`PDF workspace shows empty, generated and invalidated states at ${width}px`, async (t) => {
+    const page = await openPage(t, { viewport: { width, height: 900 } });
+    const input = page.getByLabel('Resume text', { exact: true });
+    const empty = page.getByRole('region', { name: 'Document preview', exact: true });
+    const create = page.getByRole('button', { name: 'Create PDF', exact: true });
+    assert.equal(await empty.isVisible(), true);
+    assert.equal(await page.locator('#result').isVisible(), false);
+    assert.equal(await page.locator('#preview').getAttribute('src'), null);
+    assert.equal(await page.locator('.format-help').getAttribute('open'), null);
+    const editorBounds = await page.locator('.resume-editor').boundingBox();
+    const previewBounds = await empty.boundingBox();
+    if (width > 900) {
+      assert.ok(previewBounds.x >= editorBounds.x + editorBounds.width);
+      assert.equal(previewBounds.y, editorBounds.y);
+    } else {
+      assert.ok(previewBounds.y >= editorBounds.y + editorBounds.height);
+    }
+    const textareaBounds = await input.boundingBox();
+    const actionBounds = await create.boundingBox();
+    assert.ok(actionBounds.y >= textareaBounds.y + textareaBounds.height);
+    await input.fill(source);
+    await readPdf(await submit(page));
+    assert.equal(await empty.isVisible(), false);
+    assert.equal(await page.locator('#result').isVisible(), true);
+    assert.equal(await page.locator('#preview').isVisible(), true);
+    assert.equal(
+      await page.locator('#result-title').evaluate((el) => el === document.activeElement),
+      true,
+    );
+    assert.equal(
+      await page.locator('#download').getAttribute('href'),
+      await page.locator('#preview').getAttribute('src'),
+    );
+    const downloadBounds = await page.locator('#download').boundingBox();
+    const frameBounds = await page.locator('#preview').boundingBox();
+    assert.ok(downloadBounds.y + downloadBounds.height <= frameBounds.y);
+    await input.fill(source + '\n');
+    assert.equal(await empty.isVisible(), true);
+    assert.equal(await page.locator('#result').isVisible(), false);
+    assert.equal(await page.locator('#download').getAttribute('href'), null);
+    assert.equal(await page.locator('#preview').getAttribute('src'), null);
+    await input.fill('Unformatted text');
+    await create.click();
+    await page.locator('#error-summary').waitFor();
+    assert.equal(await empty.isVisible(), true);
+    assert.equal(await input.inputValue(), 'Unformatted text');
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      true,
+    );
+  });
+}
+
 test('optional company names automatic and repeat downloads without entering PDF content', async (t) => {
   const page = await openPage(t);
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   await input.fill(source);
   const blank = await readPdf(await submit(page));
   await input.fill(withCompany(source, '  Société / West: Team?  '));
@@ -125,7 +179,7 @@ test('company edits during generation discard obsolete names and allow corrected
     await held;
     await route.continue();
   });
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   const downloads = [];
   page.on('download', (download) => downloads.push(download));
   try {
@@ -195,7 +249,7 @@ test('clipboard denial exposes focused complete instructions without changing th
     }),
   );
   await page.reload();
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   await input.fill(source);
   await page.getByText('Need help formatting your resume?', { exact: true }).click();
   await page.getByRole('button', { name: 'Copy chatbot instructions', exact: true }).click();
@@ -212,7 +266,7 @@ test('clipboard denial exposes focused complete instructions without changing th
 // This replaces the shell smoke test: exercise the built application end to end.
 test('symbol markers and an outer text code block export complete ordered PDF content after correction', async (t) => {
   const page = await openPage(t);
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   const invalid = source.replace(
     /@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/,
     '@@EDUCATION@@\n\n',
@@ -299,13 +353,15 @@ test('without native PDF viewing, one download is delivered with a usable fallba
   const page = await openPage(t, { pdfViewer: false });
   const downloads = [];
   page.on('download', (download) => downloads.push(download));
-  await page.getByLabel('Your resume', { exact: true }).fill(source);
+  await page.getByLabel('Resume text', { exact: true }).fill(source);
   const first = await readPdf(await submit(page));
   await page
     .getByText('Your browser cannot show PDFs here. Use Download PDF.', {
       exact: true,
     })
     .waitFor();
+  assert.equal(await page.locator('#preview-empty').isVisible(), false);
+  assert.equal(await page.locator('#result').isVisible(), true);
   assert.equal(await page.locator('#preview').getAttribute('aria-describedby'), 'preview-note');
   assert.equal(await page.locator('#preview').getAttribute('src'), null);
   assert.equal(await page.locator('#preview').isVisible(), false);
@@ -317,7 +373,7 @@ test('without native PDF viewing, one download is delivered with a usable fallba
 
 test('unsupported displayed glyphs block download and allow correction without losing text', async (t) => {
   const page = await openPage(t);
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   const invalid = source.replace('Product-focused engineer', '😀 Product-focused engineer');
   const downloads = [];
   page.on('download', (download) => downloads.push(download));
@@ -333,7 +389,7 @@ test('unsupported displayed glyphs block download and allow correction without l
 
 test('oversized job details block delivery, retain source and allow corrected resubmission', async (t) => {
   const page = await openPage(t);
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   const oversized = source.replace(
     'Employer: Example Studio',
     `Employer: BEGIN ${'Longword '.repeat(300)} ENDMARKER`,
@@ -376,7 +432,7 @@ for (const kind of ['unavailable', 'corrupt']) {
           })
         : route.continue(),
     );
-    const input = page.getByLabel('Your resume', { exact: true });
+    const input = page.getByLabel('Resume text', { exact: true });
     const downloads = [];
     page.on('download', (download) => downloads.push(download));
     await input.fill(source);
@@ -405,7 +461,7 @@ test('edits during pending fonts discard stale output and repeated submissions d
     await held;
     await route.continue();
   });
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   const downloads = [];
   page.on('download', (download) => downloads.push(download));
   try {
@@ -436,7 +492,7 @@ test('edits during pending fonts discard stale output and repeated submissions d
 
 test('editing an exported resume removes and revokes the old artifact before regeneration', async (t) => {
   const page = await openPage(t);
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   await input.fill(source);
   await submit(page);
   const url = (await artifactUrls(page)).download;
@@ -460,7 +516,7 @@ test('editing an exported resume removes and revokes the old artifact before reg
   assert.notEqual((await artifactUrls(page)).download, url);
 });
 
-test('interface stays within narrow and wide viewports, grows with input and keeps submit above it', async (t) => {
+test('interface stays within narrow and wide viewports, grows with input and keeps submit below it', async (t) => {
   const page = await openPage(t, { viewport: { width: 1280, height: 1000 } });
   await mkdir('output/ui', { recursive: true });
   for (const [name, width, height] of [
@@ -468,7 +524,7 @@ test('interface stays within narrow and wide viewports, grows with input and kee
     ['mobile', 390, 844],
   ]) {
     await page.setViewportSize({ width, height });
-    const input = page.getByLabel('Your resume', { exact: true });
+    const input = page.getByLabel('Resume text', { exact: true });
     await input.fill('');
     const initial = await input.boundingBox();
     await page.screenshot({ path: `output/ui/${name}-empty.png`, fullPage: true });
@@ -476,7 +532,7 @@ test('interface stays within narrow and wide viewports, grows with input and kee
     const expanded = await input.boundingBox();
     const button = await page.locator('#create-pdf').boundingBox();
     assert.ok(expanded.height > initial.height, 'Textarea expands with content');
-    assert.ok(button.y + button.height <= expanded.y, 'Submit stays above the text input');
+    assert.ok(button.y >= expanded.y + expanded.height, 'Submit follows the text editor');
     assert.ok(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
       'No horizontal overflow',
@@ -496,7 +552,7 @@ test('PDF assets stay lazy and engine load failure preserves source for reload r
     fail ? route.abort('failed') : route.continue(),
   );
   await page.reload();
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
   await page.locator('#error-summary').waitFor();
   assert.deepEqual(assets, [], 'Initial load and invalid submission load no PDF engine or fonts');
@@ -739,7 +795,7 @@ test('three local tools default to PDF Maker in one workspace with keyboard navi
 
 test('switching views preserves drafts, validation and expanded input across hidden resizes', async (t) => {
   const page = await openPage(t);
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   const invalid = source.replace(
     /@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/,
     '@@EDUCATION@@\n\n',
@@ -1141,7 +1197,7 @@ test('pending Job Finder clipboard feedback is discarded after edits or newer co
 test('optional sections export sparse content and use the existing title-free filename fallback', async (t) => {
   const page = await openPage(t);
   const sparse = await readFile(new URL('../examples/resume-sparse.txt', import.meta.url), 'utf8');
-  const input = page.getByLabel('Your resume', { exact: true });
+  const input = page.getByLabel('Resume text', { exact: true });
   await input.fill(sparse);
   const pdf = await readPdf(await submit(page), 'Resume.pdf');
   assert.ok(pdf.text.includes('Supportspecialistexperienced'));

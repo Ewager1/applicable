@@ -35,7 +35,7 @@ export function ChatbotInstructions() {
           </li>
           <li>
             Paste the complete text, including contact metadata and your applicable body sections,
-            into <strong>Your resume</strong> below, then choose <strong>Create PDF</strong>.
+            into <strong>Resume text</strong> below, then choose <strong>Create PDF</strong>.
           </li>
         </ol>
         <button

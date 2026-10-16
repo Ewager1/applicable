@@ -84,24 +84,25 @@ export function App() {
         >
           <section className="intro" aria-labelledby="page-title">
             <h1 id="page-title">Turn your resume into a polished PDF.</h1>
-            <p>
-              Resume PDF Maker turns your formatted resume text into a professional PDF. Paste your
-              resume, preview the result, and download it.
-            </p>
+            <p>Paste your resume in Applicable Format, then create your PDF.</p>
           </section>
           <ChatbotInstructions />
-          <ResumeForm
-            visible={view === 'builder'}
-            source={source}
-            state={state}
-            onSourceChange={(value) => {
-              invalidate('Resume updated. Create a PDF when you’re ready.');
-              setSource(value);
-            }}
-            onSubmit={() => void generate(source)}
-          />
-          <Status message={status} />
-          <PdfResult artifact={state.phase === 'ready' ? state.artifact : undefined} />
+          <div className="pdf-workspace">
+            <div className="resume-editor">
+              <ResumeForm
+                visible={view === 'builder'}
+                source={source}
+                state={state}
+                onSourceChange={(value) => {
+                  invalidate('Resume updated. Create a PDF when you’re ready.');
+                  setSource(value);
+                }}
+                onSubmit={() => void generate(source)}
+              />
+              <Status message={status} />
+            </div>
+            <PdfResult artifact={state.phase === 'ready' ? state.artifact : undefined} />
+          </div>
         </div>
         <div
           id="job-finder-panel"

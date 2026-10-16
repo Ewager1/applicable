@@ -91,7 +91,7 @@ test('StrictMode cancels unmounted work, delivers once after remount and revokes
     });
     try {
       await page.goto(origin);
-      await page.getByLabel('Your resume', { exact: true }).fill(source);
+      await page.getByLabel('Resume text', { exact: true }).fill(source);
       const requested = page.waitForRequest(/SourceSans3-Regular\.ttf/);
       await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
       await requested;
@@ -107,7 +107,7 @@ test('StrictMode cancels unmounted work, delivers once after remount and revokes
       assert.equal(downloads.length, 0, 'Unmounted pending work never delivers');
       assert.deepEqual(await page.evaluate(() => window.createdUrls), []);
       await page.evaluate(() => window.mountApp());
-      await page.getByLabel('Your resume', { exact: true }).fill(source);
+      await page.getByLabel('Resume text', { exact: true }).fill(source);
       for (let attempt = 0; attempt < 2; attempt++) {
         const downloaded = page.waitForEvent('download');
         await page.getByRole('button', { name: 'Create PDF', exact: true }).click();

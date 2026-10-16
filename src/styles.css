@@ -122,15 +122,6 @@ form {
   padding: 0;
 }
 
-.form-top,
-.result-top {
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
 label {
   display: block;
   font-size: 16px;
@@ -326,21 +317,75 @@ pre {
   margin: 0;
 }
 
-/* PDF result and download */
-.result {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
+/* Resume editor and actual PDF preview share one responsive workspace. */
+.pdf-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
 }
+
+.resume-editor,
+.document-preview {
+  min-width: 0;
+}
+
+.form-top {
+  margin-bottom: 14px;
+}
+
+#resume {
+  min-height: 420px;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+#preview-empty {
+  display: flex;
+  min-height: 420px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--page-background);
+}
+
+#preview-empty h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+#preview-empty p {
+  max-width: 240px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* PDF result and download */
 
 .result h2 {
   margin: 0;
-  font-size: 23px;
+  font-size: 18px;
   font-weight: 650;
   letter-spacing: -0.6px;
 }
 
 .result-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
@@ -369,6 +414,16 @@ iframe {
 }
 
 /* Responsive layout and user preferences */
+@media (max-width: 900px) {
+  .pdf-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #preview-empty {
+    min-height: 240px;
+  }
+}
+
 @media (max-width: 600px) {
   :root {
     background-image: none;
@@ -381,12 +436,6 @@ iframe {
 
   .workspace > [role='tabpanel'] {
     padding: 18px 14px;
-  }
-
-  .form-top {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 14px;
   }
 
   button[type='submit'],
