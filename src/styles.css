@@ -610,3 +610,29 @@ iframe {
     grid-template-columns: 1fr;
   }
 }
+
+/* Optional Resume Writer background; answers stay in the mounted tool panel. */
+.resume-writer-questionnaire {
+  margin: 28px 0;
+}
+
+.resume-writer-field {
+  margin: 24px 0;
+}
+
+.resume-writer-field p {
+  margin: 7px 0 10px;
+  font-size: 13px;
+}
+
+.resume-writer-questionnaire textarea {
+  min-height: 100px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.6;
+}
+
+.resume-writer-questionnaire details {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
