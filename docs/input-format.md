@@ -1,6 +1,6 @@
 # Applicable resume text format
 
-Applicable accepts a complete resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; use the chat code block’s Copy button and paste the entire result into the application. The parser, paste interface and shared production PDF integration are implemented. The application can copy the reusable chatbot instruction from its collapsible format help.
+Resume PDF Maker accepts a resume in this documented plain-text format. It does not import arbitrary Markdown or guess where jobs begin. A chatbot can produce this text directly; use the chat code block’s Copy button and paste the entire result into the application. Its collapsible format help provides reusable chatbot instructions independently of Resume Writer.
 
 See the complete [synthetic example](../examples/resume.txt), the [sparse example](../examples/resume-sparse.txt), the [volunteer/project example](../examples/resume-volunteer-projects.txt) and the reusable [chatbot instruction](../examples/chatbot-instruction.md).
 
