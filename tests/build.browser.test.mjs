@@ -1179,3 +1179,138 @@ test('volunteer/project paste exports new sections, links and company filename w
   await page.locator('#resume').fill(source);
   await readPdf(await submit(page), 'Untitled at Example Community Center Resume.pdf');
 });
+
+test('Resume Writer background is optional, keyboard expandable and transient across all tools', async (t) => {
+  const page = await openPage(t);
+  await page.addInitScript(() => {
+    window.backgroundStorageCalls = [];
+    for (const method of ['getItem', 'setItem', 'removeItem', 'clear']) {
+      const original = window.Storage.prototype[method];
+      window.Storage.prototype[method] = function (...args) {
+        window.backgroundStorageCalls.push([method, ...args]);
+        return original.apply(this, args);
+      };
+    }
+    const originalOpen = window.indexedDB.open.bind(window.indexedDB);
+    window.indexedDB.open = (...args) => {
+      window.backgroundStorageCalls.push(['indexedDB.open', ...args]);
+      return originalOpen(...args);
+    };
+  });
+  await page.reload();
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  const background = page.getByRole('region', { name: 'Help your Resume Writer get to know you' });
+  const fields = background.locator('textarea');
+  assert.equal(await background.getByRole('textbox').count(), 6);
+  assert.equal(await fields.count(), 12);
+  assert.deepEqual(
+    await background.locator(':scope > .resume-writer-field label').allTextContents(),
+    [
+      'What kinds of jobs are you interested in? (optional)',
+      'What did you actually spend your time doing in your most important jobs? (optional)',
+      'What professional accomplishments are you most proud of? (optional)',
+      'Did your work produce any measurable results? (optional)',
+      "Are there skills or responsibilities your resume doesn't fully explain? (optional)",
+      'Is there anything your Resume Writer should be careful not to overstate? (optional)',
+    ],
+  );
+  assert.match(
+    await background.textContent(),
+    /existing resumes will provide most of the information/,
+  );
+  assert.match(await background.textContent(), /All 12 questions are optional/);
+  assert.match(await background.textContent(), /reasonably supported numbers/);
+  assert.match(await background.textContent(), /estimates labeled as estimates/);
+  assert.match(await background.textContent(), /not sent anywhere or used by the formatting/);
+  const details = background.locator('details');
+  const summary = details.locator('summary');
+  assert.equal(await summary.textContent(), 'Tell us a little more');
+  assert.equal(await details.getAttribute('open'), null);
+  await summary.focus();
+  await summary.press('Enter');
+  assert.equal(await details.getAttribute('open'), '');
+  assert.equal(await background.getByRole('textbox').count(), 12);
+  await summary.press('Tab');
+  assert.equal(
+    await details
+      .locator('textarea')
+      .first()
+      .evaluate((el) => el === document.activeElement),
+    true,
+  );
+  assert.equal(await details.locator('label').count(), 6);
+  const expectedValues = [];
+  const longAnswer = 'Synthetic background: I organized supplies and helped coworkers.\n'.repeat(
+    160,
+  );
+  for (const [index, field] of (await fields.all()).entries()) {
+    const label = await field.evaluate((el) => el.labels[0].textContent);
+    assert.match(label, /\(optional\)/);
+    const description = await field.getAttribute('aria-describedby');
+    assert.match(await page.locator(`#${description}`).textContent(), /^Example: .+/);
+    assert.equal(await field.getAttribute('required'), null);
+    assert.equal(await field.getAttribute('minlength'), null);
+    assert.equal(await field.getAttribute('maxlength'), null);
+    const value = index % 3 === 0 ? '' : index % 3 === 1 ? "I don't know" : longAnswer;
+    expectedValues.push(value);
+    await field.fill(value);
+    assert.equal(await field.evaluate((el) => el.checkValidity()), true);
+  }
+  await summary.focus();
+  await summary.press('Space');
+  assert.equal(await details.getAttribute('open'), null);
+  for (const tool of ['Job Finder', 'Resume PDF Maker', 'Resume Writer']) {
+    await page.getByRole('tab', { name: tool, exact: true }).click();
+  }
+  for (const [index, field] of (await fields.all()).entries()) {
+    assert.equal(await field.inputValue(), expectedValues[index]);
+  }
+  await page.getByRole('button', { name: 'Open chatbot formatting instructions' }).click();
+  assert.equal(
+    await page.getByRole('tab', { name: 'Resume PDF Maker' }).getAttribute('aria-selected'),
+    'true',
+  );
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  assert.equal(await fields.nth(2).inputValue(), longAnswer);
+  assert.equal(await page.locator('#resume-writer-panel button').count(), 1);
+  assert.deepEqual(await page.evaluate(() => window.backgroundStorageCalls), [
+    ['removeItem', 'applicable.contact.v1'],
+  ]);
+  assert.deepEqual(
+    await page.evaluate(() => ({
+      local: { ...window.localStorage },
+      session: { ...window.sessionStorage },
+    })),
+    { local: {}, session: {} },
+  );
+  await page.reload();
+  await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+  assert.equal(await details.getAttribute('open'), null);
+  for (const field of await fields.all()) assert.equal(await field.inputValue(), '');
+});
+
+for (const width of [320, 1280]) {
+  test(`Resume Writer questions and examples remain readable at ${width}px`, async (t) => {
+    const page = await openPage(t, { viewport: { width, height: 900 }, hasTouch: width === 320 });
+    await page.getByRole('tab', { name: 'Resume Writer', exact: true }).click();
+    const background = page.getByRole('region', {
+      name: 'Help your Resume Writer get to know you',
+    });
+    await background.locator('summary').click();
+    for (const element of await background
+      .locator('label, .resume-writer-field p, textarea, summary')
+      .all()) {
+      const box = await element.boundingBox();
+      assert.ok(box.width > 0 && box.x >= 0 && box.x + box.width <= width);
+    }
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      true,
+    );
+    const field = background.getByRole('textbox').first();
+    await field.fill('Synthetic example: customer support\nI enjoy organizing appointments.');
+    assert.equal(await field.evaluate((el) => window.getComputedStyle(el).resize), 'vertical');
+    await mkdir('output/ui', { recursive: true });
+    await page.screenshot({ path: `output/ui/resume-writer-${width}.png`, fullPage: true });
+  });
+}
