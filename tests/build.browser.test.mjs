@@ -794,3 +794,189 @@ for (const width of [320, 375, 1280]) {
     }
   });
 }
+
+test('Job Finder copies latest optional answers in one action without preview and clears on reload', async (t) => {
+  const page = await openPage(t);
+  await page.evaluate(() => {
+    window.copiedJobFinderPrompt = '';
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text) => {
+          window.copiedJobFinderPrompt = text;
+        },
+      },
+    });
+  });
+  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  const form = page.getByRole('form', { name: 'Job Finder setup' });
+  const fields = form.locator('textarea');
+  const output = page.getByLabel('Your Job Finder prompt', { exact: true });
+  assert.equal(await fields.count(), 7);
+  for (const field of await fields.all()) {
+    assert.equal(await field.getAttribute('required'), null);
+    const help = await field.getAttribute('aria-describedby');
+    assert.ok((await page.locator(`#${help}`).textContent()).startsWith('Example:'));
+  }
+  const copy = form.getByRole('button', { name: 'Copy Prompt', exact: true });
+  assert.equal(await form.getByRole('button').count(), 1);
+  assert.equal(await output.count(), 0);
+  await copy.click();
+  await page.waitForFunction(() =>
+    document
+      .querySelector('#job-finder-copy-status')
+      .textContent.startsWith('Prompt created and copied.'),
+  );
+  const standard = await page.evaluate(() => window.copiedJobFinderPrompt);
+  assert.ok(standard.includes('Ask me to upload one or more previous resumes here in ChatGPT'));
+  assert.ok(!standard.includes('My questionnaire answers:'));
+  assert.equal(await output.count(), 0);
+  const values = [
+    '  Operations\nTraining 🚀  ',
+    'Remote',
+    'No nights',
+    'Small team',
+    '$70k, flexible',
+    'Mid-level',
+    'Changing industries',
+  ];
+  for (const [index, value] of values.entries()) await fields.nth(index).fill(value);
+  assert.equal(await output.count(), 0);
+  await copy.click();
+  await page.waitForFunction(() =>
+    document
+      .querySelector('#job-finder-copy-status')
+      .textContent.startsWith('Prompt created and copied.'),
+  );
+  const populated = await page.evaluate(() => window.copiedJobFinderPrompt);
+  for (const value of values) assert.ok(populated.includes(value.trim()));
+  const status = await page.locator('#job-finder-copy-status').textContent();
+  assert.match(status, /new ChatGPT conversation and upload your existing resumes there/);
+  assert.match(status, /Look for jobs/);
+  assert.equal(await output.count(), 0);
+  await page.getByRole('tab', { name: 'PDF Builder', exact: true }).click();
+  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  assert.equal(await output.count(), 0);
+  assert.equal(await fields.first().inputValue(), values[0]);
+  await fields.first().fill('Updated role');
+  assert.equal(await output.count(), 0);
+  assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
+  await copy.click();
+  const updated = await page.evaluate(() => window.copiedJobFinderPrompt);
+  assert.ok(updated.includes('Updated role'));
+  assert.ok(!updated.includes('Operations'));
+  assert.equal(await output.count(), 0);
+  await page.reload();
+  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  for (const field of await fields.all()) assert.equal(await field.inputValue(), '');
+  assert.equal(await output.count(), 0);
+  const storage = await page.evaluate(() => ({
+    local: { ...window.localStorage },
+    session: { ...window.sessionStorage },
+  }));
+  assert.equal(JSON.stringify(storage).includes('Updated role'), false);
+  assert.equal(JSON.stringify(storage).includes('Changing industries'), false);
+});
+
+test('Job Finder clipboard failure or absence focuses and selects manual output on mobile', async (t) => {
+  const page = await openPage(t, { viewport: { width: 320, height: 900 }, hasTouch: true });
+  await page.getByRole('tab', { name: 'Getting Started', exact: true }).tap();
+  await page.locator('#job-finder-roles').fill('Operations\nTraining');
+  for (const mode of ['reject', 'absent']) {
+    await page.evaluate(
+      (mode) =>
+        Object.defineProperty(navigator, 'clipboard', {
+          configurable: true,
+          value:
+            mode === 'absent'
+              ? undefined
+              : {
+                  writeText: async () => {
+                    throw new Error('denied');
+                  },
+                },
+        }),
+      mode,
+    );
+    await page.getByRole('button', { name: 'Copy Prompt', exact: true }).tap();
+    const selection = await page.locator('#job-finder-prompt').evaluate((element) => ({
+      focused: element === document.activeElement,
+      selected: element.value.slice(element.selectionStart, element.selectionEnd),
+      value: element.value,
+    }));
+    assert.equal(await page.locator('#job-finder-prompt').getAttribute('readonly'), '');
+    assert.equal(selection.focused, true);
+    assert.equal(selection.selected, selection.value);
+    assert.match(
+      await page.locator('#job-finder-copy-status').textContent(),
+      /use your device’s Copy command/,
+    );
+  }
+  assert.equal(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    true,
+  );
+  await mkdir('output/ui', { recursive: true });
+  await page.screenshot({ path: 'output/ui/job-finder-320.png', fullPage: true });
+  await page.locator('#job-finder-roles').fill('Updated role');
+  assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+  assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
+  await page.getByRole('button', { name: 'Copy Prompt', exact: true }).tap();
+  assert.ok((await page.locator('#job-finder-prompt').inputValue()).includes('Updated role'));
+  await page.evaluate(() =>
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async () => {} },
+    }),
+  );
+  await page.getByRole('button', { name: 'Copy Prompt', exact: true }).tap();
+  assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+  assert.match(
+    await page.locator('#job-finder-copy-status').textContent(),
+    /Prompt created and copied/,
+  );
+});
+
+test('pending Job Finder clipboard feedback is discarded after edits or newer copy requests', async (t) => {
+  const page = await openPage(t);
+  await page.evaluate(() =>
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () =>
+          new Promise((resolve, reject) => {
+            window.finishJobFinderCopy = resolve;
+            window.failJobFinderCopy = reject;
+          }),
+      },
+    }),
+  );
+  await page.getByRole('tab', { name: 'Getting Started', exact: true }).click();
+  for (const outcome of ['finishJobFinderCopy', 'failJobFinderCopy']) {
+    await page.getByRole('button', { name: 'Copy Prompt', exact: true }).click();
+    await page.locator('#job-finder-roles').fill(outcome);
+    await page.evaluate((outcome) => window[outcome](), outcome);
+    assert.equal(await page.locator('#job-finder-copy-status').textContent(), '');
+    assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+  }
+  const copy = page.getByRole('button', { name: 'Copy Prompt', exact: true });
+  await copy.click();
+  await page.evaluate(() => {
+    window.failOlderJobFinderCopy = window.failJobFinderCopy;
+  });
+  await copy.click();
+  await page.evaluate(() => window.finishJobFinderCopy());
+  await page.waitForFunction(() =>
+    document
+      .querySelector('#job-finder-copy-status')
+      .textContent.startsWith('Prompt created and copied.'),
+  );
+  const success = await page.locator('#job-finder-copy-status').textContent();
+  assert.match(success, /Prompt created and copied/);
+  await page.evaluate(async () => {
+    window.failOlderJobFinderCopy();
+    await new Promise(window.requestAnimationFrame);
+  });
+  assert.equal(await page.locator('#job-finder-copy-status').textContent(), success);
+  assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+});
