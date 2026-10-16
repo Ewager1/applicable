@@ -40,10 +40,10 @@ main {
 
 .masthead {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 24px 0 18px;
-  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 20px 0 18px;
 }
 
 .brand {
@@ -63,11 +63,10 @@ main {
 }
 
 .tagline {
-  font-size: clamp(31px, 4vw, 34px);
-  font-weight: 650;
-  letter-spacing: -1px;
-  line-height: 1.15;
-  margin: 24px 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 0;
 }
 
 .workspace {
@@ -80,12 +79,16 @@ main {
   padding: 24px;
 }
 
-.intro > p:last-child {
-  max-width: 480px;
+.intro > p {
+  max-width: 720px;
   color: var(--muted);
   line-height: 1.65;
   font-size: 15px;
   margin: 0;
+}
+
+.intro > p + p {
+  margin-top: 12px;
 }
 
 footer {
@@ -497,11 +500,11 @@ iframe {
   font-size: 14px;
   line-height: 1.65;
 }
-.intro h2 {
-  font-size: clamp(30px, 5vw, 46px);
-  letter-spacing: -1.4px;
-  line-height: 1.12;
-  margin: 0 0 18px;
+.intro h1 {
+  font-size: clamp(26px, 3vw, 32px);
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+  margin: 0 0 12px;
 }
 @media (max-width: 600px) {
   .view-tabs button {
@@ -512,6 +515,10 @@ iframe {
 }
 
 /* Optional Resume Writer background; answers stay in the mounted tool panel. */
+.resume-writer-questionnaire h2 {
+  font-size: 18px;
+}
+
 .resume-writer-questionnaire {
   margin: 28px 0;
 }
