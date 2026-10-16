@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { buildResumeWriterPrompt } from '../resume-writer/prompt.ts';
+import formatInstructions from '../../examples/chatbot-instruction.md?raw';
 import {
   additionalQuestions,
   emptyResumeWriterAnswers,
@@ -8,6 +10,47 @@ import {
 
 export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
   const [answers, setAnswers] = useState<ResumeWriterAnswers>(emptyResumeWriterAnswers);
+
+  const [fallbackPrompt, setFallbackPrompt] = useState('');
+  const [status, setStatus] = useState('');
+  const output = useRef<HTMLTextAreaElement>(null);
+  // Edits and newer requests invalidate pending clipboard feedback.
+  const revision = useRef(0);
+
+  useLayoutEffect(() => {
+    if (fallbackPrompt) {
+      output.current?.focus();
+      output.current?.select();
+    }
+  }, [fallbackPrompt]);
+
+  function clearCopyFeedback() {
+    revision.current += 1;
+    setFallbackPrompt('');
+    setStatus('');
+  }
+
+  async function copy() {
+    const prompt = buildResumeWriterPrompt(answers, formatInstructions);
+    const currentRevision = ++revision.current;
+    setFallbackPrompt('');
+    setStatus('');
+    try {
+      await navigator.clipboard.writeText(prompt);
+      if (currentRevision === revision.current)
+        setStatus(
+          'Setup prompt copied. Paste it into a new ChatGPT conversation and upload one or more existing resumes there. Reuse that conversation for future jobs.',
+        );
+    } catch {
+      if (currentRevision !== revision.current) return;
+      setFallbackPrompt(prompt);
+      setStatus(
+        'Copy was unavailable. The prompt is selected below; use your device’s Copy command.',
+      );
+      output.current?.focus();
+      output.current?.select();
+    }
+  }
 
   function renderQuestions(questions: typeof mainQuestions) {
     return questions.map(({ key, label, example }) => (
@@ -21,7 +64,10 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
           rows={3}
           aria-describedby={`resume-writer-${key}-example`}
           value={answers[key]}
-          onChange={(event) => setAnswers({ ...answers, [key]: event.target.value })}
+          onChange={(event) => {
+            clearCopyFeedback();
+            setAnswers({ ...answers, [key]: event.target.value });
+          }}
         />
       </div>
     ));
@@ -58,9 +104,9 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
           questions and continue learning about your experience as you use it.
         </p>
         <p>
-          Answers stay on this page while you switch tools and reset on reload. The setup prompt is
-          coming in the next update; these answers are not sent anywhere or used by the formatting
-          instructions below.
+          Answers and your setup prompt stay on this page while you switch tools and reset on
+          reload. Copy Setup Prompt includes any answers you provide; skipping every question is
+          fine. Nothing is sent to ChatGPT until you paste it there.
         </p>
         {renderQuestions(mainQuestions)}
         <details>
@@ -69,22 +115,47 @@ export function ResumeWriter({ onFormatHelp }: { onFormatHelp: () => void }) {
           {renderQuestions(additionalQuestions)}
         </details>
       </section>
-      <p className="tool-guidance">
-        The dedicated Resume Writer setup prompt is not available yet. You can start your own
-        conversation using this guidance:
+      <button className="resume-writer-copy" type="button" onClick={() => void copy()}>
+        Copy Setup Prompt
+      </button>
+      <p id="resume-writer-copy-status" className="status" role="status" aria-live="polite">
+        {status}
       </p>
+      {fallbackPrompt && (
+        <div className="resume-writer-output">
+          <label htmlFor="resume-writer-prompt">Your Resume Writer setup prompt</label>
+          <p id="resume-writer-manual-help">
+            Copy this prompt into a new ChatGPT conversation, then upload your existing resumes
+            there.
+          </p>
+          <textarea
+            ref={output}
+            id="resume-writer-prompt"
+            readOnly
+            rows={16}
+            value={fallbackPrompt}
+            aria-describedby="resume-writer-manual-help resume-writer-copy-status"
+          />
+        </div>
+      )}
       <ol className="tool-steps">
-        <li>Start a separate ChatGPT conversation and ask for help tailoring your resume.</li>
-        <li>Upload one or more previous resumes.</li>
-        <li>Answer questions about your skills, experience, and accomplishments.</li>
+        <li>Copy your setup prompt, with or without optional answers.</li>
+        <li>Paste it into a new, separate ChatGPT conversation.</li>
         <li>
-          Provide a job description whenever you want to prepare a tailored resume. Keep the facts
-          accurate and review the result.
+          Upload one or more existing resumes to ChatGPT and answer its short clarification
+          questions.
         </li>
         <li>
-          Use the existing chatbot formatting instructions to prepare text for Resume PDF Maker.
+          Share a job description whenever you are ready to tailor a resume. Review every result for
+          accuracy.
         </li>
+        <li>Reuse the same conversation for future jobs and ask for either resume format.</li>
       </ol>
+      <p className="tool-guidance">
+        Standard Resume is the default: conventional headings and bullets you can use on their own.
+        Ask for Applicable Format when you want structured text to paste into Resume PDF Maker.
+        ChatGPT can also help with cover letters and application responses when you ask.
+      </p>
       <button className="secondary" type="button" onClick={onFormatHelp}>
         Open chatbot formatting instructions
       </button>

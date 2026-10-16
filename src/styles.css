@@ -143,13 +143,15 @@ button,
   white-space: nowrap;
 }
 
-button[type='submit'] {
+button[type='submit'],
+.resume-writer-copy {
   color: var(--surface);
   background: var(--accent);
   border: 1px solid var(--accent);
 }
 
-button[type='submit']:hover {
+button[type='submit']:hover,
+.resume-writer-copy:hover {
   background: var(--accent-hover);
 }
 
@@ -375,7 +377,8 @@ iframe {
     gap: 14px;
   }
 
-  button[type='submit'] {
+  button[type='submit'],
+  .resume-writer-copy {
     width: 100%;
   }
 
@@ -635,4 +638,16 @@ iframe {
 .resume-writer-questionnaire details {
   border-top: 1px solid var(--border);
   padding-top: 18px;
+}
+
+.resume-writer-output {
+  margin: 18px 0;
+}
+
+.resume-writer-output textarea {
+  min-height: 320px;
+  margin: 12px 0;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.6;
 }

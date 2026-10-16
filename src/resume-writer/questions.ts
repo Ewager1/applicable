@@ -1,4 +1,4 @@
-// Stable answer keys let the setup prompt reuse this optional background in the next phase.
+// Stable answer keys are shared by the questionnaire and local setup prompt.
 export interface ResumeWriterAnswers {
   interestedJobs: string;
   everydayWork: string;
