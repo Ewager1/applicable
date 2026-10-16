@@ -34,7 +34,6 @@ const symbolMarkers = new Map([
   ['@@EDUCATION_ENTRY@@', '## Education'],
   ['@@CERTIFICATION@@', '## Certification'],
 ]);
-const sectionMarker = (key: string) => `@@${key.toUpperCase().replaceAll(' ', '_')}@@`;
 
 /**
  * Parse the documented Applicable text format without rewriting supplied content.
@@ -148,7 +147,8 @@ export function parseResume(source: unknown): ParseResult {
         ? errors
         : [
             {
-              message: 'Paste a complete resume with all six required body markers.',
+              message:
+                'Include at least one nonempty body section using the resume format markers.',
               line: nonblank[0]?.line ?? null,
             },
           ],
@@ -157,10 +157,7 @@ export function parseResume(source: unknown): ParseResult {
 
   const readSectionLines = (key: string): SourceLine[] => {
     const block = sectionBlocks.get(key);
-    if (!block) {
-      report(`${sectionTitles.get(key)} is missing. Add ${sectionMarker(key)}.`);
-      return [];
-    }
+    if (!block) return [];
     const lines = block.lines.filter((item) => item.text.trim());
     if (!lines.length) report(`Add content under ${block.title}.`, block.line);
     return lines;

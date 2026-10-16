@@ -213,12 +213,18 @@ test('clipboard denial exposes focused complete instructions without changing th
 test('symbol markers and an outer text code block export complete ordered PDF content after correction', async (t) => {
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
-  const invalid = source.replace(/@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/, '');
+  const invalid = source.replace(
+    /@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/,
+    '@@EDUCATION@@\n\n',
+  );
   const downloads = [];
   page.on('download', (event) => downloads.push(event));
   await input.fill(invalid);
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
-  await page.getByText('Education is missing. Add @@EDUCATION@@.', { exact: true }).waitFor();
+  const educationLine = invalid.split('\n').indexOf('@@EDUCATION@@') + 1;
+  await page
+    .getByText(`Line ${educationLine}: Add content under Education.`, { exact: true })
+    .waitFor();
   assert.equal(await input.inputValue(), invalid);
   assert.equal(await input.getAttribute('aria-invalid'), 'true');
   assert.equal(await page.evaluate(() => document.activeElement.id), 'error-summary');
@@ -739,7 +745,10 @@ test('switching views preserves drafts, validation and expanded input across hid
   const page = await openPage(t);
   const input = page.getByLabel('Your resume', { exact: true });
   const company = page.locator('#company');
-  const invalid = source.replace(/@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/, '');
+  const invalid = source.replace(
+    /@@EDUCATION@@[\s\S]*?(?=@@CERTIFICATIONS@@)/,
+    '@@EDUCATION@@\n\n',
+  );
   await input.fill(invalid);
   await company.fill('Example Company');
   await page.getByRole('button', { name: 'Create PDF', exact: true }).click();
@@ -1114,4 +1123,21 @@ test('pending Job Finder clipboard feedback is discarded after edits or newer co
   });
   assert.equal(await page.locator('#job-finder-copy-status').textContent(), success);
   assert.equal(await page.locator('#job-finder-prompt').count(), 0);
+});
+
+test('optional sections export sparse content and use the existing title-free filename fallback', async (t) => {
+  const page = await openPage(t);
+  const sparse = await readFile(new URL('../examples/resume-sparse.txt', import.meta.url), 'utf8');
+  const input = page.getByLabel('Your resume', { exact: true });
+  await input.fill(sparse);
+  const pdf = await readPdf(await submit(page), 'Resume.pdf');
+  assert.ok(pdf.text.includes('Supportspecialistexperienced'));
+  assert.ok(pdf.text.includes('SKILLS'));
+  for (const heading of ['RELEVANTEXPERIENCE', 'EDUCATION', 'CERTIFICATIONS'])
+    assert.equal(pdf.text.includes(heading), false);
+  assert.equal(await input.inputValue(), sparse);
+  assert.deepEqual(Buffer.from((await artifactUrls(page)).bytes), pdf.bytes);
+  await page.getByLabel('Company you’re applying to', { exact: false }).fill('Example Team');
+  const named = await readPdf(await submit(page), 'Untitled at Example Team Resume.pdf');
+  assert.equal(named.text, pdf.text);
 });

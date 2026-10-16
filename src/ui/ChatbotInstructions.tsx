@@ -34,7 +34,7 @@ export function ChatbotInstructions() {
             all of the returned text.
           </li>
           <li>
-            Enter your contact details, paste the six body sections into{' '}
+            Enter your contact details, paste your applicable body sections into{' '}
             <strong>Your resume</strong> below, then choose <strong>Create PDF</strong>.
           </li>
         </ol>

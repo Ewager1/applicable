@@ -621,3 +621,97 @@ test('name-only PDF omits the contact row and displays the complete body', async
   const title = items.find((item) => item.str === 'Full-');
   assert.ok(name.transform[5] - title.transform[5] < 35, 'No empty contact-row spacing');
 });
+
+const emptyBody = {
+  title: '',
+  summary: '',
+  jobs: [],
+  education: [],
+  certifications: [],
+  skills: [],
+};
+const bodyFields = Object.keys(emptyBody);
+const entrySections = [
+  ['jobs', 'RELEVANT EXPERIENCE', (resume) => resume.jobs[0].employer],
+  ['education', 'EDUCATION', (resume) => resume.education[0].qualification],
+  ['certifications', 'CERTIFICATIONS', (resume) => resume.certifications[0].title],
+  ['skills', 'SKILLS', (resume) => resume.skills[0].category],
+];
+function checkIncludedHeadings(pages, resume) {
+  const all = pages.map((page) => page.text).join('');
+  for (const [field, heading, firstValue] of entrySections) {
+    if (!resume[field].length) {
+      assert.equal(all.includes(compact(heading)), false, `Absent ${field} has no heading`);
+      continue;
+    }
+    const page = pages.find((page) => page.text.includes(compact(heading)));
+    assert.ok(page, `Included ${field} has a heading`);
+    assert.ok(page.text.includes(compact(firstValue(resume))), `No orphaned ${field} heading`);
+  }
+}
+
+for (const field of bodyFields) {
+  test(`PDF with only ${field} preserves content, links and compact first-section spacing`, async () => {
+    const resume = { ...parsedExample, ...emptyBody, [field]: parsedExample[field] };
+    const pages = await inspect(resume);
+    assert.equal(pages.length, 1);
+    checkIncludedHeadings(pages, resume);
+    const visible = pages[0].items.filter((item) => item.str.trim());
+    const headerEnd = Math.min(
+      ...visible
+        .filter((item) => resume.contact.some((row) => row.text === item.str))
+        .map((item) => item.transform[5]),
+    );
+    assert.ok(Number.isFinite(headerEnd));
+    const firstBodyLine = Math.max(
+      ...visible
+        .filter((item) => item.transform[5] < headerEnd - 1)
+        .map((item) => item.transform[5]),
+    );
+    assert.ok(headerEnd - firstBodyLine < 36, 'Omitted sections leave no accumulated blank space');
+    const links = pages[0].annotations.filter((annotation) => annotation.subtype === 'Link');
+    assert.deepEqual(
+      [...new Set(links.map((link) => link.url))].sort(),
+      parsedExample.contact
+        .filter((row) => row.link)
+        .map((row) => new URL(row.link).href)
+        .sort(),
+    );
+  });
+  test(`PDF without ${field} retains the other sections`, async () => {
+    const resume = { ...parsedExample, [field]: emptyBody[field] };
+    checkIncludedHeadings(await inspect(resume), resume);
+  });
+}
+
+test('sparse long summary keeps the last and only entry section with its content', async () => {
+  for (const field of ['education', 'certifications', 'skills']) {
+    const resume = {
+      ...parsedExample,
+      ...emptyBody,
+      summary: 'Documented synthetic support procedures and resolved customer questions. '.repeat(
+        130,
+      ),
+      [field]: parsedExample[field],
+    };
+    const pages = await inspect(resume);
+    assert.ok(pages.length > 1);
+    checkIncludedHeadings(pages, resume);
+  }
+});
+
+test('experience alone retains multi-page first-bullet continuation and its header', async () => {
+  const resume = {
+    ...stressFixture('multi-page-bullet'),
+    title: '',
+    summary: '',
+    education: [],
+    certifications: [],
+    skills: [],
+  };
+  const pages = await inspect(resume);
+  assert.ok(pages.length >= 2);
+  checkIncludedHeadings(pages, resume);
+  assert.ok(pages[0].text.includes('Beginningofonelongbullet.'));
+  assert.ok(pages.slice(1).some((page) => page.text.includes('Endofthesamelongbullet.')));
+});

@@ -17,7 +17,7 @@ The UI parses the entire source, loads/caches local fonts and awaits generation.
 
 ## Current layout
 
-US Letter, white background, 43 pt margins and one column. The B2 visual identity supersedes the earlier reference-matching typography. Contact information, title and summary do not acquire visible uppercase headings.
+US Letter, white background, 43 pt margins and one column. The B2 visual identity supersedes the earlier reference-matching typography. Contact information, title and summary do not acquire visible uppercase headings. Each body section may be omitted; omitted sections produce no content nodes, headings, dividers or section spacing. Keep-groups are registered only for included entries, including when an entry section is first, last or the only body section. Existing complete resumes retain the same layout dimensions and styles.
 
 | Semantic role                              | Source Sans 3 weight | Size     | Color                                             |
 | ------------------------------------------ | -------------------- | -------- | ------------------------------------------------- |

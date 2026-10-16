@@ -37,6 +37,7 @@ export interface Resume extends ResumeBody {
   name: string;
   contact: ContactDetail[];
 }
+/** Omitted sections use empty strings/arrays; included sections are validated in full. */
 export interface ResumeBody {
   title: string;
   /** Paragraphs separated by two newlines. */
