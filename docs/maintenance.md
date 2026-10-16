@@ -73,7 +73,7 @@ npm run proof:generate
 npm run check
 ```
 
-The generated coverage is the intersection of the actual bundled font glyphs with SHA-256 hashes, not a manually edited character list. Preserve the fail-with-correction behavior for unsupported displayed glyphs; hidden URL destinations are not font coverage checks. Tests verify real embedded font identities/weights as well as text, links and bounds.
+[`scripts/font-coverage.mjs`](../scripts/font-coverage.mjs), invoked by `npm run fonts:coverage`, reads every bundled font using pdfmake’s pinned font reader and regenerates `src/pdf/font-coverage.ts`. It records the intersection of supported glyph ranges and each font’s SHA-256 hash for production glyph validation and regression checks. Run it after intentional font changes; do not edit the generated character list by hand. Preserve the fail-with-correction behavior for unsupported displayed glyphs; hidden URL destinations are not font coverage checks. Tests verify real embedded font identities/weights as well as text, links and bounds.
 
 `proof:generate` writes seven synthetic PDFs to ignored `output/pdf/`. Render the changed pages with Poppler (`pdftoppm -r 100 -png <pdf> <output-prefix>`) and inspect the [layout checklist](../proof/README.md). Compare page counts, extracted text/order/links, actual coordinates/fonts/colors and page images rather than metadata-sensitive PDF byte hashes. Inspect header/bullet transitions, dividers and wrapped metadata at normal PDF scale.
 

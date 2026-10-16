@@ -69,6 +69,8 @@ The field grows with your text up to the available viewport, then scrolls. There
 ## Development documents
 
 - [Maintenance guide and edit/check map](docs/maintenance.md)
+- [Source structure and tooling](docs/development.md)
+- [PDF proof, fixtures and baselines](proof/README.md)
 - [Clean-source verification](docs/verification.md)
 - [Production PDF template](docs/pdf-template.md)
 - [Resume input format](docs/input-format.md)

@@ -1,6 +1,6 @@
 # Local development agent usage
 
-This optional, dependency-free Node tool benchmarks development agent/model work. It reads the locally observed Codex JSONL format, which is not a guaranteed public API. It does not affect the app or configured models, contact a provider, require an API key, run a watcher, or measure billed credits/dollars.
+[`scripts/agent-usage.mjs`](../scripts/agent-usage.mjs) is an optional, dependency-free Node CLI for observing development agent/model work. It reads the locally observed Codex JSONL format, which is not a guaranteed public API. It does not affect the app or configured models, contact a provider, require an API key, run a watcher, or measure billed credits/dollars.
 
 Run commands from the repository root with the supported Node version:
 
