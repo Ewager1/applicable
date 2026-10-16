@@ -472,6 +472,7 @@ iframe {
 
 .view-tabs {
   display: flex;
+  padding: 6px 6px 0;
   border-bottom: 1px solid var(--border);
   border-radius: 14px 14px 0 0;
   background: var(--page-background);
@@ -479,6 +480,8 @@ iframe {
 
 .view-tabs button {
   flex: 1;
+  font-size: 15px;
+  line-height: 1.35;
   min-width: 0;
   color: var(--text-primary);
   background: transparent;
@@ -487,12 +490,8 @@ iframe {
   border-radius: 0;
 }
 
-.view-tabs button:first-child {
-  border-top-left-radius: 13px;
-}
-
-.view-tabs button:last-child {
-  border-top-right-radius: 13px;
+.view-tabs button + button {
+  border-left: 1px solid var(--border);
 }
 
 .view-tabs button:focus-visible {
@@ -521,16 +520,18 @@ iframe {
   line-height: 1.65;
 }
 .intro h1 {
-  font-size: clamp(26px, 3vw, 32px);
-  letter-spacing: -0.8px;
-  line-height: 1.2;
+  color: var(--accent-hover);
+  font-size: clamp(24px, 2.5vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
   margin: 0 0 12px;
 }
 @media (max-width: 600px) {
   .view-tabs button {
-    padding: 10px 5px;
+    padding: 10px 3px;
     white-space: normal;
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
